@@ -31,3 +31,26 @@
 - Pushed initial commit to GitHub
 
 Repository is now properly initialized and synchronized.
+
+## Step 2 – Python Environment Setup (Completed)
+
+### Interpreter Configuration
+- Installed Python 3.11
+- Created virtual environment using Python 3.11
+- Activated isolated environment
+
+### Deep Learning Framework
+- Installed PyTorch (CPU version)
+- Verified successful import
+
+### Supporting Libraries Installed
+- NiBabel (MRI loading)
+- NumPy (numerical operations)
+- Pandas (metadata handling)
+- OpenCV (image preprocessing)
+- Matplotlib (visualization)
+- Scikit-learn (evaluation metrics)
+
+### Reproducibility
+- Generated requirements.txt using pip freeze
+- Locked exact dependency versions
