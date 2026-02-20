@@ -61,3 +61,19 @@ def get_label_from_patient_folder(patient_folder: str) -> int:
     label = is_abnormal(seg_volume)
 
     return label
+    
+
+def get_normal_label_from_oasis(file_path: str) -> int:
+    """
+    Returns label for OASIS dataset.
+
+    Since OASIS dataset contains healthy controls,
+    every MRI volume is labeled as 0 (Normal).
+
+    Parameters:
+        file_path (str): Path to OASIS .nii file
+
+    Returns:
+        int: 0 (normal)
+    """
+    return 0

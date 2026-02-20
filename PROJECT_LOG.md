@@ -65,8 +65,13 @@ Repository is now properly initialized and synchronized.
   - FLAIR modality
   - Segmentation masks
 - Defined abnormal labeling logic (segmentation-based)
-  # Abnormal Label Extraction Logic
-  - Implemented segmentation-based labeling
-  - Created src/label_utils.py
-  - Verified tumor detection using BRATS segmentation mask
-  - Confirmed correct abnormal label generation (Label = 1)
+### Abnormal Label Extraction Logic
+- Implemented segmentation-based labeling
+- Created src/label_utils.py
+- Verified tumor detection using BRATS segmentation mask
+- Confirmed correct abnormal label generation (Label = 1)
+### OASIS Dataset (Normal Class)
+- Downloaded via Kaggle API
+- Verified NIfTI volume structure
+- Implemented normal label logic
+- Confirmed correct label assignment (Label = 0)
