@@ -54,3 +54,19 @@ Repository is now properly initialized and synchronized.
 ### Reproducibility
 - Generated requirements.txt using pip freeze
 - Locked exact dependency versions
+
+## Step 3 – Dataset Setup (In Progress)
+
+### BRATS 2020 Dataset (Abnormal Class)
+- Downloaded via Kaggle API
+- Extracted to: data/raw/brats
+- Verified patient folder structure
+- Confirmed availability of:
+  - FLAIR modality
+  - Segmentation masks
+- Defined abnormal labeling logic (segmentation-based)
+  # Abnormal Label Extraction Logic
+  - Implemented segmentation-based labeling
+  - Created src/label_utils.py
+  - Verified tumor detection using BRATS segmentation mask
+  - Confirmed correct abnormal label generation (Label = 1)
