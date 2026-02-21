@@ -103,3 +103,15 @@ Preprocessing pipeline initiated.
 - Confirmed floating-point precision within expected tolerance
 
 MRI intensity normalization validated.
+
+### Step 4.3 – Axial Slice Extraction & Empty Slice Filtering (Completed)
+
+- Implemented axial slice extraction from 3D MRI volume
+- Added configurable non-zero pixel threshold filtering
+- Removed near-empty/background slices
+- Verified slice reduction:
+  - Original depth: 155 slices
+  - Valid slices retained: 126
+- Confirmed slice dimensions: (240, 240)
+
+Axial slice preparation validated for downstream 2.5D stacking.
