@@ -55,7 +55,7 @@ Repository is now properly initialized and synchronized.
 - Generated requirements.txt using pip freeze
 - Locked exact dependency versions
 
-## Step 3 – Dataset Setup (In Progress)
+## Step 3 – Dataset Setup (Completed)
 
 ### BRATS 2020 Dataset (Abnormal Class)
 - Downloaded via Kaggle API
@@ -64,14 +64,30 @@ Repository is now properly initialized and synchronized.
 - Confirmed availability of:
   - FLAIR modality
   - Segmentation masks
-- Defined abnormal labeling logic (segmentation-based)
+
 ### Abnormal Label Extraction Logic
 - Implemented segmentation-based labeling
 - Created src/label_utils.py
 - Verified tumor detection using BRATS segmentation mask
 - Confirmed correct abnormal label generation (Label = 1)
+
 ### OASIS Dataset (Normal Class)
 - Downloaded via Kaggle API
 - Verified NIfTI volume structure
 - Implemented normal label logic
 - Confirmed correct label assignment (Label = 0)
+
+Dataset layer fully validated.
+
+## Step 4 – MRI Volume Preprocessing Pipeline (In Progress)
+
+### Step 4.1 – NIfTI Volume Loading (Completed)
+
+- Implemented NIfTI loader using nibabel
+- Created: src/preprocessing/load_nifti.py
+- Successfully loaded BRATS FLAIR volume
+- Verified shape: (240, 240, 155)
+- Verified dtype: float32
+- Confirmed environment and file path handling
+
+Preprocessing pipeline initiated.
