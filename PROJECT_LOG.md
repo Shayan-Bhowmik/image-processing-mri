@@ -91,3 +91,15 @@ Dataset layer fully validated.
 - Confirmed environment and file path handling
 
 Preprocessing pipeline initiated.
+
+### Step 4.2 – Z-Score Normalization (Completed)
+
+- Implemented volume-wise Z-score normalization
+- Normalization applied only to non-zero voxels
+- Prevented division-by-zero edge cases
+- Verified statistical correctness:
+  - Mean ≈ 0
+  - Std ≈ 1
+- Confirmed floating-point precision within expected tolerance
+
+MRI intensity normalization validated.
