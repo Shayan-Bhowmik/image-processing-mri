@@ -115,3 +115,24 @@ MRI intensity normalization validated.
 - Confirmed slice dimensions: (240, 240)
 
 Axial slice preparation validated for downstream 2.5D stacking.
+
+### Step 4.4 – 2.5D Slice Stacking (Completed)
+
+- Implemented neighbor-based stacking strategy
+- Constructed samples using:
+  [previous_slice, current_slice, next_slice]
+- Handled boundary conditions via slice duplication
+- Converted 2D slices → 3-channel 2.5D samples
+- Verified output shape: (3, 240, 240)
+- Maintained channel-first format
+
+Local volumetric context successfully integrated.
+
+### Step 4.5 – Resize for CNN Compatibility (Completed)
+
+- Implemented bilinear interpolation resizing using PyTorch
+- Resized 2.5D samples from (3, 240, 240) to (3, 224, 224)
+- Returned output as torch.Tensor
+- Verified compatibility with pretrained CNN input requirements
+
+CNN-ready tensor pipeline validated.
