@@ -165,3 +165,29 @@ CNN-ready tensor pipeline validated.
 - Forms the foundation of model training pipeline
 
 Patient-level dataset partitioning validated and production-ready.
+
+### Step 5.2 – Custom Slice-Level PyTorch Dataset (Completed)
+
+- Created: `src/data/mri_dataset.py`
+- Integrated preprocessing pipeline inside Dataset:
+  - NIfTI loading
+  - Z-score normalization
+  - Axial slice filtering
+  - 2.5D stacking
+  - Bilinear resizing to (224, 224)
+- Refactored to slice-level dataset design
+- Implemented memory-safe lazy loading strategy
+- Built slice index mapping to prevent full dataset memory loading
+- Dataset now returns:
+  - Tensor shape: (3, 224, 224)
+  - Label: 0 (normal) or 1 (abnormal)
+
+### Dataset Statistics (Training Split):
+- Patients: 244
+- Total slice samples: 32,405
+- Output dtype: torch.float32
+
+### Architectural Impact:
+- Enables standard PyTorch DataLoader batching
+- Scalable to full dataset without memory overflow
+- Fully compatible with CNN training pipeline
