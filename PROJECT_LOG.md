@@ -79,7 +79,7 @@ Repository is now properly initialized and synchronized.
 
 Dataset layer fully validated.
 
-## Step 4 – MRI Volume Preprocessing Pipeline (In Progress)
+## Step 4 – MRI Volume Preprocessing Pipeline (Completed)
 
 ### Step 4.1 – NIfTI Volume Loading (Completed)
 
@@ -136,3 +136,32 @@ Local volumetric context successfully integrated.
 - Verified compatibility with pretrained CNN input requirements
 
 CNN-ready tensor pipeline validated.
+
+## Step 5 – Dataset Architecture (In Progress)
+
+### Step 5.1 – Leakage-Safe Patient-Level Split (Completed)
+
+- Created: `src/data/split_dataset.py`
+- Implemented patient folder discovery utility
+- Identified correct patient directory level:
+  - `MICCAI_BraTS2020_TrainingData`
+- Built deterministic train/val/test split function
+- Used fixed random seed for reproducibility
+- Enforced patient-level separation to prevent data leakage
+- Persisted split to:
+  - `data/splits/patient_split.json`
+- Corrected `.gitignore` rule to allow tracking of `src/data/`
+
+### Split Summary:
+- Total patients: 350  
+- Train: 244  
+- Validation: 52  
+- Test: 54  
+
+### Architectural Impact:
+- Guarantees leakage-safe experimentation
+- Establishes reproducible dataset partitioning
+- Prepares integration with custom PyTorch Dataset
+- Forms the foundation of model training pipeline
+
+Patient-level dataset partitioning validated and production-ready.

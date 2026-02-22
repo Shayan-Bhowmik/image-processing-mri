@@ -9,7 +9,9 @@ venv/
 .env
 
 # Data files
-data/
+/data/*
+!/data/splits/
+!/data/splits/patient_split.json
 *.nii
 *.nii.gz
 
