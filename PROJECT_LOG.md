@@ -191,3 +191,22 @@ Patient-level dataset partitioning validated and production-ready.
 - Enables standard PyTorch DataLoader batching
 - Scalable to full dataset without memory overflow
 - Fully compatible with CNN training pipeline
+
+### Step 5.3 – Train / Validation / Test DataLoaders (Completed)
+
+- Created: `src/data/dataloaders.py`
+- Implemented centralized DataLoader builder function
+- Connected patient-level split with slice-level Dataset
+- Configured:
+  - Train loader (shuffle=True)
+  - Validation loader (shuffle=False)
+  - Test loader (shuffle=False)
+- Verified batch output:
+  - Image shape: (B, 3, 224, 224)
+  - Label shape: (B)
+
+### Architectural Impact:
+- Enables efficient mini-batch training
+- Maintains leakage-safe data separation
+- Fully compatible with PyTorch training loop
+- Marks completion of end-to-end data pipeline
