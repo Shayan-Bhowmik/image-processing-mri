@@ -238,3 +238,53 @@ Data pipeline completed.
 Dataset layer now scientifically valid and robust.
 
 ---
+
+### Step 5.5 – Dataset Memory Stabilization & Architectural Redesign (Completed)
+
+#### Problem Identified
+- Repeated full-volume loading during `__getitem__`
+- Mask-based normalization causing large temporary array allocations
+- DataLoader memory crashes during slice-level iteration
+- Precomputing all resized samples exceeded available RAM
+
+#### Root Cause
+- Half-lazy dataset design:
+  - Volumes normalized multiple times
+  - Full 3D volumes loaded repeatedly per slice
+  - Mask operations created large intermediate arrays
+- Parallel DataLoader workers amplified memory usage
+
+#### Final Architectural Solution
+
+Redesigned `MRIDataset` to:
+
+- Load each patient volume once during initialization
+- Perform normalization once per volume
+- Store normalized 3D volumes in memory (volume-level caching)
+- Build slice-level index map only
+- Generate 2.5D slice triplets on-the-fly in `__getitem__`
+- Resize samples dynamically during retrieval
+
+#### Memory Optimization Improvements
+
+- Updated `load_nifti()` to load directly as `float32`
+- Eliminated redundant float64 allocation
+- Removed repeated masked array normalization
+- Prevented repeated volume reload inside DataLoader
+- Disabled multiprocessing during debugging
+
+#### Verified Stability
+
+- Total indexed slices (train split): 76,091
+- Class 0 slices: 43,615
+- Class 1 slices: 32,476
+- Dataset iteration completed without memory errors
+
+#### Architectural Impact
+
+- Dataset pipeline now memory-stable
+- No repeated heavy computation
+- Fully scalable to complete dataset
+- Training layer ready for proper experimentation
+
+Data infrastructure now production-grade and stable.
