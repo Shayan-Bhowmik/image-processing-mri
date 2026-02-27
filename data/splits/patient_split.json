@@ -1,358 +1,3152 @@
 {
     "train": [
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_134",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_220",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_204",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_066",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_089",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_266",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_350",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_214",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_284",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_152",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_159",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_166",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_307",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_178",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_315",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_091",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_054",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_027",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_249",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_026",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_092",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_208",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_073",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_313",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_160",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_067",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_332",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_020",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_218",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_171",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_321",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_219",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_039",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_011",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_264",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_253",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_075",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_300",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_286",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_200",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_170",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_247",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_035",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_038",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_322",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_095",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_090",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_223",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_269",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_329",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_157",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_212",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_086",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_081",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_047",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_341",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_078",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_132",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_327",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_246",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_188",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_316",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_179",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_311",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_301",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_049",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_121",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_225",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_224",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_305",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_172",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_063",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_107",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_169",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_147",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_012",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_155",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_239",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_148",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_100",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_071",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_140",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_010",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_097",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_106",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_241",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_238",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_282",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_135",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_145",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_211",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_198",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_114",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_119",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_331",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_044",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_105",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_181",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_008",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_205",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_180",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_276",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_330",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_007",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_094",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_060",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_345",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_128",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_210",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_056",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_293",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_123",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_306",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_025",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_314",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_104",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_124",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_101",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_032",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_240",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_163",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_257",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_245",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_222",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_176",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_252",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_070",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_158",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_168",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_344",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_061",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_213",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_085",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_009",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_271",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_262",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_337",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_019",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_002",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_242",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_059",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_006",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_087",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_226",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_349",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_254",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_031",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_116",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_133",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_272",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_299",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_244",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_317",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_290",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_310",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_055",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_228",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_189",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_183",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_199",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_043",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_347",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_122",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_209",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_033",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_281",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_018",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_125",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_022",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_021",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_146",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_174",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_015",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_062",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_079",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_243",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_207",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_005",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_277",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_083",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_154",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_202",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_258",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_273",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_042",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_096",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_287",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_051",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_156",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_278",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_164",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_077",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_232",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_028",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_130",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_046",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_196",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_129",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_250",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_201",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_216",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_001",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_294",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_231",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_335",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_076",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_234",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_279",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_165",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_197",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_069",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_193",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_251",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_320",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_030",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_185",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_229",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_003",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_142",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_065",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_260",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_291",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_227",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_098",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_297",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_268",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_153",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_261",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_319",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_333",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_292",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_161",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_040",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_270",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_221",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_348",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_340",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_295",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_127",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_131",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_255",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_057",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_093",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_103"
+        {
+            "id": "OAS1_0386_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0217_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_079",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0263_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0124_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_181",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0394_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0087_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_178",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_150",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0073_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_043",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_302",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_111",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_010",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0184_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0239_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_240",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_065",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_075",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0076_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0129_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0101_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0256_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0031_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_266",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_014",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_293",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0156_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_264",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0047_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_269",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_185",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_172",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0292_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_106",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_089",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0451_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0037_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0327_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0443_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_175",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0135_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0017_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_202",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0434_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_025",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_265",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_037",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0453_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_308",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0246_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0176_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0387_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0422_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0050_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_174",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0230_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0045_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_186",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_257",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0286_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0071_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0034_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_192",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_151",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_248",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0111_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_338",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0173_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0440_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0108_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_102",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0137_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0010_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0380_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_330",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_009",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0120_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0454_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0330_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_237",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0287_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0413_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0299_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0301_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0058_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0052_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0408_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0117_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0317_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_059",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_200",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0239_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0316_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_034",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0069_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0084_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_238",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_018",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_149",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0270_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_011",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_199",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0308_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0053_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0006_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0341_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0025_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0057_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_230",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_214",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0288_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0376_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_242",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_093",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0081_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_263",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_087",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0166_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0255_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_213",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0289_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_228",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0293_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0189_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_029",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0375_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_201",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_336",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_138",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0020_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0183_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0119_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0097_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0105_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_006",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0207_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0039_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0410_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0180_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_307",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_120",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_309",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_085",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0379_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0152_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_017",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_252",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_040",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0384_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0114_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0373_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0067_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_350",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_139",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0092_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_322",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0446_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_232",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0369_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0009_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0315_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0178_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0116_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0142_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_125",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_303",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0261_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0312_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_191",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0155_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_116",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_222",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_041",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_341",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_141",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0079_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_130",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0134_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0237_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_329",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_153",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0191_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0136_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0371_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_194",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0121_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0374_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0141_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0357_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_311",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_317",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_119",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_133",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0274_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_046",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_057",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0285_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0433_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_291",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0159_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0143_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_296",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0131_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0231_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0191_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0343_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0113_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0104_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0075_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0392_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_050",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_148",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0125_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_107",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0083_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0011_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0193_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0342_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0244_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0150_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0200_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0300_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0420_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0080_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_051",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0063_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0016_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0059_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0332_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0168_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_193",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_273",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_024",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_086",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0296_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_163",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0068_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0258_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0223_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0404_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0065_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_044",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_189",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0212_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0268_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0236_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0282_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0151_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0425_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0340_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_173",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0195_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0350_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0418_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_165",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_281",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0389_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0457_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_156",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0188_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_208",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0303_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0444_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0192_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_216",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_316",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0205_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0146_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0290_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0361_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_210",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_159",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0078_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0339_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_064",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_295",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0284_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_312",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0005_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0001_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0222_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0080_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_267",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0275_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_294",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0030_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_131",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0147_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_198",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_304",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_262",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0438_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0098_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_177",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_223",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_328",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_326",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0040_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_298",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_334",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0240_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0055_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_015",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0254_MR1_mpr_n6_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0348_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0269_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0162_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_321",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_313",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0363_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0333_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0167_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_205",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_099",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0169_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0271_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_117",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0403_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_180",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0232_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_103",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_114",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_241",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0313_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_196",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0202_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0382_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_137",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0235_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_211",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0028_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_092",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_013",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_212",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_091",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_084",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_122",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0051_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0110_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_209",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_287",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_182",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_053",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0061_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0398_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0046_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_184",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0111_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_187",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_158",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0234_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0236_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0411_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_076",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0021_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0106_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0072_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_019",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_280",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_077",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0004_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_039",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0353_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0243_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_288",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0435_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0013_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_283",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_227",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_083",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_135",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_327",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_067",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0356_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_002",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_023",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0321_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0157_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0397_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_048",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_027",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0326_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0362_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_259",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0273_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_325",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0002_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0101_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0365_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0283_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_108",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_310",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_145",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_140",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0148_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0061_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0033_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_055",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0267_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0077_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_069",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_054",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_340",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0091_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_284",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_342",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0190_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0402_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_335",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_314",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_155",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0012_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_279",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0322_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0130_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_146",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_190",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_126",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0304_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_179",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0094_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0096_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_260",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_110",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_276",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0204_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0181_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_289",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_319",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0328_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_005",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_038",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0038_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0103_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0228_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_154",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_331",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_344",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0346_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_203",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0163_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_123",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0139_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0018_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_343",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0409_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_134",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0291_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_268",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_290",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_299",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_337",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0372_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0186_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_318",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_021",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0337_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0156_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_127",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_292",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0109_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_062",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_207",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_121",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0298_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_346",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_035",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_305",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_036",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0179_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0088_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_042",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_261",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0211_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0264_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0253_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0090_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0400_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0302_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_245",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_300",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0455_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0145_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_161",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0241_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_032",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_278",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0029_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0383_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_030",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0197_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_152",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_098",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_080",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_250",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0405_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0395_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0379_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0160_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0027_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0144_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0007_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0249_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0336_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_233",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0161_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0056_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0127_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0214_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0054_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_003",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0358_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_169",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0229_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0349_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_219",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0145_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0218_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0210_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_171",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_243",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0439_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_016",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_052",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0277_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0107_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_078",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_256",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0447_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0220_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_188",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0311_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_144",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0423_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0426_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0388_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_255",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_112",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_348",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0066_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_063",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_101",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_056",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0132_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0074_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0249_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0014_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0095_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        }
     ],
     "val": [
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_248",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_325",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_110",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_150",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_192",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_068",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_265",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_144",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_191",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_304",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_298",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_308",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_074",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_235",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_203",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_256",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_263",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_267",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_109",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_034",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_138",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_206",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_162",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_338",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_118",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_029",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_167",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_326",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_139",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_289",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_237",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_285",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_346",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_274",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_088",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_037",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_137",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_108",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_182",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_190",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_084",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_187",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_233",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_318",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_312",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_052",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_334",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_324",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_149",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_117",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_024",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_036"
+        {
+            "id": "OAS1_0406_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_097",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_195",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0070_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0213_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_249",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0138_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_136",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0247_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_220",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0262_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_286",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_244",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0182_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0355_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_339",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0351_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_070",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0352_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_061",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_073",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_008",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0449_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_236",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0227_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_022",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_347",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0309_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_231",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_254",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_124",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0115_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0185_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0102_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0280_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0325_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_320",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_206",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0278_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0345_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0086_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0198_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0335_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_170",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0221_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0140_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_132",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_129",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0202_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_071",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0150_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_088",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0396_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0428_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_247",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_060",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_246",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_315",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0023_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0294_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_020",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0153_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_332",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_001",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0201_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0209_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_166",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0035_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0366_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0431_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0367_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_306",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_109",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0174_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_183",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0165_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0368_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_004",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0378_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_162",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0099_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0395_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0456_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0416_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0370_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0399_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_118",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_012",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0226_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_258",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0199_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0133_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0310_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0044_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0049_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_066",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0272_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0417_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0419_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0305_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_157",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_113",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_049",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_094",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0158_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0177_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_142",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0354_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0390_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0062_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0259_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0092_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0260_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_270",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0208_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0432_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_253",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0450_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        }
     ],
     "test": [
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_099",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_296",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_186",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_151",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_283",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_041",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_194",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_064",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_275",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_236",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_023",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_136",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_177",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_184",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_050",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_195",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_336",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_343",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_173",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_111",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_080",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_323",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_175",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_339",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_082",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_004",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_143",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_302",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_230",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_113",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_215",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_342",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_102",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_288",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_014",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_309",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_259",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_120",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_112",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_048",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_016",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_017",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_217",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_303",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_045",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_280",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_053",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_072",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_115",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_126",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_141",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_013",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_058",
-        "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData\\BraTS20_Training_328"
+        {
+            "id": "BraTS20_Training_272",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_147",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0122_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0323_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0060_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0164_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0338_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_218",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_323",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0238_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_217",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_068",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_275",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0064_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_324",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0441_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_235",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_058",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_333",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_225",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0230_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0319_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_277",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0042_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0126_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_168",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0452_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0203_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_176",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0377_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0285_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_074",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0329_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0368_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_274",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0353_MR2_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_215",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0015_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0032_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_167",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0026_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0314_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0117_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0415_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0407_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_104",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0437_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_082",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_297",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_234",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0344_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_047",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_072",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_197",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0250_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0022_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0295_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0307_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_301",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0224_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_081",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0041_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_128",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0206_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0123_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_045",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_271",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0281_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0003_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0019_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_100",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0043_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_095",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0448_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_345",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_221",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_160",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0421_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_349",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0442_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0381_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_164",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_007",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_285",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0265_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0112_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_226",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0082_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0445_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0385_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0331_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0401_MR1_mpr_n5_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_204",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0233_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_028",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0279_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0170_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_239",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_224",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_096",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_031",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_033",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0085_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0266_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_090",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0216_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0429_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "OAS1_0359_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_105",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0424_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_143",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_229",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_251",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_282",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0430_MR1_mpr_n4_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        },
+        {
+            "id": "BraTS20_Training_026",
+            "label": 1
+        },
+        {
+            "id": "BraTS20_Training_115",
+            "label": 1
+        },
+        {
+            "id": "OAS1_0318_MR1_mpr_n3_anon_111_t88_masked_gfc.nii",
+            "label": 0
+        }
     ]
 }

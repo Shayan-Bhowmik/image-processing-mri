@@ -1,5 +1,7 @@
 # Brain MRI AI Decision Support – Project Log
 
+---
+
 ## Step 1 – Repository Initialization (Completed)
 
 ### Remote Setup
@@ -30,17 +32,19 @@
 - Connected local repository to GitHub remote
 - Pushed initial commit to GitHub
 
-Repository is now properly initialized and synchronized.
+Repository is properly initialized and synchronized.
+
+---
 
 ## Step 2 – Python Environment Setup (Completed)
 
 ### Interpreter Configuration
 - Installed Python 3.11
-- Created virtual environment using Python 3.11
+- Created virtual environment
 - Activated isolated environment
 
 ### Deep Learning Framework
-- Installed PyTorch (CPU version)
+- Installed PyTorch (initially CPU version)
 - Verified successful import
 
 ### Supporting Libraries Installed
@@ -52,14 +56,18 @@ Repository is now properly initialized and synchronized.
 - Scikit-learn (evaluation metrics)
 
 ### Reproducibility
-- Generated requirements.txt using pip freeze
-- Locked exact dependency versions
+- Generated `requirements.txt`
+- Locked dependency versions
+
+Environment configuration validated.
+
+---
 
 ## Step 3 – Dataset Setup (Completed)
 
 ### BRATS 2020 Dataset (Abnormal Class)
 - Downloaded via Kaggle API
-- Extracted to: data/raw/brats
+- Extracted to: `data/raw/brats`
 - Verified patient folder structure
 - Confirmed availability of:
   - FLAIR modality
@@ -67,9 +75,9 @@ Repository is now properly initialized and synchronized.
 
 ### Abnormal Label Extraction Logic
 - Implemented segmentation-based labeling
-- Created src/label_utils.py
+- Created `src/label_utils.py`
 - Verified tumor detection using BRATS segmentation mask
-- Confirmed correct abnormal label generation (Label = 1)
+- Confirmed abnormal label generation (Label = 1)
 
 ### OASIS Dataset (Normal Class)
 - Downloaded via Kaggle API
@@ -77,136 +85,156 @@ Repository is now properly initialized and synchronized.
 - Implemented normal label logic
 - Confirmed correct label assignment (Label = 0)
 
-Dataset layer fully validated.
+Dataset layer validated.
+
+---
 
 ## Step 4 – MRI Volume Preprocessing Pipeline (Completed)
 
-### Step 4.1 – NIfTI Volume Loading (Completed)
+### Step 4.1 – NIfTI Volume Loading
+- Implemented loader using NiBabel
+- Created: `src/preprocessing/load_nifti.py`
+- Verified BRATS FLAIR volume shape: `(240, 240, 155)`
+- Confirmed dtype: float32
 
-- Implemented NIfTI loader using nibabel
-- Created: src/preprocessing/load_nifti.py
-- Successfully loaded BRATS FLAIR volume
-- Verified shape: (240, 240, 155)
-- Verified dtype: float32
-- Confirmed environment and file path handling
-
-Preprocessing pipeline initiated.
-
-### Step 4.2 – Z-Score Normalization (Completed)
-
-- Implemented volume-wise Z-score normalization
-- Normalization applied only to non-zero voxels
+### Step 4.2 – Z-Score Normalization
+- Applied normalization only to non-zero voxels
 - Prevented division-by-zero edge cases
-- Verified statistical correctness:
+- Verified:
   - Mean ≈ 0
   - Std ≈ 1
-- Confirmed floating-point precision within expected tolerance
 
-MRI intensity normalization validated.
+### Step 4.3 – Axial Slice Extraction & Filtering
+- Extracted axial slices from 3D volume
+- Removed near-empty slices using thresholding
+- Reduced:
+  - 155 slices → 126 valid slices
+- Confirmed shape: `(240, 240)`
 
-### Step 4.3 – Axial Slice Extraction & Empty Slice Filtering (Completed)
+### Step 4.4 – 2.5D Slice Stacking
+- Implemented neighbor-based stacking:
+  `[prev, current, next]`
+- Handled boundary duplication
+- Output shape: `(3, 240, 240)`
+- Channel-first format maintained
 
-- Implemented axial slice extraction from 3D MRI volume
-- Added configurable non-zero pixel threshold filtering
-- Removed near-empty/background slices
-- Verified slice reduction:
-  - Original depth: 155 slices
-  - Valid slices retained: 126
-- Confirmed slice dimensions: (240, 240)
+### Step 4.5 – Resize for CNN Compatibility
+- Implemented bilinear interpolation (PyTorch)
+- Resized to `(3, 224, 224)`
+- Returned `torch.Tensor`
 
-Axial slice preparation validated for downstream 2.5D stacking.
+Preprocessing pipeline validated end-to-end.
 
-### Step 4.4 – 2.5D Slice Stacking (Completed)
+---
 
-- Implemented neighbor-based stacking strategy
-- Constructed samples using:
-  [previous_slice, current_slice, next_slice]
-- Handled boundary conditions via slice duplication
-- Converted 2D slices → 3-channel 2.5D samples
-- Verified output shape: (3, 240, 240)
-- Maintained channel-first format
+## Step 5 – Dataset Architecture
 
-Local volumetric context successfully integrated.
-
-### Step 4.5 – Resize for CNN Compatibility (Completed)
-
-- Implemented bilinear interpolation resizing using PyTorch
-- Resized 2.5D samples from (3, 240, 240) to (3, 224, 224)
-- Returned output as torch.Tensor
-- Verified compatibility with pretrained CNN input requirements
-
-CNN-ready tensor pipeline validated.
-
-## Step 5 – Dataset Architecture (In Progress)
-
-### Step 5.1 – Leakage-Safe Patient-Level Split (Completed)
+### Step 5.1 – Leakage-Safe Patient-Level Split (Initial Version)
 
 - Created: `src/data/split_dataset.py`
-- Implemented patient folder discovery utility
-- Identified correct patient directory level:
-  - `MICCAI_BraTS2020_TrainingData`
-- Built deterministic train/val/test split function
-- Used fixed random seed for reproducibility
-- Enforced patient-level separation to prevent data leakage
+- Implemented deterministic split with fixed seed
+- Enforced patient-level separation
 - Persisted split to:
   - `data/splits/patient_split.json`
-- Corrected `.gitignore` rule to allow tracking of `src/data/`
 
-### Split Summary:
-- Total patients: 350  
-- Train: 244  
-- Validation: 52  
-- Test: 54  
+Initial Split Summary:
+- Total patients: 350
+- Train: 244
+- Validation: 52
+- Test: 54
 
-### Architectural Impact:
-- Guarantees leakage-safe experimentation
-- Establishes reproducible dataset partitioning
-- Prepares integration with custom PyTorch Dataset
-- Forms the foundation of model training pipeline
+⚠️ Later discovered to include only BRATS patients.
 
-Patient-level dataset partitioning validated and production-ready.
+---
 
-### Step 5.2 – Custom Slice-Level PyTorch Dataset (Completed)
+### Step 5.2 – Custom Slice-Level PyTorch Dataset (Initial Version)
 
 - Created: `src/data/mri_dataset.py`
-- Integrated preprocessing pipeline inside Dataset:
-  - NIfTI loading
-  - Z-score normalization
-  - Axial slice filtering
-  - 2.5D stacking
-  - Bilinear resizing to (224, 224)
-- Refactored to slice-level dataset design
-- Implemented memory-safe lazy loading strategy
-- Built slice index mapping to prevent full dataset memory loading
-- Dataset now returns:
-  - Tensor shape: (3, 224, 224)
-  - Label: 0 (normal) or 1 (abnormal)
+- Integrated full preprocessing pipeline inside Dataset
+- Implemented slice-level index mapping
+- Implemented memory-safe lazy loading
+- Verified:
+  - Tensor shape: `(3, 224, 224)`
+  - Label output: 0/1
 
-### Dataset Statistics (Training Split):
-- Patients: 244
-- Total slice samples: 32,405
-- Output dtype: torch.float32
+Initial training slice count:
+- 32,405 slices
 
-### Architectural Impact:
-- Enables standard PyTorch DataLoader batching
-- Scalable to full dataset without memory overflow
-- Fully compatible with CNN training pipeline
+---
 
-### Step 5.3 – Train / Validation / Test DataLoaders (Completed)
+### Step 5.3 – Train / Validation / Test DataLoaders
 
 - Created: `src/data/dataloaders.py`
-- Implemented centralized DataLoader builder function
-- Connected patient-level split with slice-level Dataset
+- Connected patient-level split to slice-level dataset
 - Configured:
   - Train loader (shuffle=True)
   - Validation loader (shuffle=False)
   - Test loader (shuffle=False)
-- Verified batch output:
-  - Image shape: (B, 3, 224, 224)
-  - Label shape: (B)
+- Verified batch shapes:
+  - Images: `(B, 3, 224, 224)`
+  - Labels: `(B)`
 
-### Architectural Impact:
-- Enables efficient mini-batch training
-- Maintains leakage-safe data separation
-- Fully compatible with PyTorch training loop
-- Marks completion of end-to-end data pipeline
+Data pipeline completed.
+
+---
+
+### Step 5.4 – Multi-Dataset Integration & Structural Refactor (Critical Fix)
+
+#### Problem Identified
+- Training dataset contained only BRATS patients
+- OASIS dataset was not included
+- Reported 99% accuracy was invalid (single-class bias)
+
+#### Root Cause
+- OASIS structure differs:
+  - BRATS → folder-based patients
+  - OASIS → direct `.nii` files
+- Split logic assumed folder-only patients
+
+#### Fix Implemented
+
+- Rebuilt patient-level split using:
+  - BRATS root:
+    `data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData`
+  - OASIS root:
+    `data/raw/oasis/OASIS_Clean_Data/OASIS_Clean_Data`
+
+- Updated split logic:
+  - BRATS folders → label = 1
+  - OASIS `.nii` files → label = 0
+
+#### Updated Split Summary
+- Total patients: 786
+  - BRATS: 350
+  - OASIS: 436
+- Train: 550
+- Validation: 118
+- Test: 118
+
+#### Dataset Class Refactor
+
+- Removed `get_label_from_patient_folder`
+- Refactored `MRIDataset` to accept split entries directly
+- Added 4D volume handling:
+  - Automatically squeezes extra dimension for OASIS
+- Preserved volume caching
+- Maintained 2.5D stacking and resizing
+
+#### Verified Output
+
+- Total training slices: 76,091
+- Sample shape: `(3, 224, 224)`
+- Labels verified
+- No runtime errors
+- Dataset stable
+
+#### Architectural Impact
+
+- Correct binary classification setup
+- Eliminated single-class training bias
+- Ensured statistically valid experimentation
+- Established production-grade data pipeline
+
+Dataset layer now scientifically valid and robust.
+
+---
