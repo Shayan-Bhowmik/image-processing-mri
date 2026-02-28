@@ -331,3 +331,22 @@ Results (5 epochs baseline):
 - No visible overfitting
 
 System now reports scientifically valid training + validation metrics.
+
+---
+
+Step 6.3 — Validation Confusion Matrix Verified
+
+Validation Results:
+Confusion Matrix:
+[[9867, 0],
+ [101, 6389]]
+
+Per-Class Metrics:
+- Class 0 Recall: 100%
+- Class 1 Recall: 98%
+- F1-scores ~0.99 for both classes
+
+Observations:
+- Very low false negative rate (~1.5%)
+- No false positives
+- High stability across epochs

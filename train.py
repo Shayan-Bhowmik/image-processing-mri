@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 from sklearn.utils.class_weight import compute_class_weight
+from sklearn.metrics import confusion_matrix, classification_report
 
 from models.model import BrainMRICNN
 from src.data.dataloaders import create_dataloaders
@@ -13,6 +14,9 @@ def evaluate(model, loader, criterion, device):
     total_loss = 0.0
     correct = 0
     total = 0
+
+    all_preds = []
+    all_labels = []
 
     with torch.no_grad():
         for images, labels in loader:
@@ -25,13 +29,17 @@ def evaluate(model, loader, criterion, device):
             total_loss += loss.item()
 
             _, predicted = torch.max(outputs, 1)
+
+            all_preds.extend(predicted.cpu().numpy())
+            all_labels.extend(labels.cpu().numpy())
+
             correct += (predicted == labels).sum().item()
             total += labels.size(0)
 
     avg_loss = total_loss / len(loader)
     accuracy = 100 * correct / total
 
-    return avg_loss, accuracy
+    return avg_loss, accuracy, all_labels, all_preds
 
 
 def train():
@@ -45,7 +53,7 @@ def train():
     )
 
     # -------------------------------
-    # Step 6.1 — Class Weights
+    # Class Weights
     # -------------------------------
     all_labels = []
     for _, labels in train_loader:
@@ -65,7 +73,7 @@ def train():
     print("Class Weights:", class_weights)
 
     # -------------------------------
-    # Model + Loss + Optimizer
+    # Model
     # -------------------------------
     model = BrainMRICNN().to(device)
     criterion = nn.CrossEntropyLoss(weight=class_weights)
@@ -85,7 +93,6 @@ def train():
             labels = labels.to(device)
 
             optimizer.zero_grad()
-
             outputs = model(images)
             loss = criterion(outputs, labels)
 
@@ -101,12 +108,24 @@ def train():
         train_loss = running_loss / len(train_loader)
         train_acc = 100 * correct / total
 
-        val_loss, val_acc = evaluate(model, val_loader, criterion, device)
+        val_loss, val_acc, val_true, val_pred = evaluate(
+            model, val_loader, criterion, device
+        )
 
         print(f"Epoch [{epoch+1}/{num_epochs}]")
         print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.2f}%")
         print(f"Val   Loss: {val_loss:.4f} | Val   Acc: {val_acc:.2f}%")
         print("-" * 50)
+
+    # -------------------------------
+    # Final Confusion Matrix
+    # -------------------------------
+    print("\nValidation Confusion Matrix:")
+    cm = confusion_matrix(val_true, val_pred)
+    print(cm)
+
+    print("\nClassification Report:")
+    print(classification_report(val_true, val_pred))
 
 
 if __name__ == "__main__":
