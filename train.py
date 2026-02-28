@@ -4,6 +4,7 @@ import torch.optim as optim
 import numpy as np
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.metrics import confusion_matrix, classification_report
+import os
 
 from models.model import BrainMRICNN
 from src.data.dataloaders import create_dataloaders
@@ -45,11 +46,6 @@ def evaluate(model, loader, criterion, device):
 def train():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # -------------------------------
-    # SANITY TEST FLAG
-    # -------------------------------
-    SANITY_LABEL_SHUFFLE = True  # Turn OFF after sanity test
-
     split_path = "data/splits/patient_split.json"
 
     train_loader, val_loader, test_loader = create_dataloaders(
@@ -84,8 +80,18 @@ def train():
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
-    # Reduced epochs for sanity test
-    num_epochs = 2
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer,
+        mode='min',
+        factor=0.5,
+        patience=1,
+        verbose=True
+    )
+
+    num_epochs = 5
+    best_val_acc = 0.0
+
+    os.makedirs("checkpoints", exist_ok=True)
 
     for epoch in range(num_epochs):
         model.train()
@@ -97,13 +103,6 @@ def train():
         for images, labels in train_loader:
             images = images.to(device)
             labels = labels.to(device)
-
-            # -------------------------------
-            # Shuffle labels (Sanity Test Only)
-            # -------------------------------
-            if SANITY_LABEL_SHUFFLE:
-                perm = torch.randperm(labels.size(0))
-                labels = labels[perm]
 
             optimizer.zero_grad()
             outputs = model(images)
@@ -125,14 +124,20 @@ def train():
             model, val_loader, criterion, device
         )
 
+        # Scheduler step MUST be here
+        scheduler.step(val_loss)
+
         print(f"Epoch [{epoch+1}/{num_epochs}]")
         print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.2f}%")
         print(f"Val   Loss: {val_loss:.4f} | Val   Acc: {val_acc:.2f}%")
         print("-" * 50)
 
-    # -------------------------------
-    # Final Confusion Matrix
-    # -------------------------------
+        # Save Best Model
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            torch.save(model.state_dict(), "checkpoints/best_model.pth")
+            print("✔ Best model saved.")
+
     print("\nValidation Confusion Matrix:")
     cm = confusion_matrix(val_true, val_pred)
     print(cm)

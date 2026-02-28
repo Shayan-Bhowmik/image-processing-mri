@@ -289,6 +289,8 @@ Redesigned `MRIDataset` to:
 
 Data infrastructure now production-grade and stable.
 
+---
+
 ## Step 6 - Training System Hardening
 ### Step 6.1 — Class-Weighted Loss Implemented
 
@@ -366,3 +368,31 @@ Conclusion:
 - Split integrity verified
 - Model only performs well with correct labels
 - Pipeline scientifically validated
+
+---
+
+## Step 7 - Generalization Hardening
+### Step 7.1 — Production Training Mode Enabled
+
+File Modified:
+- train.py
+
+Changes:
+- Removed sanity label shuffle
+- Restored full training
+- Added checkpoint directory
+- Added automatic saving of best validation model
+- Training now persists best_model.pth
+
+---
+
+Step 7.2 — Learning Rate Scheduler Added
+
+File Modified:
+- train.py
+
+Changes:
+- Added ReduceLROnPlateau scheduler
+- Scheduler monitors validation loss
+- Reduces LR by factor 0.5 on plateau
+- Improves convergence stability
