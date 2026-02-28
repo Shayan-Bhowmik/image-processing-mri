@@ -288,3 +288,16 @@ Redesigned `MRIDataset` to:
 - Training layer ready for proper experimentation
 
 Data infrastructure now production-grade and stable.
+
+## Step 6 - Training System Hardening
+### Step 6.1 — Class-Weighted Loss Implemented
+
+File Modified:
+- train.py
+
+Changes:
+- Added sklearn compute_class_weight
+- Computed class weights from training data
+- Updated CrossEntropyLoss to weighted version
+- Verified class distribution and printed weights
+- No architectural changes

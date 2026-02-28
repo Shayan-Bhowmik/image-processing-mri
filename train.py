@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import numpy as np
+from sklearn.utils.class_weight import compute_class_weight
 
 from models.model import BrainMRICNN
 from src.data.dataloaders import create_dataloaders
@@ -16,8 +18,11 @@ def train():
         batch_size=8
     )
 
-    # Check class distribution
+    # -------------------------------
+    # Step 6.1 — Class Distribution + Weights
+    # -------------------------------
     all_labels = []
+
     for _, labels in train_loader:
         all_labels.extend(labels.tolist())
 
@@ -25,9 +30,21 @@ def train():
     print("Class 0 count:", all_labels.count(0))
     print("Class 1 count:", all_labels.count(1))
 
+    class_weights = compute_class_weight(
+        class_weight="balanced",
+        classes=np.unique(all_labels),
+        y=all_labels
+    )
+
+    class_weights = torch.tensor(class_weights, dtype=torch.float).to(device)
+    print("Class Weights:", class_weights)
+
+    # -------------------------------
+    # Model + Weighted Loss
+    # -------------------------------
     model = BrainMRICNN().to(device)
 
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
     num_epochs = 1
@@ -63,6 +80,7 @@ def train():
         print(f"Epoch [{epoch+1}/{num_epochs}]")
         print(f"Loss: {epoch_loss:.4f}")
         print(f"Accuracy: {epoch_acc:.2f}%")
+        print("-" * 40)
 
 
 if __name__ == "__main__":
