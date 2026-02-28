@@ -45,6 +45,11 @@ def evaluate(model, loader, criterion, device):
 def train():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    # -------------------------------
+    # SANITY TEST FLAG
+    # -------------------------------
+    SANITY_LABEL_SHUFFLE = True  # Turn OFF after sanity test
+
     split_path = "data/splits/patient_split.json"
 
     train_loader, val_loader, test_loader = create_dataloaders(
@@ -79,7 +84,8 @@ def train():
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
-    num_epochs = 5
+    # Reduced epochs for sanity test
+    num_epochs = 2
 
     for epoch in range(num_epochs):
         model.train()
@@ -91,6 +97,13 @@ def train():
         for images, labels in train_loader:
             images = images.to(device)
             labels = labels.to(device)
+
+            # -------------------------------
+            # Shuffle labels (Sanity Test Only)
+            # -------------------------------
+            if SANITY_LABEL_SHUFFLE:
+                perm = torch.randperm(labels.size(0))
+                labels = labels[perm]
 
             optimizer.zero_grad()
             outputs = model(images)
