@@ -301,3 +301,33 @@ Changes:
 - Updated CrossEntropyLoss to weighted version
 - Verified class distribution and printed weights
 - No architectural changes
+
+---
+
+Step 6.2 — Validation Loop Added
+
+File Modified:
+- train.py
+
+Changes:
+- Added evaluate() function
+- Added validation loss and accuracy tracking
+- Training now reports:
+  - Train loss
+  - Train accuracy
+  - Validation loss
+  - Validation accuracy
+- Increased epochs to 5 for baseline observation
+- No architecture changes
+
+---
+
+Step 6.2 — Validation Metrics Verified
+
+Results (5 epochs baseline):
+- Train Accuracy: 99.43%
+- Validation Accuracy: 99.38%
+- Train/Val curves stable
+- No visible overfitting
+
+System now reports scientifically valid training + validation metrics.

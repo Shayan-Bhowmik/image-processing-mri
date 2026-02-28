@@ -8,6 +8,32 @@ from models.model import BrainMRICNN
 from src.data.dataloaders import create_dataloaders
 
 
+def evaluate(model, loader, criterion, device):
+    model.eval()
+    total_loss = 0.0
+    correct = 0
+    total = 0
+
+    with torch.no_grad():
+        for images, labels in loader:
+            images = images.to(device)
+            labels = labels.to(device)
+
+            outputs = model(images)
+            loss = criterion(outputs, labels)
+
+            total_loss += loss.item()
+
+            _, predicted = torch.max(outputs, 1)
+            correct += (predicted == labels).sum().item()
+            total += labels.size(0)
+
+    avg_loss = total_loss / len(loader)
+    accuracy = 100 * correct / total
+
+    return avg_loss, accuracy
+
+
 def train():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -19,10 +45,9 @@ def train():
     )
 
     # -------------------------------
-    # Step 6.1 — Class Distribution + Weights
+    # Step 6.1 — Class Weights
     # -------------------------------
     all_labels = []
-
     for _, labels in train_loader:
         all_labels.extend(labels.tolist())
 
@@ -40,14 +65,13 @@ def train():
     print("Class Weights:", class_weights)
 
     # -------------------------------
-    # Model + Weighted Loss
+    # Model + Loss + Optimizer
     # -------------------------------
     model = BrainMRICNN().to(device)
-
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
-    num_epochs = 1
+    num_epochs = 5
 
     for epoch in range(num_epochs):
         model.train()
@@ -74,13 +98,15 @@ def train():
             correct += (predicted == labels).sum().item()
             total += labels.size(0)
 
-        epoch_loss = running_loss / len(train_loader)
-        epoch_acc = 100 * correct / total
+        train_loss = running_loss / len(train_loader)
+        train_acc = 100 * correct / total
+
+        val_loss, val_acc = evaluate(model, val_loader, criterion, device)
 
         print(f"Epoch [{epoch+1}/{num_epochs}]")
-        print(f"Loss: {epoch_loss:.4f}")
-        print(f"Accuracy: {epoch_acc:.2f}%")
-        print("-" * 40)
+        print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.2f}%")
+        print(f"Val   Loss: {val_loss:.4f} | Val   Acc: {val_acc:.2f}%")
+        print("-" * 50)
 
 
 if __name__ == "__main__":
