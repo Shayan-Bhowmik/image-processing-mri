@@ -19,3 +19,18 @@
 
 ### Outcome
 Project foundation initialized and ready for environment setup.
+
+## Step 2 – Python Environment Configuration
+
+**Branch:** sanjana-sidhwani  
+**Status:** Completed  
+
+### Actions
+- Verified Python 3.11
+- Created virtual environment
+- Installed required dependencies using requirements.txt
+- Validated core library imports
+- Committed environment setup
+
+### Outcome
+Stable and reproducible development environment configured.
