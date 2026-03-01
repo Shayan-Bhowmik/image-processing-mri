@@ -13,7 +13,7 @@ def resize_sample(sample, size=(224, 224)):
     Returns:
         torch.Tensor: Resized tensor (3, 224, 224)
     """
-    tensor = torch.tensor(sample, dtype=torch.float32).unsqueeze(0)  # (1, 3, H, W)
+    tensor = torch.as_tensor(sample, dtype=torch.float32).unsqueeze(0)
 
     resized = F.interpolate(
         tensor,

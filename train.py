@@ -80,12 +80,11 @@ def train():
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer,
-        mode='min',
-        factor=0.5,
-        patience=1,
-        verbose=True
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau (
+    optimizer,
+    mode='min',
+    factor=0.5,
+    patience=1
     )
 
     num_epochs = 5

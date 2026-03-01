@@ -81,9 +81,9 @@ class MRIDataset(Dataset):
         slice_next = volume[:, :, next_idx]
 
         sample = torch.stack([
-            torch.tensor(slice_prev),
-            torch.tensor(slice_curr),
-            torch.tensor(slice_next)
+            torch.from_numpy(slice_prev),
+            torch.from_numpy(slice_curr),
+            torch.from_numpy(slice_next)
         ], dim=0)
 
         sample = resize_sample(sample, size=self.image_size)

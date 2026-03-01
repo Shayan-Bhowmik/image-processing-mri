@@ -396,3 +396,13 @@ Changes:
 - Scheduler monitors validation loss
 - Reduces LR by factor 0.5 on plateau
 - Improves convergence stability
+
+---
+
+Step 7.3 – Data Pipeline Cleanup (Part 1)
+
+- Fixed tensor reconstruction warning in resize.py
+- Removed deprecated verbose from LR scheduler
+- Replaced torch.tensor() with torch.from_numpy() in dataset
+- Eliminated unnecessary tensor copies
+- Verified clean training run (no warnings)
