@@ -417,3 +417,16 @@ Step 7.3 – Data Pipeline Finalization (Part 2)
 - Added deterministic seed control
 - Verified stable reproducible training
 - Confirmed clean validation metrics
+
+---
+
+## Step 8 - True Generalization Testing
+
+Step 8.1 – True Test Set Evaluation
+
+- Added strict held-out test evaluation using best checkpoint
+- Reported test confusion matrix and classification report
+- Verified no generalization gap
+- Sensitivity ≈ 98.8%
+- Specificity = 100%
+- Fixed torch.load future warning (weights_only=True)

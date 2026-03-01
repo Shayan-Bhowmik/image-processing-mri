@@ -82,11 +82,11 @@ def train():
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau (
-    optimizer,
-    mode='min',
-    factor=0.5,
-    patience=1
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer,
+        mode='min',
+        factor=0.5,
+        patience=1
     )
 
     num_epochs = 5
@@ -94,6 +94,9 @@ def train():
 
     os.makedirs("checkpoints", exist_ok=True)
 
+    # -------------------------------
+    # Training Loop
+    # -------------------------------
     for epoch in range(num_epochs):
         model.train()
 
@@ -125,7 +128,6 @@ def train():
             model, val_loader, criterion, device
         )
 
-        # Scheduler step MUST be here
         scheduler.step(val_loss)
 
         print(f"Epoch [{epoch+1}/{num_epochs}]")
@@ -133,18 +135,42 @@ def train():
         print(f"Val   Loss: {val_loss:.4f} | Val   Acc: {val_acc:.2f}%")
         print("-" * 50)
 
-        # Save Best Model
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             torch.save(model.state_dict(), "checkpoints/best_model.pth")
             print("✔ Best model saved.")
 
+    # -------------------------------
+    # Validation Metrics
+    # -------------------------------
     print("\nValidation Confusion Matrix:")
-    cm = confusion_matrix(val_true, val_pred)
-    print(cm)
+    cm_val = confusion_matrix(val_true, val_pred)
+    print(cm_val)
 
-    print("\nClassification Report:")
+    print("\nValidation Classification Report:")
     print(classification_report(val_true, val_pred))
+
+    # -------------------------------
+    # TEST SET EVALUATION
+    # -------------------------------
+    print("\n===== TEST SET EVALUATION =====")
+
+    model.load_state_dict(torch.load("checkpoints/best_model.pth", weights_only=True))
+    model.eval()
+
+    test_loss, test_acc, test_true, test_pred = evaluate(
+        model, test_loader, criterion, device
+    )
+
+    print(f"Test Loss: {test_loss:.4f}")
+    print(f"Test Accuracy: {test_acc:.2f}%")
+
+    print("\nTest Confusion Matrix:")
+    cm_test = confusion_matrix(test_true, test_pred)
+    print(cm_test)
+
+    print("\nTest Classification Report:")
+    print(classification_report(test_true, test_pred))
 
 
 if __name__ == "__main__":
