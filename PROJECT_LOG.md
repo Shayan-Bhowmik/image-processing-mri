@@ -406,3 +406,14 @@ Step 7.3 – Data Pipeline Cleanup (Part 1)
 - Replaced torch.tensor() with torch.from_numpy() in dataset
 - Eliminated unnecessary tensor copies
 - Verified clean training run (no warnings)
+
+---
+
+Step 7.3 – Data Pipeline Finalization (Part 2)
+
+- Fixed tensor reconstruction in resize.py
+- Removed deprecated verbose scheduler parameter
+- Replaced torch.tensor() with torch.from_numpy() in dataset
+- Added deterministic seed control
+- Verified stable reproducible training
+- Confirmed clean validation metrics

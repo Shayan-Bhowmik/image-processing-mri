@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.metrics import confusion_matrix, classification_report
 import os
+from src.utils.seed import set_seed
 
 from models.model import BrainMRICNN
 from src.data.dataloaders import create_dataloaders
@@ -44,6 +45,7 @@ def evaluate(model, loader, criterion, device):
 
 
 def train():
+    set_seed(42)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     split_path = "data/splits/patient_split.json"
