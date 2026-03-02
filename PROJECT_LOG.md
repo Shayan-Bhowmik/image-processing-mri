@@ -55,7 +55,7 @@ Stable and reproducible development environment configured.
 ### Outcome
 Both datasets successfully validated and confirmed compatible with the planned 3D MRI preprocessing pipeline.
 
-## Step 4 – MRI Preprocessing Pipeline Implementation (In Progress)
+## Step 4 – MRI Preprocessing Pipeline Implementation (Completed)
 
 ---
 
@@ -83,3 +83,15 @@ Volume-level preprocessing successfully unified both datasets with consistent di
 
 ### Outcome
 Successfully converted 3D MRI volumes into meaningful 2D axial slices, reducing noise and eliminating empty background slices prior to dataset construction.
+
+## Step 4.3 – Dataset Construction Layer (Completed)
+
+### Actions
+- Implemented slice-to-label mapping mechanism
+- Designed structured metadata format for each slice
+- Added patient ID and dataset source tracking
+- Maintained clean separation from preprocessing logic
+- Validated dataset construction on BraTS and OASIS samples
+
+### Outcome
+Successfully constructed structured slice-level dataset records with complete metadata, enabling safe training, validation splitting, and future patient-level aggregation.
