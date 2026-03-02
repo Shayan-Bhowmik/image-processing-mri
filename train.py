@@ -152,9 +152,9 @@ def train():
             torch.save(model.state_dict(), "checkpoints/best_model.pth")
             print("✔ Best model saved.")
 
-    # -------------------------------
+    # ==========================================================
     # TEST SET EVALUATION
-    # -------------------------------
+    # ==========================================================
     print("\n===== TEST SET EVALUATION =====")
 
     model.load_state_dict(
@@ -176,17 +176,15 @@ def train():
     print(classification_report(test_true, test_pred))
 
     # -------------------------------
-    # ROC-AUC (Slice-Level)
+    # Slice-Level ROC
     # -------------------------------
     print("\nROC-AUC Analysis (Slice-Level):")
-
     fpr, tpr, _ = roc_curve(test_true, test_probs)
     roc_auc = auc(fpr, tpr)
-
     print(f"ROC-AUC: {roc_auc:.4f}")
 
     # ==========================================================
-    # PATIENT-LEVEL AGGREGATION (MAX STRATEGY)
+    # PATIENT-LEVEL AGGREGATION
     # ==========================================================
     print("\n===== PATIENT-LEVEL EVALUATION (Max Probability) =====")
 
@@ -200,18 +198,18 @@ def train():
             }
         patient_dict[pid]["slice_probs"].append(prob)
 
-    patient_probs = []
     patient_labels = []
+    max_scores = []
 
     for pid in patient_dict:
         patient_labels.append(patient_dict[pid]["true_label"])
-        patient_probs.append(max(patient_dict[pid]["slice_probs"]))
+        max_scores.append(max(patient_dict[pid]["slice_probs"]))
 
     patient_labels = np.array(patient_labels)
-    patient_probs = np.array(patient_probs)
+    max_scores = np.array(max_scores)
 
     # Default threshold 0.5
-    patient_preds = (patient_probs > 0.5).astype(int)
+    patient_preds = (max_scores > 0.5).astype(int)
 
     print("\nPatient-Level Confusion Matrix:")
     print(confusion_matrix(patient_labels, patient_preds))
@@ -219,33 +217,25 @@ def train():
     print("\nPatient-Level Classification Report:")
     print(classification_report(patient_labels, patient_preds))
 
-    # Patient-Level ROC-AUC
-    fpr_p, tpr_p, _ = roc_curve(patient_labels, patient_probs)
+    fpr_p, tpr_p, _ = roc_curve(patient_labels, max_scores)
     roc_auc_patient = auc(fpr_p, tpr_p)
-
     print(f"\nPatient-Level ROC-AUC: {roc_auc_patient:.4f}")
 
     # ==========================================================
-    # PATIENT-LEVEL THRESHOLD OPTIMIZATION
+    # THRESHOLD OPTIMIZATION (MAX STRATEGY)
     # ==========================================================
     print("\n===== PATIENT-LEVEL THRESHOLD OPTIMIZATION =====")
 
     thresholds = np.linspace(0, 1, 200)
-
     best_threshold = 0.5
     best_youden = -1
-    best_sensitivity = 0
-    best_specificity = 0
 
     for t in thresholds:
-        preds = (patient_probs > t).astype(int)
-
-        cm = confusion_matrix(patient_labels, preds)
-        tn, fp, fn, tp = cm.ravel()
+        preds = (max_scores > t).astype(int)
+        tn, fp, fn, tp = confusion_matrix(patient_labels, preds).ravel()
 
         sensitivity = tp / (tp + fn) if (tp + fn) > 0 else 0
         specificity = tn / (tn + fp) if (tn + fp) > 0 else 0
-
         youden = sensitivity + specificity - 1
 
         if youden > best_youden:
@@ -257,6 +247,34 @@ def train():
     print(f"Best Threshold: {best_threshold:.4f}")
     print(f"Sensitivity at Best Threshold: {best_sensitivity:.4f}")
     print(f"Specificity at Best Threshold: {best_specificity:.4f}")
+
+    # ==========================================================
+    # AGGREGATION STRATEGY COMPARISON
+    # ==========================================================
+    print("\n===== AGGREGATION STRATEGY COMPARISON =====")
+
+    # ----- Mean Strategy -----
+    mean_scores = []
+    for pid in patient_dict:
+        mean_scores.append(np.mean(patient_dict[pid]["slice_probs"]))
+    mean_scores = np.array(mean_scores)
+
+    fpr_mean, tpr_mean, _ = roc_curve(patient_labels, mean_scores)
+    auc_mean = auc(fpr_mean, tpr_mean)
+
+    # ----- Fraction Strategy -----
+    fraction_scores = []
+    for pid in patient_dict:
+        slice_probs = np.array(patient_dict[pid]["slice_probs"])
+        fraction_scores.append(np.mean(slice_probs > 0.5))
+    fraction_scores = np.array(fraction_scores)
+
+    fpr_frac, tpr_frac, _ = roc_curve(patient_labels, fraction_scores)
+    auc_frac = auc(fpr_frac, tpr_frac)
+
+    print(f"Max Aggregation ROC-AUC: {roc_auc_patient:.4f}")
+    print(f"Mean Aggregation ROC-AUC: {auc_mean:.4f}")
+    print(f"Fraction Aggregation ROC-AUC: {auc_frac:.4f}")
 
 
 if __name__ == "__main__":

@@ -470,3 +470,13 @@ Step 8.5 – Patient-Level Threshold Optimization
 - Specificity = 1.0
 - Confirmed full separability at patient level
 - System now supports slice-level and patient-level evaluation
+
+---
+
+## Step 9 Aggregation Strategy Comparison
+### Step 9.1
+
+- Implemented Max, Mean, and Fraction aggregation
+- Compared ROC-AUC across strategies
+- All strategies achieved perfect patient-level ROC-AUC (1.0000)
+- Confirmed robustness of aggregation rule
