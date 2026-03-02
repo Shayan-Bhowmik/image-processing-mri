@@ -54,3 +54,20 @@ Stable and reproducible development environment configured.
 
 ### Outcome
 Both datasets successfully validated and confirmed compatible with the planned 3D MRI preprocessing pipeline.
+
+## Step 4 – MRI Preprocessing Pipeline Implementation (In Progress)
+
+---
+
+## Step 4.1 – Volume-Level Preprocessing (Completed)
+
+### Actions
+- Implemented NIfTI loading utility using NiBabel
+- Added automatic 4D-to-3D squeeze handling
+- Converted volume dtype from float64 to float32
+- Implemented Z-score normalization on non-zero voxels only
+- Added defensive handling for zero standard deviation cases
+- Validated functionality on BraTS and OASIS sample volumes
+
+### Outcome
+Volume-level preprocessing successfully unified both datasets with consistent dimensionality and standardized intensity distributions (mean ≈ 0, std ≈ 1).
