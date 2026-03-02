@@ -449,3 +449,13 @@ Step 8.3 – Patient ID Integration
 - Updated evaluate() to track patient IDs
 - Verified slice-level metrics unchanged
 - Confirmed stable ROC-AUC (0.9998)
+
+---
+
+Step 8.4 – Patient-Level Aggregation (Max Strategy)
+
+- Implemented slice-to-patient probability aggregation
+- Used max probability strategy
+- Achieved 100% patient-level accuracy
+- Patient-level ROC-AUC = 1.0000
+- Zero false negatives at patient level

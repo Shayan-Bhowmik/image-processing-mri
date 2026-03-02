@@ -153,16 +153,6 @@ def train():
             print("✔ Best model saved.")
 
     # -------------------------------
-    # Validation Metrics
-    # -------------------------------
-    print("\nValidation Confusion Matrix:")
-    cm_val = confusion_matrix(val_true, val_pred)
-    print(cm_val)
-
-    print("\nValidation Classification Report:")
-    print(classification_report(val_true, val_pred))
-
-    # -------------------------------
     # TEST SET EVALUATION
     # -------------------------------
     print("\n===== TEST SET EVALUATION =====")
@@ -180,8 +170,7 @@ def train():
     print(f"Test Accuracy: {test_acc:.2f}%")
 
     print("\nTest Confusion Matrix:")
-    cm_test = confusion_matrix(test_true, test_pred)
-    print(cm_test)
+    print(confusion_matrix(test_true, test_pred))
 
     print("\nTest Classification Report:")
     print(classification_report(test_true, test_pred))
@@ -195,6 +184,46 @@ def train():
     roc_auc = auc(fpr, tpr)
 
     print(f"ROC-AUC: {roc_auc:.4f}")
+
+    # ==========================================================
+    # PATIENT-LEVEL AGGREGATION (MAX PROBABILITY STRATEGY)
+    # ==========================================================
+    print("\n===== PATIENT-LEVEL EVALUATION (Max Probability) =====")
+
+    patient_dict = {}
+
+    for pid, label, prob in zip(test_patient_ids, test_true, test_probs):
+        if pid not in patient_dict:
+            patient_dict[pid] = {
+                "true_label": label,
+                "slice_probs": []
+            }
+        patient_dict[pid]["slice_probs"].append(prob)
+
+    patient_probs = []
+    patient_labels = []
+
+    for pid in patient_dict:
+        patient_labels.append(patient_dict[pid]["true_label"])
+        patient_probs.append(max(patient_dict[pid]["slice_probs"]))
+
+    patient_labels = np.array(patient_labels)
+    patient_probs = np.array(patient_probs)
+
+    # Default threshold 0.5
+    patient_preds = (patient_probs > 0.5).astype(int)
+
+    print("\nPatient-Level Confusion Matrix:")
+    print(confusion_matrix(patient_labels, patient_preds))
+
+    print("\nPatient-Level Classification Report:")
+    print(classification_report(patient_labels, patient_preds))
+
+    # Patient-Level ROC-AUC
+    fpr_p, tpr_p, thresholds_p = roc_curve(patient_labels, patient_probs)
+    roc_auc_patient = auc(fpr_p, tpr_p)
+
+    print(f"\nPatient-Level ROC-AUC: {roc_auc_patient:.4f}")
 
 
 if __name__ == "__main__":
