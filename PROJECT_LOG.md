@@ -459,3 +459,14 @@ Step 8.4 – Patient-Level Aggregation (Max Strategy)
 - Achieved 100% patient-level accuracy
 - Patient-level ROC-AUC = 1.0000
 - Zero false negatives at patient level
+
+--- 
+
+Step 8.5 – Patient-Level Threshold Optimization
+
+- Implemented threshold sweep using Youden Index
+- Optimal threshold identified: 0.2312
+- Sensitivity = 1.0
+- Specificity = 1.0
+- Confirmed full separability at patient level
+- System now supports slice-level and patient-level evaluation

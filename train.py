@@ -136,7 +136,7 @@ def train():
         train_loss = running_loss / len(train_loader)
         train_acc = 100 * correct / total
 
-        val_loss, val_acc, val_true, val_pred, _, _ = evaluate(
+        val_loss, val_acc, _, _, _, _ = evaluate(
             model, val_loader, criterion, device
         )
 
@@ -180,13 +180,13 @@ def train():
     # -------------------------------
     print("\nROC-AUC Analysis (Slice-Level):")
 
-    fpr, tpr, thresholds = roc_curve(test_true, test_probs)
+    fpr, tpr, _ = roc_curve(test_true, test_probs)
     roc_auc = auc(fpr, tpr)
 
     print(f"ROC-AUC: {roc_auc:.4f}")
 
     # ==========================================================
-    # PATIENT-LEVEL AGGREGATION (MAX PROBABILITY STRATEGY)
+    # PATIENT-LEVEL AGGREGATION (MAX STRATEGY)
     # ==========================================================
     print("\n===== PATIENT-LEVEL EVALUATION (Max Probability) =====")
 
@@ -220,10 +220,43 @@ def train():
     print(classification_report(patient_labels, patient_preds))
 
     # Patient-Level ROC-AUC
-    fpr_p, tpr_p, thresholds_p = roc_curve(patient_labels, patient_probs)
+    fpr_p, tpr_p, _ = roc_curve(patient_labels, patient_probs)
     roc_auc_patient = auc(fpr_p, tpr_p)
 
     print(f"\nPatient-Level ROC-AUC: {roc_auc_patient:.4f}")
+
+    # ==========================================================
+    # PATIENT-LEVEL THRESHOLD OPTIMIZATION
+    # ==========================================================
+    print("\n===== PATIENT-LEVEL THRESHOLD OPTIMIZATION =====")
+
+    thresholds = np.linspace(0, 1, 200)
+
+    best_threshold = 0.5
+    best_youden = -1
+    best_sensitivity = 0
+    best_specificity = 0
+
+    for t in thresholds:
+        preds = (patient_probs > t).astype(int)
+
+        cm = confusion_matrix(patient_labels, preds)
+        tn, fp, fn, tp = cm.ravel()
+
+        sensitivity = tp / (tp + fn) if (tp + fn) > 0 else 0
+        specificity = tn / (tn + fp) if (tn + fp) > 0 else 0
+
+        youden = sensitivity + specificity - 1
+
+        if youden > best_youden:
+            best_youden = youden
+            best_threshold = t
+            best_sensitivity = sensitivity
+            best_specificity = specificity
+
+    print(f"Best Threshold: {best_threshold:.4f}")
+    print(f"Sensitivity at Best Threshold: {best_sensitivity:.4f}")
+    print(f"Specificity at Best Threshold: {best_specificity:.4f}")
 
 
 if __name__ == "__main__":
