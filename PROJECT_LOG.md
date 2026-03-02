@@ -71,3 +71,15 @@ Both datasets successfully validated and confirmed compatible with the planned 3
 
 ### Outcome
 Volume-level preprocessing successfully unified both datasets with consistent dimensionality and standardized intensity distributions (mean ≈ 0, std ≈ 1).
+
+## Step 4.2 – Slice-Level Processing (Completed)
+
+### Actions
+- Implemented axial slice extraction from 3D MRI volumes
+- Developed non-zero pixel ratio based empty slice filtering
+- Maintained clean abstraction layering between volume and slice utilities
+- Ensured dataset-agnostic functionality
+- Validated filtering on BraTS and OASIS sample volumes
+
+### Outcome
+Successfully converted 3D MRI volumes into meaningful 2D axial slices, reducing noise and eliminating empty background slices prior to dataset construction.
