@@ -30,6 +30,9 @@ class MRIDataset(Dataset):
             patient_id = entry["id"]
             label = entry["label"]
 
+            # -------------------------------
+            # Determine FLAIR path
+            # -------------------------------
             if label == 1:
                 patient_path = os.path.join(self.brats_root, patient_id)
 
@@ -44,7 +47,9 @@ class MRIDataset(Dataset):
             else:
                 flair_path = os.path.join(self.oasis_root, patient_id)
 
-            # Load volume once
+            # -------------------------------
+            # Load and preprocess volume
+            # -------------------------------
             volume = load_nifti(flair_path)
 
             if len(volume.shape) == 4:
@@ -52,12 +57,14 @@ class MRIDataset(Dataset):
 
             volume = zscore_normalize(volume)
 
-            # Extract valid slice indices
-            slices = extract_valid_slices(volume)
-            valid_indices = list(range(len(slices)))
-
-            # Store normalized volume
+            # Store normalized volume once
             self.volume_store[patient_id] = volume
+
+            # -------------------------------
+            # Index valid slices
+            # -------------------------------
+            valid_slices = extract_valid_slices(volume)
+            valid_indices = list(range(len(valid_slices)))
 
             for slice_idx in valid_indices:
                 self.index_map.append((patient_id, slice_idx, label))
@@ -72,7 +79,7 @@ class MRIDataset(Dataset):
 
         volume = self.volume_store[patient_id]
 
-        # Handle boundaries safely
+        # Safe slice boundaries
         prev_idx = max(slice_idx - 1, 0)
         next_idx = min(slice_idx + 1, volume.shape[2] - 1)
 
@@ -80,12 +87,14 @@ class MRIDataset(Dataset):
         slice_curr = volume[:, :, slice_idx]
         slice_next = volume[:, :, next_idx]
 
+        # Stack 2.5D slices
         sample = torch.stack([
             torch.from_numpy(slice_prev),
             torch.from_numpy(slice_curr),
             torch.from_numpy(slice_next)
         ], dim=0)
 
+        # Resize to model input size
         sample = resize_sample(sample, size=self.image_size)
 
-        return sample, label
+        return sample, label, patient_id

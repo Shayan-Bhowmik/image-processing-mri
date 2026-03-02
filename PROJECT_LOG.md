@@ -439,3 +439,13 @@ Step 8.2 – ROC-AUC Evaluation
 - Implemented ROC curve computation
 - Achieved ROC-AUC = 0.9998
 - Confirmed strong separability between classes
+
+---
+
+Step 8.3 – Patient ID Integration
+
+- Modified MRIDataset to return patient_id
+- Updated training loop to handle 3-tuple batches
+- Updated evaluate() to track patient IDs
+- Verified slice-level metrics unchanged
+- Confirmed stable ROC-AUC (0.9998)

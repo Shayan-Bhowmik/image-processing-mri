@@ -25,9 +25,10 @@ def evaluate(model, loader, criterion, device):
     all_preds = []
     all_labels = []
     all_probs = []
+    all_patient_ids = []
 
     with torch.no_grad():
-        for images, labels in loader:
+        for images, labels, patient_ids in loader:
             images = images.to(device)
             labels = labels.to(device)
 
@@ -44,6 +45,7 @@ def evaluate(model, loader, criterion, device):
             all_preds.extend(predicted.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
             all_probs.extend(positive_probs.cpu().numpy())
+            all_patient_ids.extend(patient_ids)
 
             correct += (predicted == labels).sum().item()
             total += labels.size(0)
@@ -51,7 +53,7 @@ def evaluate(model, loader, criterion, device):
     avg_loss = total_loss / len(loader)
     accuracy = 100 * correct / total
 
-    return avg_loss, accuracy, all_labels, all_preds, all_probs
+    return avg_loss, accuracy, all_labels, all_preds, all_probs, all_patient_ids
 
 
 def train():
@@ -69,7 +71,7 @@ def train():
     # Class Weights
     # -------------------------------
     all_labels = []
-    for _, labels in train_loader:
+    for _, labels, _ in train_loader:
         all_labels.extend(labels.tolist())
 
     print("Total samples:", len(all_labels))
@@ -114,7 +116,7 @@ def train():
         correct = 0
         total = 0
 
-        for images, labels in train_loader:
+        for images, labels, _ in train_loader:
             images = images.to(device)
             labels = labels.to(device)
 
@@ -134,7 +136,7 @@ def train():
         train_loss = running_loss / len(train_loader)
         train_acc = 100 * correct / total
 
-        val_loss, val_acc, val_true, val_pred, _ = evaluate(
+        val_loss, val_acc, val_true, val_pred, _, _ = evaluate(
             model, val_loader, criterion, device
         )
 
@@ -170,7 +172,7 @@ def train():
     )
     model.eval()
 
-    test_loss, test_acc, test_true, test_pred, test_probs = evaluate(
+    test_loss, test_acc, test_true, test_pred, test_probs, test_patient_ids = evaluate(
         model, test_loader, criterion, device
     )
 
@@ -185,9 +187,9 @@ def train():
     print(classification_report(test_true, test_pred))
 
     # -------------------------------
-    # ROC-AUC
+    # ROC-AUC (Slice-Level)
     # -------------------------------
-    print("\nROC-AUC Analysis:")
+    print("\nROC-AUC Analysis (Slice-Level):")
 
     fpr, tpr, thresholds = roc_curve(test_true, test_probs)
     roc_auc = auc(fpr, tpr)
