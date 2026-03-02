@@ -430,3 +430,12 @@ Step 8.1 – True Test Set Evaluation
 - Sensitivity ≈ 98.8%
 - Specificity = 100%
 - Fixed torch.load future warning (weights_only=True)
+
+---
+
+Step 8.2 – ROC-AUC Evaluation
+
+- Added probability extraction
+- Implemented ROC curve computation
+- Achieved ROC-AUC = 0.9998
+- Confirmed strong separability between classes

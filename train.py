@@ -3,7 +3,12 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 from sklearn.utils.class_weight import compute_class_weight
-from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import (
+    confusion_matrix,
+    classification_report,
+    roc_curve,
+    auc
+)
 import os
 from src.utils.seed import set_seed
 
@@ -19,6 +24,7 @@ def evaluate(model, loader, criterion, device):
 
     all_preds = []
     all_labels = []
+    all_probs = []
 
     with torch.no_grad():
         for images, labels in loader:
@@ -30,10 +36,14 @@ def evaluate(model, loader, criterion, device):
 
             total_loss += loss.item()
 
+            probs = torch.softmax(outputs, dim=1)
+            positive_probs = probs[:, 1]
+
             _, predicted = torch.max(outputs, 1)
 
             all_preds.extend(predicted.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
+            all_probs.extend(positive_probs.cpu().numpy())
 
             correct += (predicted == labels).sum().item()
             total += labels.size(0)
@@ -41,7 +51,7 @@ def evaluate(model, loader, criterion, device):
     avg_loss = total_loss / len(loader)
     accuracy = 100 * correct / total
 
-    return avg_loss, accuracy, all_labels, all_preds
+    return avg_loss, accuracy, all_labels, all_preds, all_probs
 
 
 def train():
@@ -124,7 +134,7 @@ def train():
         train_loss = running_loss / len(train_loader)
         train_acc = 100 * correct / total
 
-        val_loss, val_acc, val_true, val_pred = evaluate(
+        val_loss, val_acc, val_true, val_pred, _ = evaluate(
             model, val_loader, criterion, device
         )
 
@@ -155,10 +165,12 @@ def train():
     # -------------------------------
     print("\n===== TEST SET EVALUATION =====")
 
-    model.load_state_dict(torch.load("checkpoints/best_model.pth", weights_only=True))
+    model.load_state_dict(
+        torch.load("checkpoints/best_model.pth", weights_only=True)
+    )
     model.eval()
 
-    test_loss, test_acc, test_true, test_pred = evaluate(
+    test_loss, test_acc, test_true, test_pred, test_probs = evaluate(
         model, test_loader, criterion, device
     )
 
@@ -171,6 +183,16 @@ def train():
 
     print("\nTest Classification Report:")
     print(classification_report(test_true, test_pred))
+
+    # -------------------------------
+    # ROC-AUC
+    # -------------------------------
+    print("\nROC-AUC Analysis:")
+
+    fpr, tpr, thresholds = roc_curve(test_true, test_probs)
+    roc_auc = auc(fpr, tpr)
+
+    print(f"ROC-AUC: {roc_auc:.4f}")
 
 
 if __name__ == "__main__":
