@@ -2,10 +2,7 @@
 
 ---
 
-## Step 1 – Project Structure Initialization
-
-**Branch:** sanjana-sidhwani  
-**Status:** Completed  
+## Step 1 – Project Structure Initialization (Completed)
 
 ### Actions
 - Created independent orphan branch
@@ -20,10 +17,9 @@
 ### Outcome
 Project foundation initialized and ready for environment setup.
 
-## Step 2 – Python Environment Configuration
+---
 
-**Branch:** sanjana-sidhwani  
-**Status:** Completed  
+## Step 2 – Python Environment Configuration (Completed)
 
 ### Actions
 - Verified Python 3.11
@@ -35,10 +31,9 @@ Project foundation initialized and ready for environment setup.
 ### Outcome
 Stable and reproducible development environment configured.
 
-## Step 3 – Dataset Structure Validation
+---
 
-**Branch:** sanjana-sidhwani  
-**Status:** Completed  
+## Step 3 – Dataset Structure Validation (Completed)
 
 ### Actions
 - Downloaded BraTS 2020 dataset (Abnormal class)
