@@ -1,0 +1,65 @@
+import numpy as np
+import torch
+
+from src.dataset.mri_dataset import MRISliceDataset, create_dataloader
+
+
+def generate_dummy_records(num_samples=10):
+    records = []
+
+    for i in range(num_samples):
+        record = {
+            "slice": np.random.rand(224, 224),
+            "label": i % 2,
+            "patient_id": f"patient_{i//5}",
+            "slice_index": i,
+            "dataset": "dummy"
+        }
+
+        records.append(record)
+
+    return records
+
+
+def test_dataset_creation():
+    records = generate_dummy_records()
+
+    dataset = MRISliceDataset(records)
+
+    assert len(dataset) == len(records)
+
+
+def test_dataset_sample_format():
+    records = generate_dummy_records()
+
+    dataset = MRISliceDataset(records)
+
+    image, label = dataset[0]
+
+    assert isinstance(image, torch.Tensor)
+    assert isinstance(label, torch.Tensor)
+
+    assert image.shape == (3, 224, 224)
+    assert label.dtype == torch.long
+
+
+def test_dataloader_batch():
+    records = generate_dummy_records(20)
+
+    dataset = MRISliceDataset(records)
+
+    dataloader = create_dataloader(dataset, batch_size=4)
+
+    images, labels = next(iter(dataloader))
+
+    assert images.shape == (4, 3, 224, 224)
+    assert labels.shape == (4,)
+
+
+if __name__ == "__main__":
+    test_dataset_creation()
+    test_dataset_sample_format()
+    test_dataloader_batch()
+
+    print("===== Testing MRI Dataset Loader =====")
+    print("All Step 8.1 tests passed successfully.")

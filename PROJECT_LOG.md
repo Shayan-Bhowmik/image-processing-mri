@@ -139,3 +139,20 @@ Successfully transformed slice-level dataset into model-ready 2.5D inputs with s
 ### Outcome
 Successfully implemented the CNN architecture responsible for MRI slice classification.  
 The model definition is modular, Grad-CAM compatible, and validated through unit testing, enabling seamless integration with the upcoming training pipeline.
+
+## Step 8 – Training Pipeline Implementation
+
+---
+
+## Step 8.1 – Dataset Loader Integration (Completed)
+
+### Actions
+- Implemented PyTorch Dataset class for MRI slice records
+- Integrated dataset records with input transformation pipeline
+- Ensured image tensors follow channel-first format (3 × 224 × 224)
+- Implemented label retrieval for slice-level classification
+- Added DataLoader configuration for batch-based training
+- Validated dataset loading using sample batches
+
+### Outcome
+Successfully implemented the dataset loader responsible for feeding MRI slice data into the training pipeline. The loader integrates dataset records, input transformations, and PyTorch batching utilities, enabling efficient data delivery to the CNN model during training.
