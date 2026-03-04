@@ -118,3 +118,24 @@ Dataset is now safely split into training and validation sets at the patient lev
 
 ### Outcome
 Successfully transformed slice-level dataset into model-ready 2.5D inputs with standardized spatial dimensions.
+
+## Step 7 – Model Definition (Completed)
+
+### Actions
+- Implemented CNN architecture for MRI slice classification using PyTorch
+- Created modular model definition inside src/models/cnn_model.py
+- Designed stacked convolution blocks consisting of Conv2D, BatchNorm, ReLU, and MaxPooling
+- Implemented progressive feature extraction layers (3 → 32 → 64 → 128 → 256 channels)
+- Added Adaptive Average Pooling for spatial feature aggregation
+- Implemented classifier head with fully connected layers and dropout regularization
+- Applied Kaiming Normal initialization for convolution and linear layers
+- Added feature map storage and gradient hook support for future Grad-CAM explainability
+- Implemented centralized model creation system inside src/models/model_factory.py
+- Added model registry to support extensible architecture management
+- Implemented model configuration interface for architecture parameters
+- Created unit tests to validate model creation, forward pass, and output shape
+- Verified compatibility with 2.5D stacked MRI inputs (3 × 224 × 224)
+
+### Outcome
+Successfully implemented the CNN architecture responsible for MRI slice classification.  
+The model definition is modular, Grad-CAM compatible, and validated through unit testing, enabling seamless integration with the upcoming training pipeline.
