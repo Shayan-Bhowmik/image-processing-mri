@@ -6,7 +6,7 @@
 
 ---
 
-## Step 1.1 — Create Project Repository (Completed)
+## Step 1.1 — Create Project Repository
 
 **Goal:** Initialize the project directory and organize the development structure.
 
@@ -22,7 +22,7 @@
 
 ---
 
-## Step 1.2 — Install Required Libraries (Completed)
+## Step 1.2 — Install Required Libraries
 
 **Goal:** Set up the Python environment with all necessary dependencies.
 
@@ -36,7 +36,7 @@
 
 ---
 
-## Step 1.3 — Git Hygiene (Completed)
+## Step 1.3 — Git Hygiene
 
 **Goal:** Maintain a clean and efficient repository by managing tracked files properly.
 
