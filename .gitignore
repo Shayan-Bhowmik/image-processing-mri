@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# MRI datasets
+data/raw/
+data/brats/
+data/oasis/
+*.nii
+*.nii.gz
+
+# Model weights
+*.pth
+*.pt
+*.h5
+*.ckpt
+
+# Logs
+logs/
+outputs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
