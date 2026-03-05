@@ -498,3 +498,29 @@ Create visualization script to generate Grad-CAM heatmaps for test samples.
 Step 10.2 - Added Grad-CAM visualization 
 
 Added visualize_gradcam.py to generate Grad-CAM heatmaps for MRI slices.
+
+---
+
+## Step 10.3 — Batch Grad-CAM Generation
+
+Implemented automated Grad-CAM generation for multiple MRI slices.
+
+Changes:
+- Updated `visualize_gradcam.py` to iterate through the test dataset
+- Skip empty MRI slices using signal threshold
+- Generate Grad-CAM heatmaps automatically
+- Save results to `results/gradcam/`
+
+Output:
+- Generated multiple Grad-CAM visualizations showing model attention regions on MRI slices.
+
+Purpose:
+This enables large-scale explainability analysis and produces visual artifacts suitable for demonstrations, reports, and exhibitions.
+
+Example output directory:
+results/gradcam/
+    gradcam_1.png
+    gradcam_2.png
+    gradcam_3.png
+    gradcam_4.png
+    gradcam_5.png
