@@ -45,38 +45,97 @@ os.makedirs(output_dir, exist_ok=True)
 
 
 saved_images = 0
-max_images = 5
+max_images = 10
 
 
 for images, labels, patient_ids in test_loader:
 
     slice_img = images[0][1].numpy()
 
-    # Skip nearly empty slices
+    # Skip slices with very little brain content
+    brain_pixels = np.sum(slice_img > 0)
+
+    if brain_pixels < 5000:
+        continue
+
     if slice_img.std() < 0.05:
         continue
 
     images = images.to(device)
 
-    # Generate heatmap
+    # -----------------------------
+    # Run model prediction
+    # -----------------------------
+    with torch.no_grad():
+        outputs = model(images)
+        probs = torch.softmax(outputs, dim=1)
+
+    tumor_prob = probs[0, 1].item()
+
+    # Only visualize slices likely containing tumor
+    if tumor_prob < 0.7:
+        continue
+
+
+    # -----------------------------
+    # Generate Grad-CAM
+    # -----------------------------
     cam = gradcam.generate(images)
 
-    # Normalize MRI slice for visualization
+
+    # -----------------------------
+    # Prepare MRI image
+    # -----------------------------
     image = images[0][1].cpu().numpy()
+
     image = (image - image.min()) / (image.max() - image.min() + 1e-8)
 
-    plt.figure(figsize=(10,4))
 
-    plt.subplot(1,2,1)
+    # -----------------------------
+    # Brain Mask
+    # -----------------------------
+    brain_threshold = np.percentile(image, 20)
+    brain_mask = image > brain_threshold
+
+    cam = cam * brain_mask
+
+    cam = cam - cam.min()
+    cam = cam / (cam.max() + 1e-8)
+
+
+    # -----------------------------
+    # Heatmap
+    # -----------------------------
+    heatmap = np.clip(cam, 0, 1)
+    heatmap_color = plt.cm.jet(heatmap)[:, :, :3]
+
+
+    # -----------------------------
+    # Overlay
+    # -----------------------------
+    overlay = image[..., None] * 0.65 + heatmap_color * 0.35
+
+
+    # -----------------------------
+    # Plot
+    # -----------------------------
+    plt.figure(figsize=(12, 4))
+
+    plt.subplot(1, 3, 1)
     plt.title("MRI Slice")
     plt.imshow(image, cmap="gray")
     plt.axis("off")
 
-    plt.subplot(1,2,2)
+    plt.subplot(1, 3, 2)
     plt.title("Grad-CAM Heatmap")
-    plt.imshow(image, cmap="gray")
-    plt.imshow(cam, cmap="jet", alpha=0.5)
+    plt.imshow(heatmap, cmap="jet")
     plt.axis("off")
+
+    plt.subplot(1, 3, 3)
+    plt.title("Overlay")
+    plt.imshow(overlay)
+    plt.axis("off")
+
 
     save_path = os.path.join(output_dir, f"gradcam_{saved_images+1}.png")
     plt.savefig(save_path, bbox_inches="tight")
