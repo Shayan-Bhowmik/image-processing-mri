@@ -21,7 +21,7 @@ class GradCAM:
             self.gradients = grad_output[0].detach()
 
         self.target_layer.register_forward_hook(forward_hook)
-        self.target_layer.register_backward_hook(backward_hook)
+        self.target_layer.register_full_backward_hook(backward_hook)
 
     def generate(self, input_tensor, class_idx=None):
 
