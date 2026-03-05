@@ -140,7 +140,7 @@ Successfully transformed slice-level dataset into model-ready 2.5D inputs with s
 Successfully implemented the CNN architecture responsible for MRI slice classification.  
 The model definition is modular, Grad-CAM compatible, and validated through unit testing, enabling seamless integration with the upcoming training pipeline.
 
-## Step 8 – Training Pipeline Implementation
+## Step 8 – Training Pipeline Implementation (Completed)
 
 ---
 
@@ -170,3 +170,28 @@ Successfully implemented the dataset loader responsible for feeding MRI slice da
 
 ### Outcome
 Successfully implemented the core training loop responsible for model learning. The trainer module now orchestrates forward passes, loss computation, gradient updates, and validation evaluation, enabling the CNN model to learn discriminative patterns from MRI slices.
+
+## Step 8.3 – Training Execution Script (Completed)
+
+### Actions
+- Created centralized training execution script at src/training/train_model.py
+- Implemented command-line argument parsing for flexible training configuration
+- Added comprehensive hyperparameter support (learning rate, batch size, epochs, dropout, etc.)
+- Integrated model initialization via model factory
+- Configured loss function (CrossEntropyLoss) for binary classification
+- Implemented optimizer setup with Adam and optional weight decay
+- Added optional learning rate scheduler (StepLR) support
+- Integrated dataset record loading interface with placeholder implementation
+- Implemented patient-level dataset splitting via split_utils
+- Created PyTorch dataset instances using MRISliceDataset
+- Configured DataLoader creation for batch-based training
+- Initialized Trainer class with all required components
+- Implemented full training execution workflow
+- Added model checkpoint saving functionality with metadata
+- Implemented comprehensive logging and progress reporting
+- Added dataset statistics and model information display
+- Configured reproducible training via random seed setting
+- Added automatic device detection (CPU/GPU) with manual override option
+
+### Outcome
+Successfully implemented the complete training execution script serving as the central entry point for the training pipeline. The script orchestrates all training components from data loading through model checkpoint saving, providing a production-ready interface for training the MRI classification system with configurable hyperparameters via command-line arguments.
