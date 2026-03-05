@@ -494,3 +494,5 @@ Generate heatmaps showing which regions of MRI slices influenced the model's tum
 
 Next:
 Create visualization script to generate Grad-CAM heatmaps for test samples.
+
+Added visualize_gradcam.py to generate Grad-CAM heatmaps for MRI slices.
