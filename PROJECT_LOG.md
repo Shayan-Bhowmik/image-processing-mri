@@ -474,9 +474,23 @@ Step 8.5 – Patient-Level Threshold Optimization
 ---
 
 ## Step 9 Aggregation Strategy Comparison
-### Step 9.1
 
 - Implemented Max, Mean, and Fraction aggregation
 - Compared ROC-AUC across strategies
 - All strategies achieved perfect patient-level ROC-AUC (1.0000)
 - Confirmed robustness of aggregation rule
+
+---
+
+## Step 10 — Explainability (Grad-CAM)
+
+Implemented Grad-CAM module to visualize CNN attention regions in MRI slices.
+
+Added:
+- src/utils/gradcam.py
+
+Purpose:
+Generate heatmaps showing which regions of MRI slices influenced the model's tumor predictions.
+
+Next:
+Create visualization script to generate Grad-CAM heatmaps for test samples.
