@@ -74,7 +74,7 @@
 
 ---
 
-## Step 2.2 — Extract MRI Slices Using 2.5D Slicing (Completed)
+## Step 2.2 — Extract MRI Slices Using 2.5D Slicing
 
 **Goal:** Convert 3D MRI volumes into informative 2D slices while preserving spatial context.
 
