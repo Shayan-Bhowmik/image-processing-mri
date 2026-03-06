@@ -58,7 +58,7 @@
 
 ---
 
-## Step 2.1 — Load MRI Using NiBabel (Completed)
+## Step 2.1 — Load MRI Using NiBabel
 
 **Goal:** Load `.nii` MRI files and convert them into NumPy arrays for further processing.
 
@@ -91,7 +91,7 @@
 
 ---
 
-## Step 2.3 — Preprocess MRI Slice (Completed)
+## Step 2.3 — Preprocess MRI Slice
 
 **Goal:** Transform extracted MRI slices into a format suitable for CNN models.
 
