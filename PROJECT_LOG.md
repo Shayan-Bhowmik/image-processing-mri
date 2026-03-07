@@ -144,3 +144,19 @@
 **Outcome:** MRI volumes were successfully divided into **training, validation, and test subsets**, ensuring proper data separation for model training and evaluation.
 
 ---
+
+## Step 6.3 — PyTorch Dataset Integration
+
+**Goal:** Enable dynamic loading and preprocessing of MRI volumes during training.
+
+### Actions
+
+• Implemented a custom **PyTorch Dataset class (`MRIDataset`)**  
+• Loaded MRI volumes directly from `.nii` files using **NiBabel**  
+• Generated **2.5D slices** by stacking adjacent slices _(i-1, i, i+1)_  
+• Applied preprocessing including **resizing to 224 × 224 pixels** and **normalization**  
+• Converted slices into tensors compatible with **ResNet50 input requirements**
+
+**Outcome:** MRI volumes can now be dynamically loaded and converted into **CNN-ready 2.5D slices during training**, eliminating the need to store intermediate image files and enabling efficient data processing.
+
+---
