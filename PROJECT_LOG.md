@@ -1,6 +1,6 @@
 # Brain MRI AI Decision Support — Project Log
 
-## Step 1 — Project Setup (Completed)
+## Step 1 — Project Setup
 
 **Goal:** Create the working environment and initialize the project structure for the Brain MRI AI project.
 
@@ -106,13 +106,13 @@
 
 ---
 
-# Step 6 — Build Training Dataset
+# Step 3 — Build Training Dataset
 
 **Goal:** Prepare MRI data for model training by organizing the **OASIS (normal)** and **BraTS (abnormal)** datasets and creating training, validation, and test splits compatible with the PyTorch training pipeline.
 
 ---
 
-## Step 6.1 — Dataset Organization
+## Step 3.1 — Dataset Organization
 
 **Goal:** Collect MRI volumes from the OASIS and BraTS datasets and organize them for model training.
 
@@ -127,7 +127,7 @@
 
 ---
 
-## Step 6.2 — Dataset Splitting
+## Step 3.2 — Dataset Splitting
 
 **Goal:** Divide the collected MRI volumes into training, validation, and test subsets.
 
@@ -145,7 +145,7 @@
 
 ---
 
-## Step 6.3 — PyTorch Dataset Integration
+## Step 3.3 — PyTorch Dataset Integration
 
 **Goal:** Enable dynamic loading and preprocessing of MRI volumes during training.
 
