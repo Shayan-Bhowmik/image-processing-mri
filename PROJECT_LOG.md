@@ -105,3 +105,42 @@
 **Outcome:** MRI slices are converted into **CNN-ready images (224 × 224 × 3)** suitable for deep learning model training and inference.
 
 ---
+
+# Step 6 — Build Training Dataset
+
+**Goal:** Prepare MRI data for model training by organizing the **OASIS (normal)** and **BraTS (abnormal)** datasets and creating training, validation, and test splits compatible with the PyTorch training pipeline.
+
+---
+
+## Step 6.1 — Dataset Organization
+
+**Goal:** Collect MRI volumes from the OASIS and BraTS datasets and organize them for model training.
+
+### Actions
+
+• Defined dataset paths for **OASIS Clean Data** and **BraTS 2020 Training Data** directories  
+• Collected MRI file paths from the OASIS dataset representing **normal brain scans**  
+• Traversed BraTS patient directories and selected the **T1CE MRI modality** for tumor detection  
+• Created separate lists of MRI file paths for **normal (OASIS)** and **abnormal (BraTS)** datasets
+
+**Outcome:** MRI volumes from both datasets were successfully identified and organized into lists representing normal and abnormal brain scans.
+
+---
+
+## Step 6.2 — Dataset Splitting
+
+**Goal:** Divide the collected MRI volumes into training, validation, and test subsets.
+
+### Actions
+
+• Randomly shuffled the MRI file lists to prevent ordering bias  
+• Implemented dataset splitting using the following ratio:
+70% Training
+15% Validation
+15% Test
+• Applied the split separately to the **OASIS (normal)** and **BraTS (abnormal)** datasets  
+• Generated file lists corresponding to each dataset partition
+
+**Outcome:** MRI volumes were successfully divided into **training, validation, and test subsets**, ensuring proper data separation for model training and evaluation.
+
+---
