@@ -161,11 +161,11 @@
 
 ---
 
-Step 4 — Model Development (Completed)
+Step 4 — Model Development
 
 Goal: Build and train a deep learning model capable of classifying MRI scans as normal or tumor.
 
-Step 4.1 — Define CNN Architecture (Completed)
+Step 4.1 — Define CNN Architecture
 Actions
 
 • Implemented ResNet50 architecture using PyTorch
