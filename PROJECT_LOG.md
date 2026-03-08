@@ -175,7 +175,7 @@ Actions
 
 Outcome: A customized ResNet50 model capable of performing MRI classification.
 
-Step 4.2 — Define Training Components (Completed)
+Step 4.2 — Define Training Components
 Actions
 
 • Implemented CrossEntropyLoss for classification
