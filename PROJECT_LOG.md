@@ -161,34 +161,49 @@
 
 ---
 
-Step 4 — Model Development
+# Step 4 — Model Development
 
-Goal: Build and train a deep learning model capable of classifying MRI scans as normal or tumor.
+**Goal:** Build and train a deep learning model capable of classifying MRI scans as **normal or tumor**.
 
-Step 4.1 — Define CNN Architecture
-Actions
+---
 
-• Implemented ResNet50 architecture using PyTorch
-• Loaded ImageNet pretrained weights for transfer learning
-• Modified the final fully connected layer to output 2 classes (Normal / Tumor)
-• Ensured compatibility with 224 × 224 × 3 MRI slice inputs
+## Step 4.1 — Define CNN Architecture
 
-Outcome: A customized ResNet50 model capable of performing MRI classification.
+**Goal:** Implement a deep learning model capable of learning features from MRI slices using transfer learning.
 
-Step 4.2 — Define Training Components
-Actions
+### Actions
 
-• Implemented CrossEntropyLoss for classification
-• Configured Adam optimizer for gradient descent
-• Defined learning rate and training hyperparameters
-• Enabled automatic device selection (CPU / GPU)
+• Implemented **ResNet50 architecture using PyTorch**  
+• Loaded **ImageNet pretrained weights** for transfer learning  
+• Modified the **final fully connected layer** to output **2 classes (Normal / Tumor)**  
+• Ensured compatibility with **224 × 224 × 3 MRI slice inputs**
 
-Outcome: Training configuration prepared with loss function, optimizer, and device setup.
+**Outcome:** A customized **ResNet50 model** capable of performing MRI classification.
 
-Step 4.3 — Implement Training Loop
-Actions
+---
 
-• Loaded MRI datasets using PyTorch DataLoader
+## Step 4.2 — Define Training Components
+
+**Goal:** Configure the core components required for model training.
+
+### Actions
+
+• Implemented **CrossEntropyLoss** for classification  
+• Configured **Adam optimizer** for gradient descent  
+• Defined **learning rate and training hyperparameters**  
+• Enabled **automatic device selection (CPU / GPU)**
+
+**Outcome:** Training configuration prepared with **loss function, optimizer, and device setup**.
+
+---
+
+## Step 4.3 — Implement Training Loop
+
+**Goal:** Train the CNN model using MRI data batches.
+
+### Actions
+
+• Loaded MRI datasets using **PyTorch DataLoader**  
 • Implemented training loop with:
 
 Forward pass
@@ -198,29 +213,40 @@ Loss calculation
 Backpropagation
 
 Optimizer updates
-• Tracked training loss and accuracy per epoch
 
-Outcome: The CNN model successfully trains on MRI slices generated from OASIS (normal) and BRATS (tumor) datasets.
+• Tracked **training loss and accuracy per epoch**
 
-Step 4.4 — Data Preparation for Training
-Actions
+**Outcome:** The CNN model successfully trains on MRI slices generated from **OASIS (normal)** and **BRATS (tumor)** datasets.
 
-• Loaded OASIS dataset as the normal brain class
-• Loaded BRATS dataset (FLAIR modality) as the tumor class
-• Implemented 2.5D slicing strategy by stacking adjacent slices (i−1, i, i+1)
-• Resized slices to 224 × 224 pixels
+---
+
+## Step 4.4 — Data Preparation for Training
+
+**Goal:** Integrate MRI datasets and preprocessing pipeline into the training workflow.
+
+### Actions
+
+• Loaded **OASIS dataset** as the **normal brain class**  
+• Loaded **BRATS dataset (FLAIR modality)** as the **tumor class**  
+• Implemented **2.5D slicing strategy** by stacking adjacent slices _(i−1, i, i+1)_  
+• Resized slices to **224 × 224 pixels**  
 • Normalized slice intensity values
 
-Outcome: MRI volumes are converted into CNN-ready 2.5D slices compatible with ResNet50 input requirements.
+**Outcome:** MRI volumes are converted into **CNN-ready 2.5D slices compatible with ResNet50 input requirements**.
 
-Step 4.5 — Model Training Execution (Completed)
-Actions
+---
 
-• Executed model training for 5 epochs
-• Monitored training loss and accuracy during training
-• Observed rapid convergence due to transfer learning
+## Step 4.5 — Model Training Execution
 
-Training Results
+**Goal:** Train the CNN model using the prepared dataset.
+
+### Actions
+
+• Executed **model training for 5 epochs**  
+• Monitored **training loss and accuracy during training**  
+• Observed **rapid convergence due to transfer learning**
+
+### Training Results
 
 Epoch 1/5
 Train Loss: 12.0793
@@ -242,14 +268,34 @@ Epoch 5/5
 Train Loss: 0.1378
 Train Accuracy: 1.0000
 
-Outcome: The model successfully learned MRI classification patterns and achieved high training accuracy.
+**Outcome:** The model successfully learned MRI classification patterns and achieved **high training accuracy**.
 
-Step 4.6 — Save Trained Model (Completed)
-Actions
+---
 
-• Saved trained model weights using PyTorch torch.save()
-• Stored model checkpoint inside the models/ directory
+## Step 4.6 — Save Trained Model
+
+**Goal:** Persist the trained CNN model for later inference and evaluation.
+
+### Actions
+
+• Saved trained model weights using **PyTorch `torch.save()`**  
+• Stored model checkpoint inside the **models/** directory
+
+**Outcome:** The model successfully learned MRI classification patterns and achieved **high training accuracy**.
+
+---
+
+## Step 4.6 — Save Trained Model
+
+**Goal:** Persist the trained CNN model for later inference and evaluation.
+
+### Actions
+
+• Saved trained model weights using **PyTorch `torch.save()`**  
+• Stored model checkpoint inside the **models/** directory
 
 models/mri_resnet50.pth
 
-Outcome: The trained CNN model is saved and available for inference, evaluation, and deployment.
+**Outcome:** The trained CNN model is saved and available for **inference, evaluation, and deployment**.
+
+---
