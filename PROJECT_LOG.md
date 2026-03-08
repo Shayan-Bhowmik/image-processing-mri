@@ -185,7 +185,7 @@ Actions
 
 Outcome: Training configuration prepared with loss function, optimizer, and device setup.
 
-Step 4.3 — Implement Training Loop (Completed)
+Step 4.3 — Implement Training Loop
 Actions
 
 • Loaded MRI datasets using PyTorch DataLoader
@@ -202,7 +202,7 @@ Optimizer updates
 
 Outcome: The CNN model successfully trains on MRI slices generated from OASIS (normal) and BRATS (tumor) datasets.
 
-Step 4.4 — Data Preparation for Training (Completed)
+Step 4.4 — Data Preparation for Training
 Actions
 
 • Loaded OASIS dataset as the normal brain class
