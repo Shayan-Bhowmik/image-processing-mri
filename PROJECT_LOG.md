@@ -299,3 +299,47 @@ models/mri_resnet50.pth
 **Outcome:** The trained CNN model is saved and available for **inference, evaluation, and deployment**.
 
 ---
+
+## Step 5 — Explainable AI
+
+Goal:  
+Provide visual explanations of model predictions to support medical interpretability and help understand which regions of the MRI influence the model's decision.
+
+---
+
+### Step 5.1 — Implement Grad-CAM
+
+Goal:  
+Highlight regions of the MRI image that influenced the model's prediction.
+
+Actions:
+
+- Implemented the Grad-CAM (Gradient-weighted Class Activation Mapping) technique for CNN interpretability.
+- Attached forward and backward hooks to the final convolutional layer (`layer4`) of the ResNet50 model.
+- Captured feature maps produced during the forward pass.
+- Computed gradients of the predicted class with respect to these feature maps.
+- Calculated channel-wise importance weights using global average pooling of gradients.
+- Generated a class activation map by combining the feature maps with the computed weights.
+- Applied ReLU activation and normalization to produce the final Grad-CAM heatmap.
+
+Outcome:
+Grad-CAM successfully generates heatmaps that highlight the most influential regions used by the model during prediction, improving transparency and interpretability of the CNN model.
+
+---
+
+### Step 5.2 — Overlay Heatmap on MRI Image
+
+Goal:  
+Visualize Grad-CAM results by overlaying activation heatmaps directly on MRI images.
+
+Actions:
+
+- Resized the Grad-CAM heatmap to match the MRI input resolution (224 × 224).
+- Converted the normalized heatmap into a colored activation map using the JET color scheme.
+- Blended the activation heatmap with the original MRI image using weighted transparency.
+- Displayed the resulting visualization using Matplotlib for easier inspection.
+
+Outcome:
+The final visualization clearly shows highlighted regions of the MRI image where the model focused while making predictions, providing an intuitive explanation of the model’s decision process.
+
+---
