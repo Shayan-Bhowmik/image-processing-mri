@@ -302,15 +302,13 @@ models/mri_resnet50.pth
 
 ## Step 5 — Explainable AI
 
-Goal:  
-Provide visual explanations of model predictions to support medical interpretability and help understand which regions of the MRI influence the model's decision.
+Goal: Provide visual explanations of model predictions to support medical interpretability and help understand which regions of the MRI influence the model's decision.
 
 ---
 
 ### Step 5.1 — Implement Grad-CAM
 
-Goal:  
-Highlight regions of the MRI image that influenced the model's prediction.
+Goal: Highlight regions of the MRI image that influenced the model's prediction.
 
 Actions:
 
@@ -322,15 +320,13 @@ Actions:
 - Generated a class activation map by combining the feature maps with the computed weights.
 - Applied ReLU activation and normalization to produce the final Grad-CAM heatmap.
 
-Outcome:
-Grad-CAM successfully generates heatmaps that highlight the most influential regions used by the model during prediction, improving transparency and interpretability of the CNN model.
+Outcome: Grad-CAM successfully generates heatmaps that highlight the most influential regions used by the model during prediction, improving transparency and interpretability of the CNN model.
 
 ---
 
 ### Step 5.2 — Overlay Heatmap on MRI Image
 
-Goal:  
-Visualize Grad-CAM results by overlaying activation heatmaps directly on MRI images.
+Goal: Visualize Grad-CAM results by overlaying activation heatmaps directly on MRI images.
 
 Actions:
 
@@ -339,7 +335,6 @@ Actions:
 - Blended the activation heatmap with the original MRI image using weighted transparency.
 - Displayed the resulting visualization using Matplotlib for easier inspection.
 
-Outcome:
-The final visualization clearly shows highlighted regions of the MRI image where the model focused while making predictions, providing an intuitive explanation of the model’s decision process.
+Outcome: The final visualization clearly shows highlighted regions of the MRI image where the model focused while making predictions, providing an intuitive explanation of the model’s decision process.
 
 ---
