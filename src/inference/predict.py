@@ -68,30 +68,6 @@ def preprocess_slice(slice_img):
 
     return slice_img
 
-# Step 6.3 — Predict slice
-
-def predict_slice(model, slice_tensor):
-
-    with torch.no_grad():
-
-        slice_tensor = slice_tensor.unsqueeze(0)
-
-        output = model(slice_tensor)
-
-        probabilities = torch.softmax(output, dim=1)
-
-    return probabilities.squeeze()
-
-# Aggregate slice predictions
-
-def aggregate_predictions(predictions):
-
-    predictions = torch.stack(predictions)
-
-    mean_prediction = predictions.mean(dim=0)
-
-    return mean_prediction
-
 # Full prediction pipeline
 
 def predict_mri(model, mri_path):

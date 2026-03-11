@@ -338,3 +338,47 @@ Actions:
 Outcome: The final visualization clearly shows highlighted regions of the MRI image where the model focused while making predictions, providing an intuitive explanation of the model’s decision process.
 
 ---
+
+## Step 6 — Prediction Pipeline
+
+### Step 6.1 — Load Trained Model
+
+**Goal:** Load the trained ResNet50 model and its saved weights so that it can be used for performing inference on new MRI scans.
+
+**Actions:**  
+• Loaded trained ResNet50 model architecture  
+• Loaded saved model weights from the trained checkpoint  
+• Set the model to evaluation mode using `model.eval()`
+
+**Outcome:** The trained model is successfully loaded with its learned parameters and prepared for performing inference on new MRI scans.
+
+---
+
+### Step 6.2 — MRI Preprocessing Pipeline
+
+**Goal:** Prepare new MRI scans for model inference by loading `.nii` volumes, generating 2.5D slices, and applying the same preprocessing steps used during training.
+
+**Actions:**  
+• Loaded MRI volumes (`.nii` files) using NiBabel  
+• Generated 2.5D slices using adjacent slices `(i-1, i, i+1)`  
+• Resized slices to `224×224`  
+• Applied normalization consistent with the training preprocessing pipeline
+
+**Outcome:** MRI volumes are successfully converted into normalized 2.5D slices that are compatible with the CNN model input format.
+
+---
+
+### Step 6.3 — Generate Predictions
+
+**Goal:**  
+Use the trained CNN model to classify MRI slices and combine slice-level predictions to obtain a final prediction for the entire MRI scan.
+
+**Actions:**  
+• Passed preprocessed MRI slices through the trained ResNet50 model  
+• Computed prediction probabilities for **Normal** and **Tumor** classes  
+• Aggregated slice-level predictions to produce a patient-level classification
+
+**Outcome:**  
+The inference pipeline successfully generates probability scores for Normal and Tumor classes and outputs a final classification result for each MRI scan.
+
+---
