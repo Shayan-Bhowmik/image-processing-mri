@@ -370,15 +370,13 @@ Outcome: The final visualization clearly shows highlighted regions of the MRI im
 
 ### Step 6.3 — Generate Predictions
 
-**Goal:**  
-Use the trained CNN model to classify MRI slices and combine slice-level predictions to obtain a final prediction for the entire MRI scan.
+**Goal:** Use the trained CNN model to classify MRI slices and combine slice-level predictions to obtain a final prediction for the entire MRI scan.
 
 **Actions:**  
 • Passed preprocessed MRI slices through the trained ResNet50 model  
 • Computed prediction probabilities for **Normal** and **Tumor** classes  
 • Aggregated slice-level predictions to produce a patient-level classification
 
-**Outcome:**  
-The inference pipeline successfully generates probability scores for Normal and Tumor classes and outputs a final classification result for each MRI scan.
+**Outcome:** The inference pipeline successfully generates probability scores for Normal and Tumor classes and outputs a final classification for each MRI scan.
 
 ---
