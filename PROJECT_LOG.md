@@ -637,3 +637,58 @@ Implemented configurable training pipeline to support ablation experiments.
 System is now fully configurable for controlled ablation experiments without code duplication.
 
 Ready to evaluate impact of architectural choices.
+
+--- 
+
+## Step 11.1 — Ablation 1: Removal of 2.5D Context (In Progress)
+
+### Objective
+
+Evaluate the impact of spatial context (2.5D input) by removing neighboring slices and using only single-slice (2D) input.
+
+---
+
+### Changes Implemented
+
+#### Data Pipeline Modification
+
+File Modified:
+- `src/preprocessing/stacking.py`
+
+Changes:
+- Removed multi-slice stacking:
+  - `[prev_slice, current_slice, next_slice]`
+- Replaced with single-slice input:
+  - `[current_slice]`
+- Added channel dimension using `np.expand_dims`
+- Output shape updated:
+  - From `(3, H, W)` → `(1, H, W)`
+
+---
+
+### Rationale
+
+- 2.5D input captures inter-slice spatial continuity
+- This experiment isolates the contribution of contextual information
+- Establishes whether neighboring slices significantly impact classification performance
+
+---
+
+### Experimental Integrity
+
+- No changes made to:
+  - Model architecture (except input channels – pending)
+  - Loss function
+  - Optimizer
+  - Dataset split
+  - Training schedule
+
+- Ensures controlled ablation with only one variable changed
+
+---
+
+### Status
+
+- Data pipeline successfully modified
+- Model update pending
+- Training not yet started

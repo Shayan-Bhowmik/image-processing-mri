@@ -3,21 +3,20 @@ import numpy as np
 
 def create_25d_samples(slices):
     """
-    Convert a list of 2D slices into 2.5D stacked samples.
+    Ablation: Convert slices into 2D samples (no context).
 
-    Each output sample has shape (3, H, W):
-        [previous_slice, current_slice, next_slice]
+    Each output sample has shape (1, H, W):
+        [current_slice]
 
-    Edge slices are duplicated to maintain consistency.
+    This removes 2.5D context (previous and next slices)
+    and keeps only the central slice.
     """
     samples = []
     n = len(slices)
 
     for i in range(n):
-        prev_slice = slices[i - 1] if i > 0 else slices[i]
-        next_slice = slices[i + 1] if i < n - 1 else slices[i]
-
-        stacked = np.stack([prev_slice, slices[i], next_slice], axis=0)
-        samples.append(stacked)
+        # Take only the current slice and add channel dimension
+        single_slice = np.expand_dims(slices[i], axis=0)  # (1, H, W)
+        samples.append(single_slice)
 
     return samples
