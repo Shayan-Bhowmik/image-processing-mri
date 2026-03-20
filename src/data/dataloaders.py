@@ -5,15 +5,16 @@ from src.data.mri_dataset import MRIDataset, load_split
 def create_dataloaders(
     split_path,
     batch_size=8,
-    num_workers=0
+    num_workers=0,
+    use_2_5d=True
 ):
     train_paths = load_split(split_path, "train")
     val_paths = load_split(split_path, "val")
     test_paths = load_split(split_path, "test")
 
-    train_dataset = MRIDataset(train_paths)
-    val_dataset = MRIDataset(val_paths)
-    test_dataset = MRIDataset(test_paths)
+    train_dataset = MRIDataset(train_paths, use_2_5d=use_2_5d)
+    val_dataset = MRIDataset(val_paths, use_2_5d=use_2_5d)
+    test_dataset = MRIDataset(test_paths, use_2_5d=use_2_5d)
 
     train_loader = DataLoader(
         train_dataset,

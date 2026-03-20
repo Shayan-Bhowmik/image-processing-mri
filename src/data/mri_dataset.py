@@ -16,8 +16,9 @@ def load_split(split_path, split_name):
 
 
 class MRIDataset(Dataset):
-    def __init__(self, split_entries, image_size=(224, 224)):
+    def __init__(self, split_entries, image_size=(224, 224), use_2_5d=True):
         self.image_size = image_size
+        self.use_2_5d = use_2_5d   # ✅ IMPORTANT (you missed this)
         self.index_map = []  # (patient_id, slice_index, label)
         self.volume_store = {}  # patient_id -> normalized 3D volume
 
@@ -87,12 +88,17 @@ class MRIDataset(Dataset):
         slice_curr = volume[:, :, slice_idx]
         slice_next = volume[:, :, next_idx]
 
-        # Stack 2.5D slices
-        sample = torch.stack([
-            torch.from_numpy(slice_prev),
-            torch.from_numpy(slice_curr),
-            torch.from_numpy(slice_next)
-        ], dim=0)
+        # -------------------------------
+        # 2.5D OR 1-slice mode
+        # -------------------------------
+        if self.use_2_5d:
+            sample = torch.stack([
+                torch.from_numpy(slice_prev),
+                torch.from_numpy(slice_curr),
+                torch.from_numpy(slice_next)
+            ], dim=0)
+        else:
+            sample = torch.from_numpy(slice_curr).unsqueeze(0)
 
         # Resize to model input size
         sample = resize_sample(sample, size=self.image_size)

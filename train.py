@@ -58,18 +58,30 @@ def evaluate(model, loader, criterion, device):
 
 def train():
     set_seed(42)
+
+    # =========================
+    # CONFIG (NEW)
+    # =========================
+    config = {
+        "use_2_5d": True
+    }
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     split_path = "data/splits/patient_split.json"
 
+    # =========================
+    # DATALOADER (UPDATED)
+    # =========================
     train_loader, val_loader, test_loader = create_dataloaders(
         split_path,
-        batch_size=8
+        batch_size=8,
+        use_2_5d=config["use_2_5d"]
     )
 
-    # -------------------------------
-    # Class Weights
-    # -------------------------------
+    # =========================
+    # CLASS WEIGHTS
+    # =========================
     all_labels = []
     for _, labels, _ in train_loader:
         all_labels.extend(labels.tolist())
@@ -87,10 +99,12 @@ def train():
     class_weights = torch.tensor(class_weights, dtype=torch.float).to(device)
     print("Class Weights:", class_weights)
 
-    # -------------------------------
-    # Model
-    # -------------------------------
-    model = BrainMRICNN().to(device)
+    # =========================
+    # MODEL (UPDATED)
+    # =========================
+    in_channels = 3 if config["use_2_5d"] else 1
+    model = BrainMRICNN(in_channels=in_channels).to(device)
+
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
@@ -106,9 +120,9 @@ def train():
 
     os.makedirs("checkpoints", exist_ok=True)
 
-    # -------------------------------
-    # Training Loop
-    # -------------------------------
+    # =========================
+    # TRAINING LOOP
+    # =========================
     for epoch in range(num_epochs):
         model.train()
 
@@ -152,9 +166,9 @@ def train():
             torch.save(model.state_dict(), "checkpoints/best_model.pth")
             print("✔ Best model saved.")
 
-    # ==========================================================
+    # =========================
     # TEST SET EVALUATION
-    # ==========================================================
+    # =========================
     print("\n===== TEST SET EVALUATION =====")
 
     model.load_state_dict(
@@ -175,17 +189,17 @@ def train():
     print("\nTest Classification Report:")
     print(classification_report(test_true, test_pred))
 
-    # -------------------------------
-    # Slice-Level ROC
-    # -------------------------------
+    # =========================
+    # SLICE-LEVEL ROC
+    # =========================
     print("\nROC-AUC Analysis (Slice-Level):")
     fpr, tpr, _ = roc_curve(test_true, test_probs)
     roc_auc = auc(fpr, tpr)
     print(f"ROC-AUC: {roc_auc:.4f}")
 
-    # ==========================================================
+    # =========================
     # PATIENT-LEVEL AGGREGATION
-    # ==========================================================
+    # =========================
     print("\n===== PATIENT-LEVEL EVALUATION (Max Probability) =====")
 
     patient_dict = {}
@@ -208,7 +222,6 @@ def train():
     patient_labels = np.array(patient_labels)
     max_scores = np.array(max_scores)
 
-    # Default threshold 0.5
     patient_preds = (max_scores > 0.5).astype(int)
 
     print("\nPatient-Level Confusion Matrix:")
@@ -221,9 +234,9 @@ def train():
     roc_auc_patient = auc(fpr_p, tpr_p)
     print(f"\nPatient-Level ROC-AUC: {roc_auc_patient:.4f}")
 
-    # ==========================================================
-    # THRESHOLD OPTIMIZATION (MAX STRATEGY)
-    # ==========================================================
+    # =========================
+    # THRESHOLD OPTIMIZATION
+    # =========================
     print("\n===== PATIENT-LEVEL THRESHOLD OPTIMIZATION =====")
 
     thresholds = np.linspace(0, 1, 200)
@@ -247,34 +260,6 @@ def train():
     print(f"Best Threshold: {best_threshold:.4f}")
     print(f"Sensitivity at Best Threshold: {best_sensitivity:.4f}")
     print(f"Specificity at Best Threshold: {best_specificity:.4f}")
-
-    # ==========================================================
-    # AGGREGATION STRATEGY COMPARISON
-    # ==========================================================
-    print("\n===== AGGREGATION STRATEGY COMPARISON =====")
-
-    # ----- Mean Strategy -----
-    mean_scores = []
-    for pid in patient_dict:
-        mean_scores.append(np.mean(patient_dict[pid]["slice_probs"]))
-    mean_scores = np.array(mean_scores)
-
-    fpr_mean, tpr_mean, _ = roc_curve(patient_labels, mean_scores)
-    auc_mean = auc(fpr_mean, tpr_mean)
-
-    # ----- Fraction Strategy -----
-    fraction_scores = []
-    for pid in patient_dict:
-        slice_probs = np.array(patient_dict[pid]["slice_probs"])
-        fraction_scores.append(np.mean(slice_probs > 0.5))
-    fraction_scores = np.array(fraction_scores)
-
-    fpr_frac, tpr_frac, _ = roc_curve(patient_labels, fraction_scores)
-    auc_frac = auc(fpr_frac, tpr_frac)
-
-    print(f"Max Aggregation ROC-AUC: {roc_auc_patient:.4f}")
-    print(f"Mean Aggregation ROC-AUC: {auc_mean:.4f}")
-    print(f"Fraction Aggregation ROC-AUC: {auc_frac:.4f}")
 
 
 if __name__ == "__main__":

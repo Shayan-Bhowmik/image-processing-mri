@@ -4,11 +4,11 @@ import torch.nn.functional as F
 
 
 class BrainMRICNN(nn.Module):
-    def __init__(self, num_classes=2):
+    def __init__(self, num_classes=2, in_channels=3):
         super(BrainMRICNN, self).__init__()
 
         self.features = nn.Sequential(
-            nn.Conv2d(3, 16, kernel_size=3, padding=1),
+            nn.Conv2d(in_channels, 16, kernel_size=3, padding=1),
             nn.BatchNorm2d(16),
             nn.ReLU(),
             nn.MaxPool2d(2),

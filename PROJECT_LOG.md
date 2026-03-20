@@ -598,3 +598,42 @@ Grad-CAM outputs now highlight tumor-related regions within the brain more clear
 This significantly improves explainability quality for demonstrations and evaluation.
 
 Grad-CAM pipeline successfully integrated into the project.
+
+---
+
+## Step 11 — Ablation Framework Setup
+
+Implemented configurable training pipeline to support ablation experiments.
+
+### Changes Made
+
+- Added `use_2_5d` flag in MRIDataset
+  - Supports both:
+    - 2.5D input (3 slices)
+    - Single-slice input (1 channel)
+
+- Updated dataloaders to pass configuration flag
+  - `create_dataloaders(..., use_2_5d=True/False)`
+
+- Modified CNN model to support dynamic input channels
+  - Added `in_channels` parameter
+  - Enables switching between 1-channel and 3-channel input
+
+- Updated training pipeline (`train.py`)
+  - Introduced config-based control:
+    - `use_2_5d`
+  - Model and dataloaders now adapt automatically
+
+### Verification
+
+- Ran full training with `use_2_5d=True`
+- Achieved same baseline performance:
+  - Test Accuracy: ~99.47%
+  - ROC-AUC: ~0.9998
+  - Patient-level accuracy: 100%
+
+### Outcome
+
+System is now fully configurable for controlled ablation experiments without code duplication.
+
+Ready to evaluate impact of architectural choices.
