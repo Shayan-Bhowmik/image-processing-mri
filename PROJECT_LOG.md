@@ -640,7 +640,7 @@ Ready to evaluate impact of architectural choices.
 
 --- 
 
-## Step 11.1 — Ablation 1: Removal of 2.5D Context (In Progress)
+## Step 11.1 — Ablation 1: Removal of 2.5D Context
 
 ### Objective
 
@@ -769,3 +769,51 @@ Evaluate the impact of class imbalance handling by removing class weights from t
 ### Conclusion
 
 Class weights are not necessary for this dataset and can be safely removed without impacting model performance.
+
+---
+
+## Step 11.4 — Ablation 3: Removal of Normalization
+
+### Objective
+
+Evaluate the impact of Z-score normalization on model performance and training stability.
+
+---
+
+### Changes Implemented
+
+- Removed normalization from preprocessing pipeline
+- Replaced z-score normalization with identity function (raw intensities)
+
+---
+
+### Results Summary
+
+| Model Variant | Normalization | Test Accuracy | ROC-AUC |
+|--------------|--------------|--------------|--------|
+| Baseline     | Yes          | 99.47%       | 0.9998 |
+| Ablation 3   | No           | 99.39%       | 0.9997 |
+
+---
+
+### Observations
+
+- Slight drop in accuracy (~0.08%)
+- Minor decrease in ROC-AUC
+- Training instability observed:
+  - High validation loss in early epochs
+  - Fluctuating loss across epochs
+
+---
+
+### Interpretation
+
+- Model is robust to lack of normalization
+- Tumor features are strong enough to be learned from raw intensities
+- However, normalization significantly improves training stability and convergence
+
+---
+
+### Conclusion
+
+Normalization is not essential for final performance but is critical for stable and reliable training.
