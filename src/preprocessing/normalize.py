@@ -3,9 +3,18 @@ import numpy as np
 
 def zscore_normalize(volume: np.ndarray) -> np.ndarray:
     """
-    Ablation 3: Normalization removed.
-
-    This function now returns the raw MRI volume without any scaling.
-    Only ensures the data type is float32 for consistency.
+    Perform Z-score normalization on non-zero voxels of an MRI volume.
     """
-    return volume.astype(np.float32)
+    mask = volume > 0
+
+    if np.sum(mask) == 0:
+        return volume
+
+    mean = volume[mask].mean()
+    std = volume[mask].std()
+
+    if std == 0:
+        return volume
+
+    volume[mask] = (volume[mask] - mean) / std
+    return volume
