@@ -60,10 +60,10 @@ def train():
     set_seed(42)
 
     # =========================
-    # CONFIG (ABLATION SWITCH)
+    # CONFIG (BASELINE RESTORED)
     # =========================
     config = {
-        "use_2_5d": False   # 🔥 Ablation 1 (2D input)
+        "use_2_5d": True   # ✅ BACK TO BASELINE
     }
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -80,16 +80,10 @@ def train():
     )
 
     # =========================
-    #  SANITY CHECK (MANDATORY)
+    # SANITY CHECK (BASELINE)
     # =========================
-    x, y, *_ = next(iter(train_loader))
-    print("Sanity Check - Input shape:", x.shape)
-
-    in_channels = 3 if config["use_2_5d"] else 1
-    model = BrainMRICNN(num_classes=2, in_channels=in_channels).to(device)
-
-    out = model(x.to(device))
-    print("Sanity Check - Output shape:", out.shape)
+    x, _, *_ = next(iter(train_loader))
+    print("Baseline check - Input shape:", x.shape)
 
     # =========================
     # CLASS WEIGHTS
@@ -110,6 +104,12 @@ def train():
 
     class_weights = torch.tensor(class_weights, dtype=torch.float).to(device)
     print("Class Weights:", class_weights)
+
+    # =========================
+    # MODEL
+    # =========================
+    in_channels = 3 if config["use_2_5d"] else 1
+    model = BrainMRICNN(num_classes=2, in_channels=in_channels).to(device)
 
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
@@ -195,9 +195,6 @@ def train():
     print("\nTest Classification Report:")
     print(classification_report(test_true, test_pred))
 
-    # =========================
-    # ROC
-    # =========================
     print("\nROC-AUC Analysis (Slice-Level):")
     fpr, tpr, _ = roc_curve(test_true, test_probs)
     roc_auc = auc(fpr, tpr)
