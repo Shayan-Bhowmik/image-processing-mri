@@ -720,3 +720,52 @@ Changes:
 ### Conclusion
 
 2.5D input improves performance marginally, particularly in reducing false negatives, but is not strictly necessary for high classification accuracy.
+
+---
+
+## Step 11.3 — Ablation 2: Removal of Class Weights
+
+### Objective
+
+Evaluate the impact of class imbalance handling by removing class weights from the loss function.
+
+---
+
+### Changes Implemented
+
+- Removed class weights from CrossEntropyLoss
+- Replaced:
+  - `CrossEntropyLoss(weight=class_weights)`
+  - with `CrossEntropyLoss()`
+
+---
+
+### Results Summary
+
+| Model Variant | Class Weights | Test Accuracy | ROC-AUC |
+|--------------|--------------|--------------|--------|
+| Baseline     | Yes          | 99.47%       | 0.9998 |
+| Ablation 2   | No           | 99.41%       | 0.9998 |
+
+---
+
+### Observations
+
+- Negligible drop in accuracy (~0.06%)
+- ROC-AUC unchanged
+- Slight reduction in false negatives
+- No bias toward majority class observed
+
+---
+
+### Interpretation
+
+- Dataset imbalance is mild (~1.34:1 ratio)
+- Model learns class distribution effectively without weighting
+- Class weighting does not significantly influence performance
+
+---
+
+### Conclusion
+
+Class weights are not necessary for this dataset and can be safely removed without impacting model performance.

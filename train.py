@@ -111,7 +111,7 @@ def train():
     in_channels = 3 if config["use_2_5d"] else 1
     model = BrainMRICNN(num_classes=2, in_channels=in_channels).to(device)
 
-    criterion = nn.CrossEntropyLoss(weight=class_weights)
+    criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
