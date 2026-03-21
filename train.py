@@ -60,10 +60,10 @@ def train():
     set_seed(42)
 
     # =========================
-    # CONFIG (NEW)
+    # CONFIG (ABLATION SWITCH)
     # =========================
     config = {
-        "use_2_5d": True
+        "use_2_5d": False   # 🔥 Ablation 1 (2D input)
     }
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -71,13 +71,25 @@ def train():
     split_path = "data/splits/patient_split.json"
 
     # =========================
-    # DATALOADER (UPDATED)
+    # DATALOADER
     # =========================
     train_loader, val_loader, test_loader = create_dataloaders(
         split_path,
         batch_size=8,
         use_2_5d=config["use_2_5d"]
     )
+
+    # =========================
+    #  SANITY CHECK (MANDATORY)
+    # =========================
+    x, y, *_ = next(iter(train_loader))
+    print("Sanity Check - Input shape:", x.shape)
+
+    in_channels = 3 if config["use_2_5d"] else 1
+    model = BrainMRICNN(num_classes=2, in_channels=in_channels).to(device)
+
+    out = model(x.to(device))
+    print("Sanity Check - Output shape:", out.shape)
 
     # =========================
     # CLASS WEIGHTS
@@ -98,12 +110,6 @@ def train():
 
     class_weights = torch.tensor(class_weights, dtype=torch.float).to(device)
     print("Class Weights:", class_weights)
-
-    # =========================
-    # MODEL (UPDATED)
-    # =========================
-    in_channels = 3 if config["use_2_5d"] else 1
-    model = BrainMRICNN(in_channels=in_channels).to(device)
 
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
@@ -190,76 +196,12 @@ def train():
     print(classification_report(test_true, test_pred))
 
     # =========================
-    # SLICE-LEVEL ROC
+    # ROC
     # =========================
     print("\nROC-AUC Analysis (Slice-Level):")
     fpr, tpr, _ = roc_curve(test_true, test_probs)
     roc_auc = auc(fpr, tpr)
     print(f"ROC-AUC: {roc_auc:.4f}")
-
-    # =========================
-    # PATIENT-LEVEL AGGREGATION
-    # =========================
-    print("\n===== PATIENT-LEVEL EVALUATION (Max Probability) =====")
-
-    patient_dict = {}
-
-    for pid, label, prob in zip(test_patient_ids, test_true, test_probs):
-        if pid not in patient_dict:
-            patient_dict[pid] = {
-                "true_label": label,
-                "slice_probs": []
-            }
-        patient_dict[pid]["slice_probs"].append(prob)
-
-    patient_labels = []
-    max_scores = []
-
-    for pid in patient_dict:
-        patient_labels.append(patient_dict[pid]["true_label"])
-        max_scores.append(max(patient_dict[pid]["slice_probs"]))
-
-    patient_labels = np.array(patient_labels)
-    max_scores = np.array(max_scores)
-
-    patient_preds = (max_scores > 0.5).astype(int)
-
-    print("\nPatient-Level Confusion Matrix:")
-    print(confusion_matrix(patient_labels, patient_preds))
-
-    print("\nPatient-Level Classification Report:")
-    print(classification_report(patient_labels, patient_preds))
-
-    fpr_p, tpr_p, _ = roc_curve(patient_labels, max_scores)
-    roc_auc_patient = auc(fpr_p, tpr_p)
-    print(f"\nPatient-Level ROC-AUC: {roc_auc_patient:.4f}")
-
-    # =========================
-    # THRESHOLD OPTIMIZATION
-    # =========================
-    print("\n===== PATIENT-LEVEL THRESHOLD OPTIMIZATION =====")
-
-    thresholds = np.linspace(0, 1, 200)
-    best_threshold = 0.5
-    best_youden = -1
-
-    for t in thresholds:
-        preds = (max_scores > t).astype(int)
-        tn, fp, fn, tp = confusion_matrix(patient_labels, preds).ravel()
-
-        sensitivity = tp / (tp + fn) if (tp + fn) > 0 else 0
-        specificity = tn / (tn + fp) if (tn + fp) > 0 else 0
-        youden = sensitivity + specificity - 1
-
-        if youden > best_youden:
-            best_youden = youden
-            best_threshold = t
-            best_sensitivity = sensitivity
-            best_specificity = specificity
-
-    print(f"Best Threshold: {best_threshold:.4f}")
-    print(f"Sensitivity at Best Threshold: {best_sensitivity:.4f}")
-    print(f"Specificity at Best Threshold: {best_specificity:.4f}")
 
 
 if __name__ == "__main__":

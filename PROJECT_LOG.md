@@ -692,3 +692,31 @@ Changes:
 - Data pipeline successfully modified
 - Model update pending
 - Training not yet started
+
+---
+
+## Step 11.2 — Ablation 1 Results (2D vs 2.5D)
+
+### Results Summary
+
+| Model Variant | Input Type | Test Accuracy | ROC-AUC |
+|--------------|----------|--------------|--------|
+| Baseline     | 2.5D     | 99.47%       | 0.9998 |
+| Ablation 1   | 2D       | 99.32%       | 0.9996 |
+
+### Observations
+
+- Slight decrease in accuracy (~0.15%)
+- Slight drop in ROC-AUC
+- Minor increase in false negatives
+- No increase in false positives
+
+### Interpretation
+
+- 2.5D context provides additional spatial information across slices
+- However, tumor features are sufficiently strong in individual slices
+- Model remains highly effective even without contextual input
+
+### Conclusion
+
+2.5D input improves performance marginally, particularly in reducing false negatives, but is not strictly necessary for high classification accuracy.
