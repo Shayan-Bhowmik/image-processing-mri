@@ -224,3 +224,14 @@ Successfully implemented the complete training execution script serving as the c
 
 ### Outcome
 Successfully implemented the prediction collection module for the evaluation pipeline. The system can now run inference on validation datasets and collect prediction outputs required for performance metric computation while maintaining compatibility with Grad-CAM functionality during training.
+
+## Step 9.2 – Evaluation Metrics (Completed)
+
+### Actions
+- Implemented classification metrics module in `src/evaluation/metrics.py`
+- Computed accuracy, precision, recall, and F1-score for binary classification
+- Implemented confusion matrix computation
+- Structured metric outputs for evaluation reporting
+
+### Outcome
+The system can now compute quantitative performance metrics from prediction outputs, enabling objective evaluation of the MRI classification model.
