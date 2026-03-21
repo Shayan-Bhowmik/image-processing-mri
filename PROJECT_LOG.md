@@ -283,7 +283,7 @@ Dataset successfully constructed and stored for efficient reuse during training.
 ### Outcome
 Training pipeline successfully executed on the full dataset using GPU acceleration. The model achieved high accuracy on both training and validation sets, and a trained model checkpoint was generated for evaluation and future use.
 
-## Step 11 – Model Evaluation Deep Dive & Validation (In Progress)
+## Step 11 – Model Evaluation Deep Dive & Validation (Completed)
 
 ---
 
@@ -366,3 +366,29 @@ Analysis revealed that all errors were false negatives, where the model predicte
 This indicates that while overall model accuracy is very high, there is a slight tendency to miss certain tumor cases.  
 
 The insight highlights an important limitation of the model and provides direction for further improvements in sensitivity and reliability.
+
+## Step 11.4 – Patient-Level Prediction using Top-K Aggregation (Completed)
+
+### Actions
+- Implemented Top-K aggregation strategy in src/aggregation/topk_aggregation.py
+- Grouped slice-level predictions by patient ID
+- Selected top-K highest confidence slices per patient
+- Computed patient-level prediction based on aggregated slice probabilities
+- Implemented patient-level ground truth extraction
+- Integrated aggregation into evaluation pipeline
+- Computed evaluation metrics at patient level
+
+- Files Modified / Added
+  src/aggregation/topk_aggregation.py
+  src/evaluation/run_evaluation.py
+
+### Outcome
+Successfully extended the system from slice-level classification to patient-level diagnosis.  
+
+Patient-level evaluation achieved perfect performance:
+- Accuracy: 1.0000  
+- Precision: 1.0000  
+- Recall: 1.0000  
+- F1 Score: 1.0000  
+
+Top-K aggregation improved robustness by compensating for occasional slice-level errors, ensuring reliable patient-level predictions.

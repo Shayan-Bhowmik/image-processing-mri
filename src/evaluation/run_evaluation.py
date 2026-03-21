@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
-
+from src.aggregation.topk_aggregation import topk_patient_prediction, get_patient_labels
 from src.evaluation.predictor import Predictor
 from src.evaluation.metrics import compute_classification_metrics
 from src.evaluation.report import generate_report
@@ -41,6 +41,27 @@ def main():
     )
 
     outputs = predictor.collect_predictions(val_loader)
+    patient_preds = topk_patient_prediction(
+    records=val_records,
+    probs=outputs["probabilities"],
+    k=5
+    )
+
+    patient_labels = get_patient_labels(val_records)
+
+
+    y_true = []
+    y_pred = []
+
+    for pid in patient_labels:
+        y_true.append(patient_labels[pid])
+        y_pred.append(patient_preds[pid])
+
+    print("\n===== Patient-Level Evaluation =====")
+
+    patient_metrics = compute_classification_metrics(y_true, y_pred)
+
+    generate_report(patient_metrics)
 
     metrics = compute_classification_metrics(
         outputs["true_labels"],
