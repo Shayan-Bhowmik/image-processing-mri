@@ -601,6 +601,35 @@ Grad-CAM pipeline successfully integrated into the project.
 
 ---
 
+## Step 10.5 — Grad-CAM Debugging & Stabilization (Critical Fix)
+
+### Problem Identified
+
+Grad-CAM outputs became unstable:
+
+- Fully blue heatmaps (no activation)
+- Over-saturated maps
+- Noisy visualizations
+
+---
+
+### Root Causes
+
+1. Incorrect target layer (`features[-1]`) → no spatial gradients  
+2. Over-aggressive thresholding → removed valid signal  
+3. Cropping/padding → distorted CAM  
+4. Weak gradients → required full signal preservation  
+
+---
+
+### Fixes Implemented
+
+#### Correct Layer Selection
+```python```
+target_layer = model.features[6]
+
+---
+
 ## Step 11 — Ablation Framework Setup
 
 Implemented configurable training pipeline to support ablation experiments.
