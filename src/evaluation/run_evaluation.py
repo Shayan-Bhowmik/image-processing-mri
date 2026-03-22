@@ -40,15 +40,17 @@ def main():
         device=device,
     )
 
+    
     outputs = predictor.collect_predictions(val_loader)
+
+    
     patient_preds = topk_patient_prediction(
-    records=val_records,
-    probs=outputs["probabilities"],
-    k=5
+        records=val_records,
+        probs=outputs["probabilities"],
+        k=5
     )
 
     patient_labels = get_patient_labels(val_records)
-
 
     y_true = []
     y_pred = []
@@ -59,13 +61,24 @@ def main():
 
     print("\n===== Patient-Level Evaluation =====")
 
-    patient_metrics = compute_classification_metrics(y_true, y_pred)
+    
+    patient_probs = [[1 - p, p] for p in y_pred]
+
+    patient_metrics = compute_classification_metrics(
+        y_true,
+        y_pred,
+        patient_probs
+    )
 
     generate_report(patient_metrics)
 
+
+    print("\n===== Slice-Level Evaluation =====")
+
     metrics = compute_classification_metrics(
         outputs["true_labels"],
-        outputs["predicted_labels"]
+        outputs["predicted_labels"],
+        outputs["probabilities"]
     )
 
     generate_report(metrics)

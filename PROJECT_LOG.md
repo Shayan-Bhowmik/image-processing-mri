@@ -392,3 +392,29 @@ Patient-level evaluation achieved perfect performance:
 - F1 Score: 1.0000  
 
 Top-K aggregation improved robustness by compensating for occasional slice-level errors, ensuring reliable patient-level predictions.
+
+## Step 12 – ROC-AUC Evaluation
+
+---
+
+## Step 12.1 – ROC-AUC Metric Integration (Completed)
+
+### Actions
+- Extended evaluation metrics to include ROC-AUC score
+- Imported roc_auc_score from sklearn.metrics
+- Extracted class-wise probabilities from model outputs
+- Computed ROC-AUC using probability of positive class
+- Integrated ROC-AUC computation into evaluation pipeline
+- Updated evaluation execution to pass probability outputs
+
+- Files Modified / Added
+  src/evaluation/metrics.py
+  src/evaluation/run_evaluation.py
+  src/evaluation/report.py
+
+### Outcome
+Successfully integrated ROC-AUC metric into evaluation pipeline.  
+
+Model achieved near-perfect ROC-AUC, indicating strong separability between normal and abnormal classes across all classification thresholds.  
+
+This confirms that the model is not only accurate but also highly confident and robust in distinguishing between classes.

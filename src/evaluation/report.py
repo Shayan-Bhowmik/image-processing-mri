@@ -19,6 +19,8 @@ def print_report(metrics: Dict) -> None:
     print(f"Precision: {precision:.4f}")
     print(f"Recall:    {recall:.4f}")
     print(f"F1 Score:  {f1:.4f}\n")
+    if "roc_auc" in metrics:
+        print(f"ROC AUC:   {metrics['roc_auc']:.4f}")
 
     if len(cm) != 2 or len(cm[0]) != 2:
         raise ValueError("Confusion matrix must be 2x2 for binary classification")
