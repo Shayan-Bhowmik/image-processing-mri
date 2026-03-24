@@ -417,3 +417,27 @@ Successfully integrated ROC-AUC metric into evaluation pipeline.
 Model achieved near-perfect ROC-AUC, indicating strong separability between normal and abnormal classes across all classification thresholds.  
 
 This confirms that the model is not only accurate but also highly confident and robust in distinguishing between classes.
+
+## Step 13 – Model Explainability using Grad-CAM (In Progress)
+
+### Step 13.1 – Initial Grad-CAM Implementation (Completed)
+
+### Actions
+- Implemented Grad-CAM module in src/evaluation/gradcam.py
+- Utilized stored convolutional feature maps and gradients from CNN model
+- Generated class-specific activation maps using weighted feature maps
+- Integrated Grad-CAM into evaluation pipeline (run_evaluation.py)
+- Visualized results using center MRI slice from 2.5D input
+- Created combined panel output showing MRI slice, heatmap, and overlay
+- Saved visualization outputs with auto-increment naming for tracking
+
+- Files Modified / Added
+  src/evaluation/gradcam.py
+  src/evaluation/run_evaluation.py
+
+### Outcome
+Successfully generated Grad-CAM visualizations for model predictions.  
+
+The heatmaps highlight regions of high activation, with noticeable emphasis on structural boundaries (e.g., brain edges) along with internal regions. This indicates that the model is utilizing both global structural features and localized patterns for classification.
+
+The current visualization reflects the model’s learned feature representations but requires further refinement to improve localization of clinically relevant regions (e.g., tumor areas).

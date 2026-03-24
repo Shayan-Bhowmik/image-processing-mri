@@ -4,6 +4,7 @@ from src.aggregation.topk_aggregation import topk_patient_prediction, get_patien
 from src.evaluation.predictor import Predictor
 from src.evaluation.metrics import compute_classification_metrics
 from src.evaluation.report import generate_report
+from src.evaluation.gradcam import GradCAM, save_gradcam_panel
 
 from src.dataset.mri_dataset import MRISliceDataset
 from src.dataset.split_utils import split_dataset_by_patient
@@ -11,11 +12,35 @@ from src.dataset.split_utils import split_dataset_by_patient
 import pickle
 import gzip
 from collections import Counter
+import numpy as np
 
 
 def load_dataset(path):
     with gzip.open(path, "rb") as f:
         return pickle.load(f)
+
+
+def select_representative_slice_index(records, preferred_label=None):
+    best_idx = 0
+    best_score = -1
+
+    for idx, record in enumerate(records):
+        if preferred_label is not None and record["label"] != preferred_label:
+            continue
+
+        brain_pixels = int(np.count_nonzero(record["slice"]))
+        if brain_pixels > best_score:
+            best_score = brain_pixels
+            best_idx = idx
+
+    if best_score < 0:
+        for idx, record in enumerate(records):
+            brain_pixels = int(np.count_nonzero(record["slice"]))
+            if brain_pixels > best_score:
+                best_score = brain_pixels
+                best_idx = idx
+
+    return best_idx
 
 
 def main():
@@ -40,10 +65,8 @@ def main():
         device=device,
     )
 
-    
     outputs = predictor.collect_predictions(val_loader)
 
-    
     patient_preds = topk_patient_prediction(
         records=val_records,
         probs=outputs["probabilities"],
@@ -65,7 +88,6 @@ def main():
 
     print("\n===== Patient-Level Evaluation =====")
 
-    
     patient_probs = [[1 - p, p] for p in y_pred]
 
     patient_metrics = compute_classification_metrics(
@@ -86,6 +108,23 @@ def main():
     )
 
     generate_report(metrics)
+    print("\n===== Grad-CAM Visualization =====")
+
+    gradcam = GradCAM(predictor.model)
+
+    sample_idx = select_representative_slice_index(val_records, preferred_label=1)
+    sample_image, _ = val_dataset[sample_idx]
+    image_np = sample_image[1].cpu().numpy()
+
+    input_tensor = sample_image.unsqueeze(0).to(device)
+
+    cam = gradcam.generate(input_tensor, class_idx=1)
+
+    save_gradcam_panel(
+    image=image_np,
+    cam=cam,
+    save_path="outputs/figures/gradcam_panel.png"
+    )
 
 
 if __name__ == "__main__":
