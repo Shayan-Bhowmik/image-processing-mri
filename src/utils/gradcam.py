@@ -10,6 +10,7 @@ class GradCAM:
 
         self.gradients = None
         self.activations = None
+        self._hooks = []
 
         self._register_hooks()
 
@@ -23,10 +24,26 @@ class GradCAM:
             # Store gradients (detach to avoid accumulation issues)
             self.gradients = grad_output[0].detach()
 
-        self.target_layer.register_forward_hook(forward_hook)
-        self.target_layer.register_full_backward_hook(backward_hook)
+        self._hooks.append(self.target_layer.register_forward_hook(forward_hook))
+        self._hooks.append(self.target_layer.register_full_backward_hook(backward_hook))
 
-    def generate(self, input_tensor, class_idx=1):
+    def remove_hooks(self):
+        for hook in self._hooks:
+            hook.remove()
+        self._hooks = []
+
+    def __del__(self):
+        # Best-effort cleanup in case caller forgets explicit removal.
+        self.remove_hooks()
+
+    def generate(
+        self,
+        input_tensor,
+        class_idx=None,
+        smooth_kernel=5,
+        clip_percentiles=(2.0, 99.5),
+        eps=1e-8,
+    ):
 
         # -----------------------------
         # Reset gradients
@@ -37,8 +54,11 @@ class GradCAM:
         output = self.model(input_tensor)
 
         # -----------------------------
-        # FORCE TARGET CLASS
+        # Select target class
         # -----------------------------
+        if class_idx is None:
+            class_idx = int(torch.argmax(output, dim=1).item())
+
         target = output[:, class_idx]
 
         # Backward pass
@@ -56,7 +76,8 @@ class GradCAM:
         # -----------------------------
         # Compute weights
         # -----------------------------
-        weights = gradients.mean(dim=(2, 3), keepdim=True)
+        # Emphasize positive influence regions to reduce noisy negative evidence.
+        weights = F.relu(gradients).mean(dim=(2, 3), keepdim=True)
 
         # -----------------------------
         # Compute CAM
@@ -64,6 +85,16 @@ class GradCAM:
         cam = (weights * activations).sum(dim=1, keepdim=True)
 
         cam = F.relu(cam)
+
+        if smooth_kernel and smooth_kernel > 1:
+            if smooth_kernel % 2 == 0:
+                smooth_kernel += 1
+            cam = F.avg_pool2d(
+                cam,
+                kernel_size=smooth_kernel,
+                stride=1,
+                padding=smooth_kernel // 2,
+            )
 
         # -----------------------------
         # Resize to input size
@@ -81,8 +112,14 @@ class GradCAM:
         # Normalize safely
         # -----------------------------
         cam = cam - cam.min()
+        cam = cam / (cam.max() + eps)
 
-        if cam.max() != 0:
-            cam = cam / cam.max()
+        if clip_percentiles is not None:
+            low, high = clip_percentiles
+            low_v = np.percentile(cam, low)
+            high_v = np.percentile(cam, high)
+
+            if high_v > low_v:
+                cam = np.clip((cam - low_v) / (high_v - low_v + eps), 0.0, 1.0)
 
         return cam

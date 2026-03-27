@@ -149,6 +149,36 @@ checkpoint_path = st.sidebar.text_input("Checkpoint path", "checkpoints/best_mod
 threshold = st.sidebar.slider("Decision threshold", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
 show_gradcam = st.sidebar.toggle("Show Grad-CAM", value=True)
 
+with st.sidebar.expander("Grad-CAM Quality", expanded=False):
+    gradcam_smooth_kernel = st.slider(
+        "Smoothing kernel (odd)",
+        min_value=1,
+        max_value=15,
+        value=5,
+        step=2,
+    )
+    gradcam_clip_low, gradcam_clip_high = st.slider(
+        "Heatmap percentile clip",
+        min_value=0.0,
+        max_value=100.0,
+        value=(2.0, 99.5),
+        step=0.5,
+    )
+    heatmap_display_threshold = st.slider(
+        "Overlay saliency threshold",
+        min_value=0.0,
+        max_value=1.0,
+        value=0.35,
+        step=0.01,
+    )
+    focus_percentile = st.slider(
+        "Focus top percentile",
+        min_value=70,
+        max_value=99,
+        value=90,
+        step=1,
+    )
+
 uploaded_file = st.file_uploader("Upload MRI volume (.nii or .nii.gz)", type=["nii", "nii.gz"])
 
 if uploaded_file is None:
@@ -170,7 +200,7 @@ except Exception as exc:
 input_batch = prep["input_batch"]
 valid_slices = prep["valid_slices"]
 
-_, slice_probs = predict_slices(model, input_batch, device)
+slice_preds, slice_probs = predict_slices(model, input_batch, device)
 patient_score = aggregate_patient_score(slice_probs, top_k=10)
 pred_label = 1 if patient_score >= threshold else 0
 pred_text = "Tumor-like pattern" if pred_label == 1 else "Normal-like pattern"
@@ -196,7 +226,15 @@ slice_index = st.slider("Slice index", min_value=0, max_value=max_index, value=d
 
 # Use resized middle channel from model input so overlay matches Grad-CAM shape.
 slice_img = input_batch[slice_index][1].detach().cpu().numpy()
-slice_img = (slice_img - slice_img.min()) / (slice_img.max() - slice_img.min() + 1e-8)
+
+# Robust windowing on non-background voxels keeps full-brain structure visible.
+brain_pixels = slice_img[np.abs(slice_img) > 1e-6]
+if brain_pixels.size > 0:
+    p_low, p_high = np.percentile(brain_pixels, [1.0, 99.0])
+else:
+    p_low, p_high = float(slice_img.min()), float(slice_img.max())
+
+slice_img = np.clip((slice_img - p_low) / (p_high - p_low + 1e-8), 0.0, 1.0)
 selected_prob = float(slice_probs[slice_index])
 
 st.markdown(
@@ -214,17 +252,47 @@ viz_tab, chart_tab = st.tabs(["Slice Viewer", "Probability Trend"])
 with viz_tab:
     if show_gradcam:
         try:
-            heatmap = build_gradcam_for_slice(model, device, input_batch[slice_index])
+            selected_target_class = int(slice_preds[slice_index])
+            heatmap = build_gradcam_for_slice(
+                model,
+                device,
+                input_batch[slice_index],
+                target_class=selected_target_class,
+                smooth_kernel=gradcam_smooth_kernel,
+                clip_percentiles=(gradcam_clip_low, gradcam_clip_high),
+                apply_brain_mask=True,
+                brain_mask_threshold=0.05,
+            )
         except Exception as exc:
             st.error(f"Grad-CAM failed: {exc}")
             st.stop()
 
-        heatmap_color = plt.cm.jet(heatmap)[:, :, :3]
-        overlay = slice_img[..., None] * 0.4 + heatmap_color * 0.6
+        heatmap_color = plt.cm.viridis(heatmap)[:, :, :3]
+        base_rgb = np.repeat(slice_img[..., None], 3, axis=2)
+        display_brain_mask = (slice_img > 0.08).astype(np.float32)
+
+        # Keep only strongest CAM regions to avoid coloring the full slice.
+        nonzero_cam = heatmap[heatmap > 0]
+        if nonzero_cam.size > 0:
+            focus_cut = float(np.percentile(nonzero_cam, focus_percentile))
+        else:
+            focus_cut = heatmap_display_threshold
+
+        focus_threshold = max(heatmap_display_threshold, focus_cut)
+        cam_focus = np.clip((heatmap - focus_threshold) / (1.0 - focus_threshold + 1e-8), 0.0, 1.0)
+        cam_focus = np.power(cam_focus, 0.65) * display_brain_mask
+
+        # Heatmap panel: grayscale anatomy with color only on salient CAM regions.
+        heatmap_alpha = (cam_focus * 0.95)[..., None]
+        heatmap_on_brain = base_rgb * (1.0 - heatmap_alpha) + heatmap_color * heatmap_alpha
+
+        # Overlay panel: gentler blend to preserve anatomical edges.
+        alpha = (cam_focus * 0.65)[..., None]
+        overlay = base_rgb * (1.0 - alpha) + heatmap_color * alpha
 
         c1, c2, c3 = st.columns(3)
         c1.image(slice_img, caption="MRI Slice", use_container_width=True, clamp=True)
-        c2.image(heatmap, caption="Grad-CAM Heatmap", use_container_width=True, clamp=True)
+        c2.image(heatmap_on_brain, caption="Grad-CAM on Brain", use_container_width=True, clamp=True)
         c3.image(overlay, caption="Overlay", use_container_width=True, clamp=True)
     else:
         st.image(slice_img, caption="MRI Slice", use_container_width=True, clamp=True)

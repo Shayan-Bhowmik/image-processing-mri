@@ -127,14 +127,36 @@ def build_gradcam_for_slice(
     model: BrainMRICNN,
     device: torch.device,
     sample_tensor: torch.Tensor,
-    target_class: int = 1,
+    target_class: int | None = None,
+    smooth_kernel: int = 5,
+    clip_percentiles: Tuple[float, float] = (2.0, 99.5),
+    apply_brain_mask: bool = True,
+    brain_mask_threshold: float = 0.05,
 ) -> np.ndarray:
     """Generate Grad-CAM heatmap for one preprocessed sample tensor (3, H, W)."""
-    gradcam = GradCAM(model, model.features[6])
+    # Last convolution layer usually gives more class-discriminative maps.
+    gradcam = GradCAM(model, model.features[8])
 
     input_tensor = sample_tensor.unsqueeze(0).to(device)
-    input_tensor = (input_tensor - input_tensor.mean()) / (input_tensor.std() + 1e-8)
     input_tensor.requires_grad_(True)
 
-    heatmap = gradcam.generate(input_tensor, class_idx=target_class)
+    try:
+        heatmap = gradcam.generate(
+            input_tensor,
+            class_idx=target_class,
+            smooth_kernel=smooth_kernel,
+            clip_percentiles=clip_percentiles,
+        )
+    finally:
+        gradcam.remove_hooks()
+
+    if apply_brain_mask:
+        base_slice = sample_tensor[1].detach().cpu().numpy()
+        base_slice = (base_slice - base_slice.min()) / (base_slice.max() - base_slice.min() + 1e-8)
+        brain_mask = (base_slice > brain_mask_threshold).astype(np.float32)
+
+        heatmap = heatmap * brain_mask
+        heatmap = heatmap - heatmap.min()
+        heatmap = heatmap / (heatmap.max() + 1e-8)
+
     return np.clip(heatmap, 0.0, 1.0)

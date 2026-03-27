@@ -22,7 +22,7 @@ model.eval()
 # -----------------------------
 # Grad-CAM setup
 # -----------------------------
-target_layer = model.features[6]
+target_layer = model.features[8]
 gradcam = GradCAM(model, target_layer)
 
 
@@ -71,7 +71,6 @@ for images, labels, patient_ids in test_loader:
     # NORMALIZATION
     # -----------------------------
     images = images.to(device).float()
-    images = (images - images.mean()) / (images.std() + 1e-8)
     images.requires_grad_(True)
 
     # -----------------------------
@@ -87,7 +86,12 @@ for images, labels, patient_ids in test_loader:
     # -----------------------------
     # Grad-CAM
     # -----------------------------
-    cam = gradcam.generate(images, class_idx=1)
+    cam = gradcam.generate(
+        images,
+        class_idx=1,
+        smooth_kernel=5,
+        clip_percentiles=(2.0, 99.5),
+    )
 
     fallback_samples.append((images.detach().clone(), tumor_prob, cam))
 
