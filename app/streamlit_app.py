@@ -224,10 +224,10 @@ max_index = len(valid_slices) - 1
 default_index = int(np.argmax(slice_probs))
 slice_index = st.slider("Slice index", min_value=0, max_value=max_index, value=default_index, step=1)
 
-# Use resized middle channel from model input so overlay matches Grad-CAM shape.
+
 slice_img = input_batch[slice_index][1].detach().cpu().numpy()
 
-# Robust windowing on non-background voxels keeps full-brain structure visible.
+
 brain_pixels = slice_img[np.abs(slice_img) > 1e-6]
 if brain_pixels.size > 0:
     p_low, p_high = np.percentile(brain_pixels, [1.0, 99.0])
@@ -271,7 +271,7 @@ with viz_tab:
         base_rgb = np.repeat(slice_img[..., None], 3, axis=2)
         display_brain_mask = (slice_img > 0.08).astype(np.float32)
 
-        # Keep only strongest CAM regions to avoid coloring the full slice.
+
         nonzero_cam = heatmap[heatmap > 0]
         if nonzero_cam.size > 0:
             focus_cut = float(np.percentile(nonzero_cam, focus_percentile))
@@ -282,11 +282,11 @@ with viz_tab:
         cam_focus = np.clip((heatmap - focus_threshold) / (1.0 - focus_threshold + 1e-8), 0.0, 1.0)
         cam_focus = np.power(cam_focus, 0.65) * display_brain_mask
 
-        # Heatmap panel: grayscale anatomy with color only on salient CAM regions.
+
         heatmap_alpha = (cam_focus * 0.95)[..., None]
         heatmap_on_brain = base_rgb * (1.0 - heatmap_alpha) + heatmap_color * heatmap_alpha
 
-        # Overlay panel: gentler blend to preserve anatomical edges.
+
         alpha = (cam_focus * 0.65)[..., None]
         overlay = base_rgb * (1.0 - alpha) + heatmap_color * alpha
 

@@ -59,35 +59,35 @@ def evaluate(model, loader, criterion, device):
 def train():
     set_seed(42)
 
-    # =========================
-    # CONFIG (BASELINE RESTORED)
-    # =========================
+
+
+
     config = {
-        "use_2_5d": True   # ✅ BACK TO BASELINE
+        "use_2_5d": True
     }
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     split_path = "data/splits/patient_split.json"
 
-    # =========================
-    # DATALOADER
-    # =========================
+
+
+
     train_loader, val_loader, test_loader = create_dataloaders(
         split_path,
         batch_size=8,
         use_2_5d=config["use_2_5d"]
     )
 
-    # =========================
-    # SANITY CHECK (BASELINE)
-    # =========================
+
+
+
     x, _, *_ = next(iter(train_loader))
     print("Baseline check - Input shape:", x.shape)
 
-    # =========================
-    # CLASS WEIGHTS
-    # =========================
+
+
+
     all_labels = []
     for _, labels, _ in train_loader:
         all_labels.extend(labels.tolist())
@@ -105,9 +105,9 @@ def train():
     class_weights = torch.tensor(class_weights, dtype=torch.float).to(device)
     print("Class Weights:", class_weights)
 
-    # =========================
-    # MODEL
-    # =========================
+
+
+
     in_channels = 3 if config["use_2_5d"] else 1
     model = BrainMRICNN(num_classes=2, in_channels=in_channels).to(device)
 
@@ -121,14 +121,14 @@ def train():
         patience=1
     )
 
-    num_epochs = 5
+    num_epochs = 50
     best_val_acc = 0.0
 
     os.makedirs("checkpoints", exist_ok=True)
 
-    # =========================
-    # TRAINING LOOP
-    # =========================
+
+
+
     for epoch in range(num_epochs):
         model.train()
 
@@ -172,9 +172,9 @@ def train():
             torch.save(model.state_dict(), "checkpoints/best_model.pth")
             print("✔ Best model saved.")
 
-    # =========================
-    # TEST SET EVALUATION
-    # =========================
+
+
+
     print("\n===== TEST SET EVALUATION =====")
 
     model.load_state_dict(

@@ -17,7 +17,7 @@ def extract_valid_slices(volume: np.ndarray, threshold: float = 0.01):
     height, width, depth = volume.shape
     total_pixels = height * width
 
-    for i in range(depth):  # axial direction
+    for i in range(depth):
         slice_ = volume[:, :, i]
 
         non_zero_ratio = np.count_nonzero(slice_) / total_pixels

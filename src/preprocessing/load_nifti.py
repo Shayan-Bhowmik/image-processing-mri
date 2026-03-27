@@ -8,7 +8,7 @@ def load_nifti(path: str) -> np.ndarray:
     """
     nii = nib.load(path)
 
-    # Load directly as float32 (prevents float64 allocation)
+
     volume = nii.get_fdata(dtype=np.float32)
 
     return volume

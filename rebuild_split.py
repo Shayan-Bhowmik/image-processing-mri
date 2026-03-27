@@ -7,14 +7,14 @@ random.seed(42)
 brats_root = "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
 oasis_root = "data/raw/oasis/OASIS_Clean_Data/OASIS_Clean_Data"
 
-# BRATS patients (folders)
+
 brats_patients = [
     {"id": p, "label": 1}
     for p in os.listdir(brats_root)
     if os.path.isdir(os.path.join(brats_root, p))
 ]
 
-# OASIS patients (files)
+
 oasis_patients = [
     {"id": f, "label": 0}
     for f in os.listdir(oasis_root)

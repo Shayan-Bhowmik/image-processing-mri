@@ -11,24 +11,24 @@ from src.utils.gradcam import GradCAM
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-# -----------------------------
-# Load trained model
-# -----------------------------
+
+
+
 model = BrainMRICNN().to(device)
 model.load_state_dict(torch.load("checkpoints/best_model.pth", weights_only=True))
 model.eval()
 
 
-# -----------------------------
-# Grad-CAM setup
-# -----------------------------
+
+
+
 target_layer = model.features[8]
 gradcam = GradCAM(model, target_layer)
 
 
-# -----------------------------
-# Load dataset
-# -----------------------------
+
+
+
 split_path = "data/splits/patient_split.json"
 
 _, _, test_loader = create_dataloaders(
@@ -37,9 +37,9 @@ _, _, test_loader = create_dataloaders(
 )
 
 
-# -----------------------------
-# Output folder
-# -----------------------------
+
+
+
 output_dir = "results/gradcam"
 os.makedirs(output_dir, exist_ok=True)
 
@@ -67,15 +67,15 @@ for images, labels, patient_ids in test_loader:
     if slice_img.std() < 0.05:
         continue
 
-    # -----------------------------
-    # NORMALIZATION
-    # -----------------------------
+
+
+
     images = images.to(device).float()
     images.requires_grad_(True)
 
-    # -----------------------------
-    # Forward
-    # -----------------------------
+
+
+
     outputs = model(images)
     probs = torch.softmax(outputs, dim=1)
     tumor_prob = probs[0, 1].item()
@@ -83,9 +83,9 @@ for images, labels, patient_ids in test_loader:
     if iteration % 10 == 0:
         print(f"Prob: {tumor_prob:.4f}")
 
-    # -----------------------------
-    # Grad-CAM
-    # -----------------------------
+
+
+
     cam = gradcam.generate(
         images,
         class_idx=1,
@@ -95,15 +95,15 @@ for images, labels, patient_ids in test_loader:
 
     fallback_samples.append((images.detach().clone(), tumor_prob, cam))
 
-    # -----------------------------
-    # Prepare image
-    # -----------------------------
+
+
+
     image = images[0][1].detach().cpu().numpy()
     image = (image - image.min()) / (image.max() + 1e-8)
 
-    # -----------------------------
-    # CLEAN CAM (ONLY THIS)
-    # -----------------------------
+
+
+
     cam = cam - cam.min()
     if cam.max() > 0:
         cam = cam / cam.max()
@@ -113,15 +113,15 @@ for images, labels, patient_ids in test_loader:
     heatmap = np.clip(cam, 0, 1)
     heatmap_color = plt.cm.jet(heatmap)[:, :, :3]
 
-    # -----------------------------
-    # Overlay
-    # -----------------------------
+
+
+
     overlay = image[..., None] * 0.4 + heatmap_color * 0.6
 
 
-    # -----------------------------
-    # Plot
-    # -----------------------------
+
+
+
     plt.figure(figsize=(12, 4))
 
     plt.subplot(1, 3, 1)
@@ -151,9 +151,9 @@ for images, labels, patient_ids in test_loader:
         break
 
 
-# -----------------------------
-# Fallback
-# -----------------------------
+
+
+
 if saved_images < max_images:
 
     print(f"\nUsing fallback...")

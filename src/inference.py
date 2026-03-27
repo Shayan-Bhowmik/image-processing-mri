@@ -134,7 +134,7 @@ def build_gradcam_for_slice(
     brain_mask_threshold: float = 0.05,
 ) -> np.ndarray:
     """Generate Grad-CAM heatmap for one preprocessed sample tensor (3, H, W)."""
-    # Last convolution layer usually gives more class-discriminative maps.
+
     gradcam = GradCAM(model, model.features[8])
 
     input_tensor = sample_tensor.unsqueeze(0).to(device)

@@ -22,4 +22,4 @@ def resize_sample(sample, size=(224, 224)):
         align_corners=False
     )
 
-    return resized.squeeze(0)  # (3, 224, 224)
+    return resized.squeeze(0)

@@ -45,7 +45,7 @@ def save_split(train, val, test, save_path):
 
 
 if __name__ == "__main__":
-    root_dir = "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"  # adjust if needed
+    root_dir = "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
 
     patient_paths = get_patient_folders(root_dir)
     train, val, test = split_patients(patient_paths)

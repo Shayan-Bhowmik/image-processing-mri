@@ -18,9 +18,9 @@ def load_split(split_path, split_name):
 class MRIDataset(Dataset):
     def __init__(self, split_entries, image_size=(224, 224), use_2_5d=True):
         self.image_size = image_size
-        self.use_2_5d = use_2_5d   # ✅ IMPORTANT (you missed this)
-        self.index_map = []  # (patient_id, slice_index, label)
-        self.volume_store = {}  # patient_id -> normalized 3D volume
+        self.use_2_5d = use_2_5d
+        self.index_map = []
+        self.volume_store = {}
 
         self.brats_root = "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
         self.oasis_root = "data/raw/oasis/OASIS_Clean_Data/OASIS_Clean_Data"
@@ -31,9 +31,9 @@ class MRIDataset(Dataset):
             patient_id = entry["id"]
             label = entry["label"]
 
-            # -------------------------------
-            # Determine FLAIR path
-            # -------------------------------
+
+
+
             if label == 1:
                 patient_path = os.path.join(self.brats_root, patient_id)
 
@@ -48,9 +48,9 @@ class MRIDataset(Dataset):
             else:
                 flair_path = os.path.join(self.oasis_root, patient_id)
 
-            # -------------------------------
-            # Load and preprocess volume
-            # -------------------------------
+
+
+
             volume = load_nifti(flair_path)
 
             if len(volume.shape) == 4:
@@ -58,12 +58,12 @@ class MRIDataset(Dataset):
 
             volume = zscore_normalize(volume)
 
-            # Store normalized volume once
+
             self.volume_store[patient_id] = volume
 
-            # -------------------------------
-            # Index valid slices
-            # -------------------------------
+
+
+
             valid_slices = extract_valid_slices(volume)
             valid_indices = list(range(len(valid_slices)))
 
@@ -80,7 +80,7 @@ class MRIDataset(Dataset):
 
         volume = self.volume_store[patient_id]
 
-        # Safe slice boundaries
+
         prev_idx = max(slice_idx - 1, 0)
         next_idx = min(slice_idx + 1, volume.shape[2] - 1)
 
@@ -88,9 +88,9 @@ class MRIDataset(Dataset):
         slice_curr = volume[:, :, slice_idx]
         slice_next = volume[:, :, next_idx]
 
-        # -------------------------------
-        # 2.5D OR 1-slice mode
-        # -------------------------------
+
+
+
         if self.use_2_5d:
             sample = torch.stack([
                 torch.from_numpy(slice_prev),
@@ -100,7 +100,7 @@ class MRIDataset(Dataset):
         else:
             sample = torch.from_numpy(slice_curr).unsqueeze(0)
 
-        # Resize to model input size
+
         sample = resize_sample(sample, size=self.image_size)
 
         return sample, label, patient_id

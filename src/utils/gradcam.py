@@ -17,11 +17,11 @@ class GradCAM:
     def _register_hooks(self):
 
         def forward_hook(module, input, output):
-            # Store activations (detach to avoid graph issues)
+
             self.activations = output.detach()
 
         def backward_hook(module, grad_input, grad_output):
-            # Store gradients (detach to avoid accumulation issues)
+
             self.gradients = grad_output[0].detach()
 
         self._hooks.append(self.target_layer.register_forward_hook(forward_hook))
@@ -33,7 +33,7 @@ class GradCAM:
         self._hooks = []
 
     def __del__(self):
-        # Best-effort cleanup in case caller forgets explicit removal.
+
         self.remove_hooks()
 
     def generate(
@@ -45,43 +45,43 @@ class GradCAM:
         eps=1e-8,
     ):
 
-        # -----------------------------
-        # Reset gradients
-        # -----------------------------
+
+
+
         self.model.zero_grad()
 
-        # Forward pass
+
         output = self.model(input_tensor)
 
-        # -----------------------------
-        # Select target class
-        # -----------------------------
+
+
+
         if class_idx is None:
             class_idx = int(torch.argmax(output, dim=1).item())
 
         target = output[:, class_idx]
 
-        # Backward pass
+
         target.backward(torch.ones_like(target))
 
-        # -----------------------------
-        # Safety checks (IMPORTANT)
-        # -----------------------------
+
+
+
         if self.gradients is None or self.activations is None:
             raise RuntimeError("GradCAM hooks not working properly.")
 
         gradients = self.gradients
         activations = self.activations
 
-        # -----------------------------
-        # Compute weights
-        # -----------------------------
-        # Emphasize positive influence regions to reduce noisy negative evidence.
+
+
+
+
         weights = F.relu(gradients).mean(dim=(2, 3), keepdim=True)
 
-        # -----------------------------
-        # Compute CAM
-        # -----------------------------
+
+
+
         cam = (weights * activations).sum(dim=1, keepdim=True)
 
         cam = F.relu(cam)
@@ -96,9 +96,9 @@ class GradCAM:
                 padding=smooth_kernel // 2,
             )
 
-        # -----------------------------
-        # Resize to input size
-        # -----------------------------
+
+
+
         cam = F.interpolate(
             cam,
             size=(input_tensor.shape[2], input_tensor.shape[3]),
@@ -108,9 +108,9 @@ class GradCAM:
 
         cam = cam.squeeze().cpu().numpy()
 
-        # -----------------------------
-        # Normalize safely
-        # -----------------------------
+
+
+
         cam = cam - cam.min()
         cam = cam / (cam.max() + eps)
 
