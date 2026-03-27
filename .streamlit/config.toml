@@ -1,0 +1,4 @@
+[server]
+# Avoid torch class introspection issues in Streamlit's source watcher on Windows.
+fileWatcherType = "none"
+runOnSave = false
