@@ -53,3 +53,45 @@ def zscore_normalize(volume):
         normalized[mask] = (volume[mask] - mean) / std
     
     return normalized
+
+
+def strip_skull(slice_2d: np.ndarray, margin: int = 20) -> np.ndarray:
+    """
+    Remove outer skull boundary by cropping to brain region and padding back.
+    
+    This isolates the internal brain structures (including tumors) from the
+    bright skull boundary that models often use as a shortcut for classification.
+    
+    Args:
+        slice_2d: 2D MRI slice (H, W)
+        margin: padding around detected brain region in pixels
+    
+    Returns:
+        Skull-stripped slice with same shape as input, zeros outside brain
+    """
+    if slice_2d.ndim != 2:
+        raise ValueError(f"Expected 2D slice, got shape {slice_2d.shape}")
+    
+    # After z-score normalization, valid brain voxels can be both positive and negative.
+    # Keep all non-background voxels instead of only positive intensities.
+    mask = slice_2d != 0
+    
+    if not mask.any():
+        return slice_2d
+    
+    ys, xs = np.where(mask)
+    y1 = max(0, ys.min() - margin)
+    y2 = min(slice_2d.shape[0], ys.max() + margin + 1)
+    x1 = max(0, xs.min() - margin)
+    x2 = min(slice_2d.shape[1], xs.max() + margin + 1)
+    
+    cropped = slice_2d[y1:y2, x1:x2]
+    
+    padded = np.pad(
+        cropped,
+        ((y1, slice_2d.shape[0] - y2), (x1, slice_2d.shape[1] - x2)),
+        mode='constant',
+        constant_values=0.0
+    )
+    
+    return padded

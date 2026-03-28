@@ -418,7 +418,7 @@ Model achieved near-perfect ROC-AUC, indicating strong separability between norm
 
 This confirms that the model is not only accurate but also highly confident and robust in distinguishing between classes.
 
-## Step 13 – Model Explainability using Grad-CAM (In Progress)
+## Step 13 – Model Explainability using Grad-CAM (Completed)
 
 ### Step 13.1 – Initial Grad-CAM Implementation (Completed)
 
@@ -436,8 +436,36 @@ This confirms that the model is not only accurate but also highly confident and 
   src/evaluation/run_evaluation.py
 
 ### Outcome
-Successfully generated Grad-CAM visualizations for model predictions.  
+Successfully generated Grad-CAM visualizations for model predictions.
 
 The heatmaps highlight regions of high activation, with noticeable emphasis on structural boundaries (e.g., brain edges) along with internal regions. This indicates that the model is utilizing both global structural features and localized patterns for classification.
 
-The current visualization reflects the model’s learned feature representations but requires further refinement to improve localization of clinically relevant regions (e.g., tumor areas).
+The current visualization reflects the model's learned feature representations but requires further refinement to improve localization of clinically relevant regions (e.g., tumor areas).
+
+### Step 13.2 – Clinical-Focus Preprocessing & Grad-CAM Refinement (Completed)
+
+### Actions
+- Refactored preprocessing pipeline to reduce shortcut learning from skull boundaries:
+  - Center crop + constrained augmentation for training
+  - Deterministic center crop + resize for validation
+  - Added transform parameter validation
+- Implemented skull-strip utility suppressing outer skull-edge cues in 2.5D inputs
+  - Corrected mask logic for z-score normalized slices (changed from > 0 to != 0)
+- Improved Grad-CAM reliability:
+  - Fixed class handling and removed duplicated gradient normalization
+  - Auto-load latest checkpoint from outputs/checkpoints
+  - Selected Grad-CAM slice using highest tumor probability instead of max pixels
+  - Added selection diagnostics in evaluation logs
+- Hardened transform tests with deterministic, dataset-independent checks
+
+- Files Modified / Added
+  src/dataset/input_transforms.py
+  src/dataset/mri_dataset.py
+  src/preprocessing/volume_utils.py
+  src/training/train_model.py
+  src/evaluation/gradcam.py
+  src/evaluation/run_evaluation.py
+  tests/test_input_transforms.py
+
+### Outcome
+Grad-CAM quality improved from edge-dominant activations toward more internal, clinically relevant regions. The explainability workflow is now stable and driven by clinical probability signals for ongoing tuning and model validation.

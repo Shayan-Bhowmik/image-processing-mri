@@ -29,7 +29,9 @@ class MRISliceDataset(Dataset):
         image = transform_record(
             record=record,
             patient_index=self.patient_index,
-            target_size=self.target_size
+            target_size=self.target_size,
+            pre_resize=(self.transform is None),
+            apply_skull_strip=True,
         )
 
         image = self._to_tensor(image)

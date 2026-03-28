@@ -53,14 +53,17 @@ class MRIClassifierCNN(nn.Module):
         self.gradients = grad
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+       
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
 
+
+        self.conv_output = x
+
         if x.requires_grad:
             x.register_hook(self._save_gradient)
 
-        self.conv_output = x
 
         x = self.conv4(x)
 

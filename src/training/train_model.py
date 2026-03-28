@@ -18,6 +18,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from src.models.model_factory import create_model
 from src.dataset.mri_dataset import MRISliceDataset, create_train_val_dataloaders
 from src.dataset.split_utils import split_dataset_by_patient
+from src.dataset.input_transforms import build_train_transform, build_eval_transform
 from src.training.trainer import Trainer
 
 
@@ -41,6 +42,7 @@ def parse_arguments():
 
     parser.add_argument("--train_ratio", type=float, default=0.8)
     parser.add_argument("--target_size", type=int, default=224)
+    parser.add_argument("--center_crop_size", type=int, default=180)
     parser.add_argument("--num_workers", type=int, default=0)
     parser.add_argument("--random_seed", type=int, default=42)
 
@@ -197,14 +199,26 @@ def main():
 
     print("\n[Step 3/7] Creating datasets...")
 
+    train_transform = build_train_transform(
+        target_size=args.target_size,
+        center_crop_size=args.center_crop_size,
+    )
+
+    val_transform = build_eval_transform(
+        target_size=args.target_size,
+        center_crop_size=args.center_crop_size,
+    )
+
     train_dataset = MRISliceDataset(
         dataset_records=train_records,
-        target_size=args.target_size
+        target_size=args.target_size,
+        transform=train_transform,
     )
 
     val_dataset = MRISliceDataset(
         dataset_records=val_records,
-        target_size=args.target_size
+        target_size=args.target_size,
+        transform=val_transform,
     )
 
     print_dataset_info(train_dataset, val_dataset)

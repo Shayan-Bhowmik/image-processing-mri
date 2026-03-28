@@ -8,16 +8,27 @@ from src.evaluation.gradcam import GradCAM, save_gradcam_panel
 
 from src.dataset.mri_dataset import MRISliceDataset
 from src.dataset.split_utils import split_dataset_by_patient
+from src.dataset.input_transforms import build_eval_transform
 
 import pickle
 import gzip
 from collections import Counter
 import numpy as np
+from pathlib import Path
 
 
 def load_dataset(path):
     with gzip.open(path, "rb") as f:
         return pickle.load(f)
+
+
+def get_latest_checkpoint(checkpoint_dir="outputs/checkpoints"):
+    checkpoint_dir = Path(checkpoint_dir)
+    candidates = list(checkpoint_dir.glob("*.pth"))
+    if not candidates:
+        raise FileNotFoundError(f"No checkpoints found in {checkpoint_dir}")
+    latest = max(candidates, key=lambda p: p.stat().st_mtime)
+    return str(latest)
 
 
 def select_representative_slice_index(records, preferred_label=None):
@@ -43,6 +54,30 @@ def select_representative_slice_index(records, preferred_label=None):
     return best_idx
 
 
+def select_highest_tumor_probability_slice_index(records, probabilities, preferred_label=1):
+    if len(records) != len(probabilities):
+        raise ValueError(
+            f"records ({len(records)}) and probabilities ({len(probabilities)}) must have equal length"
+        )
+
+    best_idx = None
+    best_prob = -1.0
+
+    for idx, (record, prob_vec) in enumerate(zip(records, probabilities)):
+        if preferred_label is not None and record["label"] != preferred_label:
+            continue
+
+        tumor_prob = float(prob_vec[1])
+        if tumor_prob > best_prob:
+            best_prob = tumor_prob
+            best_idx = idx
+
+    if best_idx is None:
+        best_idx = int(np.argmax([float(p[1]) for p in probabilities]))
+
+    return best_idx
+
+
 def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -57,14 +92,18 @@ def main():
     print("Val:", Counter([r["label"] for r in val_records]))
     print("================================\n")
 
-    val_dataset = MRISliceDataset(val_records)
+    val_transform = build_eval_transform(target_size=224, center_crop_size=180)
+    val_dataset = MRISliceDataset(val_records, target_size=224, transform=val_transform)
     val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
+    checkpoint_path = get_latest_checkpoint("outputs/checkpoints")
+    print(f"Using checkpoint: {checkpoint_path}")
+
     predictor = Predictor.load_from_checkpoint(
-        checkpoint_path="outputs/checkpoints/mri_classifier_20260322_011228.pth",
+        checkpoint_path=checkpoint_path,
         device=device,
     )
-
+    predictor.model.eval()
     outputs = predictor.collect_predictions(val_loader)
 
     patient_preds = topk_patient_prediction(
@@ -112,11 +151,23 @@ def main():
 
     gradcam = GradCAM(predictor.model)
 
-    sample_idx = select_representative_slice_index(val_records, preferred_label=1)
+    sample_idx = select_highest_tumor_probability_slice_index(
+        val_records,
+        outputs["probabilities"],
+        preferred_label=1,
+    )
+    print(
+        "Selected Grad-CAM slice | "
+        f"idx={sample_idx} | "
+        f"label={val_records[sample_idx]['label']} | "
+        f"tumor_prob={outputs['probabilities'][sample_idx][1]:.4f}"
+    )
     sample_image, _ = val_dataset[sample_idx]
-    image_np = sample_image[1].cpu().numpy()
+    image_np = sample_image[1].detach().cpu().numpy()
+    image_np = (image_np - image_np.min()) / (image_np.max() + 1e-8)
 
     input_tensor = sample_image.unsqueeze(0).to(device)
+    input_tensor.requires_grad = True
 
     cam = gradcam.generate(input_tensor, class_idx=1)
 
