@@ -927,3 +927,87 @@ Run Command:
 ### Step 12 Summary
 
 Project now includes a complete inference and explainability application layer on top of the trained model pipeline, enabling demonstration-ready MRI decision support.
+
+---
+
+### Step 12.4 - Reliability Metrics Expansion in UI
+
+File Modified:
+- `app/streamlit_app.py`
+
+Implemented:
+- Added a dedicated **Result Reliability** section with compact card layout
+- Added per-case interpretability metrics:
+  - prediction confidence (predicted class probability)
+  - decision robustness (distance from threshold)
+  - slice consistency (slice-level agreement with patient decision)
+  - entropy-based uncertainty
+  - composite confidence score
+- Added benchmark extraction from `PROJECT_LOG.md` (cached parser):
+  - reference test accuracy
+  - reference patient-level accuracy
+  - reference ROC-AUC
+- Added collapsible advanced details to prevent UI clutter
+
+Outcome:
+Inference results now provide richer confidence context without overwhelming the dashboard.
+
+---
+
+### Step 12.5 - Dashboard Styling and Spacing Refinement
+
+File Modified:
+- `app/streamlit_app.py`
+
+Implemented:
+- Iterative theme tuning with multiple palette trials for improved visual harmony
+- Enforced solid-color styling (removed gradient backgrounds)
+- Added responsive spacing improvements for:
+  - summary cards
+  - reliability cards
+  - status pills
+  - tabs and media panels
+- Improved status pill text rhythm and offset from indicator dots
+- Tuned header/toolbar spacing and control alignment
+- Replaced default red widget accents (slider/toggle/progress/tab highlight)
+- Removed accidental numeric highlight blocks on slider labels
+
+Outcome:
+UI is cleaner, more consistent, and easier to scan across desktop and mobile widths.
+
+---
+
+### Step 12.6 - Sidebar Toggle Icon Customization
+
+File Modified:
+- `app/streamlit_app.py`
+
+Implemented:
+- Replaced default sidebar collapse arrow icon with a custom hamburger-style icon
+- Implemented icon entirely with CSS (three rounded horizontal bars)
+- Preserved control position while improving visual clarity
+
+Outcome:
+Sidebar toggle now matches dashboard styling and is more recognizable.
+
+---
+
+### Step 12.7 - Theme Iteration Rollback and Final State
+
+Files Modified:
+- `app/streamlit_app.py`
+- `PROJECT_LOG.md`
+
+History Captured:
+- Temporary switch to alternate palette sets for experimentation
+- Final rollback to validated blue theme after visual comparison
+
+Final Active UI Palette:
+- `#89d2dc`
+- `#6564db`
+- `#232ed1`
+- `#101d42`
+- `#0d1317`
+
+Outcome:
+Project UI remains stable and aligned with the preferred theme while preserving all functional dashboard improvements.
