@@ -846,3 +846,84 @@ Evaluate the impact of Z-score normalization on model performance and training s
 ### Conclusion
 
 Normalization is not essential for final performance but is critical for stable and reliable training.
+
+---
+
+## Step 12 - Streamlit Decision-Support App
+
+### Objective
+
+Deliver an interactive interface for MRI inference so users can upload a scan, review tumor likelihood, and inspect Grad-CAM explainability outputs without running training scripts.
+
+---
+
+### Step 12.1 - Inference Utilities for App Runtime
+
+File Added:
+- `src/inference.py`
+
+Implemented:
+- Device-aware model loading (`cpu`/`cuda`) from `checkpoints/best_model.pth`
+- Upload-safe NIfTI preprocessing from raw bytes
+- Reuse of training-aligned preprocessing:
+  - 4D handling
+  - z-score normalization
+  - valid slice extraction
+  - 2.5D stacking
+  - resize to `(3, 224, 224)`
+- Slice-level probability prediction
+- Patient-level score aggregation (top-k mean)
+- Single-slice Grad-CAM generation for UI visualization
+
+Outcome:
+Inference path is modularized and reusable by the web app.
+
+---
+
+### Step 12.2 - Streamlit Frontend Implementation
+
+File Added:
+- `app/streamlit_app.py`
+
+Implemented:
+- Streamlit page configuration and custom UI theme
+- Sidebar controls:
+  - checkpoint path
+  - decision threshold
+  - Grad-CAM toggle
+  - Grad-CAM quality controls (smoothing, clipping, saliency threshold, focus percentile)
+- Upload flow for `.nii` / `.nii.gz`
+- Cached model loading for fast repeated inference
+- Prediction summary panel:
+  - patient score
+  - threshold
+  - decision label
+  - valid slice count
+- Slice viewer with index slider
+- Explainability view with three synchronized panels:
+  - MRI slice
+  - Grad-CAM on brain mask
+  - overlay image
+- Probability trend chart across slices
+
+Outcome:
+End-to-end interactive decision-support interface is operational.
+
+---
+
+### Step 12.3 - Integration Validation
+
+Validated:
+- App loads trained checkpoint successfully
+- Uploaded scans pass preprocessing pipeline without structural mismatch
+- Slice-level predictions and patient-level decision are produced correctly
+- Grad-CAM rendering is integrated into interactive inspection workflow
+
+Run Command:
+- `streamlit run app/streamlit_app.py`
+
+---
+
+### Step 12 Summary
+
+Project now includes a complete inference and explainability application layer on top of the trained model pipeline, enabling demonstration-ready MRI decision support.
