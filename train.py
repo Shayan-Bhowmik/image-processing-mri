@@ -121,7 +121,7 @@ def train():
         patience=1
     )
 
-    num_epochs = 50
+    num_epochs = 60
     best_val_acc = 0.0
 
     os.makedirs("checkpoints", exist_ok=True)
