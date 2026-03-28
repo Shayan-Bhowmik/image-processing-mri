@@ -469,3 +469,28 @@ The current visualization reflects the model's learned feature representations b
 
 ### Outcome
 Grad-CAM quality improved from edge-dominant activations toward more internal, clinically relevant regions. The explainability workflow is now stable and driven by clinical probability signals for ongoing tuning and model validation.
+
+## Step 14 – Inference Wrapper for Deployment (Completed)
+
+### Actions
+- Created src/inference.py module for model prediction interface
+  - Implemented predict_on_mri() function for end-to-end inference
+  - Integrated NIfTI loading, preprocessing (normalization, skull stripping, cropping)
+  - Automatic latest checkpoint detection from outputs/checkpoints
+  - Multi-slice voting mechanism (>50% tumor slices = positive prediction)
+  - Returns prediction, confidence, tumor probability, and slice statistics
+  - Auto device selection (GPU if available, CPU fallback)
+  - Configurable preprocessing parameters (crop size, transforms, skull strip flag)
+- Implemented get_latest_checkpoint() utility for checkpoint auto-loading
+- Added command-line interface for standalone inference testing
+  - Usage: python src/inference.py path/to/patient.nii --crop_size 180
+  - Provides formatted results output with prediction and confidence metrics
+- Designed Streamlit-compatible function signature
+  - Takes file path → Returns simple dict with results
+  - No direct dependency on Streamlit (clean separation)
+
+- Files Modified / Added
+  src/inference.py
+
+### Outcome
+Successfully implemented production-ready inference wrapper decoupling analysis logic from UI implementation. The module provides a clean, reusable interface for Streamlit integration without tight coupling. Supports both CLI and programmatic usage. Ready for Streamlit application development.

@@ -1,0 +1,150 @@
+import sys
+from pathlib import Path
+import numpy as np
+import torch
+import torch.nn.functional as F
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
+from src.models.model_factory import create_model
+from src.preprocessing.volume_utils import load_nifti, zscore_normalize, strip_skull
+from src.preprocessing.slice_utils import extract_axial_slices
+from src.dataset.input_transforms import build_eval_transform
+
+
+def get_latest_checkpoint(checkpoint_dir: str = "outputs/checkpoints") -> str:
+    checkpoint_dir = Path(checkpoint_dir)
+    if not checkpoint_dir.exists():
+        raise FileNotFoundError(f"Checkpoint directory not found: {checkpoint_dir}")
+    
+    pth_files = sorted(checkpoint_dir.glob("*.pth"))
+    if not pth_files:
+        raise FileNotFoundError(f"No .pth files found in {checkpoint_dir}")
+    
+    return str(pth_files[-1])
+
+
+def predict_on_mri(
+    mri_path: str,
+    checkpoint_path: str = None,
+    device: str = "auto",
+    target_size: int = 224,
+    center_crop_size: int = 180,
+    apply_skull_strip: bool = True
+) -> dict:
+    
+    if checkpoint_path is None:
+        checkpoint_path = get_latest_checkpoint()
+    
+    if device == "auto":
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    else:
+        device = torch.device(device)
+    
+    mri_path = Path(mri_path)
+    if not mri_path.exists():
+        raise FileNotFoundError(f"MRI file not found: {mri_path}")
+    
+    checkpoint_path = Path(checkpoint_path)
+    if not checkpoint_path.exists():
+        raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
+    
+    volume = load_nifti(str(mri_path))
+    normalized_volume = zscore_normalize(volume)
+    
+    if apply_skull_strip:
+        normalized_volume = strip_skull(normalized_volume)
+    
+    slices = extract_axial_slices(normalized_volume)
+    
+    eval_transform = build_eval_transform(
+        target_size=target_size,
+        center_crop_size=center_crop_size
+    )
+    
+    model = create_model(architecture='cnn', num_classes=2)
+    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
+    if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
+        model.load_state_dict(checkpoint['model_state_dict'])
+    else:
+        model.load_state_dict(checkpoint)
+    
+    model = model.to(device)
+    model.eval()
+    
+    predictions_all = []
+    confidences_all = []
+    tumor_probs_all = []
+    
+    with torch.no_grad():
+        for slice_2d in slices:
+            if eval_transform:
+                slice_tensor = eval_transform(slice_2d)
+            else:
+                slice_tensor = torch.from_numpy(slice_2d).float()
+            
+            if slice_tensor.ndim == 2:
+                slice_tensor = slice_tensor.unsqueeze(0)
+            
+            if slice_tensor.dim() == 3:
+                if slice_tensor.shape[0] != 3:
+                    if slice_tensor.shape[2] == 3:
+                        slice_tensor = slice_tensor.permute(2, 0, 1)
+                    else:
+                        slice_tensor = slice_tensor.repeat(3, 1, 1)
+            
+            slice_tensor = slice_tensor.unsqueeze(0).to(device)
+            
+            output = model(slice_tensor)
+            probs = F.softmax(output, dim=1)
+            pred = torch.argmax(probs, dim=1).item()
+            conf = probs[0, pred].item()
+            tumor_prob = probs[0, 1].item()
+            
+            predictions_all.append(pred)
+            confidences_all.append(conf)
+            tumor_probs_all.append(tumor_prob)
+    
+    avg_tumor_prob = np.mean(tumor_probs_all)
+    tumor_slices = sum(1 for p in predictions_all if p == 1)
+    final_pred = 1 if tumor_slices > len(predictions_all) * 0.5 else 0
+    final_confidence = avg_tumor_prob if final_pred == 1 else (1 - avg_tumor_prob)
+    
+    return {
+        "prediction": final_pred,
+        "confidence": final_confidence,
+        "tumor_probability": avg_tumor_prob,
+        "tumor_slices": tumor_slices,
+        "total_slices": len(predictions_all),
+        "checkpoint_used": str(checkpoint_path)
+    }
+
+
+if __name__ == "__main__":
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Run inference on MRI file")
+    parser.add_argument("mri_path", type=str, help="Path to MRI file")
+    parser.add_argument("--checkpoint", type=str, default=None, help="Path to checkpoint")
+    parser.add_argument("--device", type=str, default="auto", choices=["auto", "cuda", "cpu"])
+    parser.add_argument("--crop_size", type=int, default=180, help="Center crop size")
+    
+    args = parser.parse_args()
+    
+    result = predict_on_mri(
+        args.mri_path,
+        checkpoint_path=args.checkpoint,
+        device=args.device,
+        center_crop_size=args.crop_size
+    )
+    
+    print("\n" + "=" * 60)
+    print("Inference Results")
+    print("=" * 60)
+    print(f"Prediction: {'Tumor (1)' if result['prediction'] == 1 else 'Normal (0)'}")
+    print(f"Confidence: {result['confidence']:.4f}")
+    print(f"Tumor Probability: {result['tumor_probability']:.4f}")
+    print(f"Tumor Slices: {result['tumor_slices']} / {result['total_slices']}")
+    print(f"Checkpoint: {result['checkpoint_used']}")
+    print("=" * 60 + "\n")
