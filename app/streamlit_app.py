@@ -1,8 +1,10 @@
-import numpy as np
+﻿import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
 from datetime import datetime
+from pathlib import Path
+import json
 import re
 
 from src.inference import (
@@ -668,11 +670,38 @@ def load_reference_metrics(log_path: str = "PROJECT_LOG.md") -> dict[str, float]
     return metrics
 
 
+@st.cache_data
+def load_calibrated_threshold(
+    calibration_path: str = "outputs/calibration/recommended_threshold.json",
+    fallback: float = 0.5,
+) -> float:
+    path = Path(calibration_path)
+    if not path.exists():
+        return fallback
+
+    try:
+        with path.open("r", encoding="utf-8") as f:
+            payload = json.load(f)
+        threshold = float(payload.get("recommended_threshold", fallback))
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        return fallback
+
+    return float(np.clip(threshold, 0.0, 1.0))
+
+
 st.sidebar.header("Controls")
 checkpoint_path = st.sidebar.text_input("Checkpoint path", "checkpoints/best_model.pth")
-threshold = st.sidebar.slider("Decision threshold", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
+default_threshold = load_calibrated_threshold()
+threshold = st.sidebar.slider(
+    "Decision threshold",
+    min_value=0.0,
+    max_value=1.0,
+    value=float(default_threshold),
+    step=0.01,
+)
 show_gradcam = st.sidebar.toggle("Show Grad-CAM", value=True)
 st.sidebar.caption("Tune prediction and visualization settings before reviewing slices.")
+st.sidebar.caption(f"Calibrated default threshold: {default_threshold:.2f}")
 st.sidebar.divider()
 
 with st.sidebar.expander("Grad-CAM Quality", expanded=False):
@@ -999,6 +1028,3 @@ with ranking_tab:
     )
     st.dataframe(ranking_df, use_container_width=True, hide_index=True)
     st.caption("Use these slices as a fast review shortlist for expert verification.")
-
-
-
