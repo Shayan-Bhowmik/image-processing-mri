@@ -1126,3 +1126,32 @@ Comprehensive threshold optimization framework:
 - Complete biomarker separation achieved
 
 ---
+
+### Step 13.4 — Streamlit App Integration
+
+### File Modified
+
+- `app/streamlit_app.py`
+
+### Changes Implemented
+
+**Automatic Threshold Loading**
+- Added import: `from pathlib import Path`, `import json`
+- Implemented `@st.cache_data` decorated `load_calibrated_threshold()` function
+- Function URL: Lines 674-690 (streamlit_app.py)
+- Reads from: `outputs/calibration/recommended_threshold.json`
+- Fallback: 0.5 if file missing or corrupted
+- Constraints: Clips to valid range [0.0, 1.0]
+
+**UI Integration**
+- Updated threshold parameter slider (lines 694-704):
+  - Default value now uses `load_calibrated_threshold()` instead of hardcoded 0.5
+  - User can still manually override for sensitivity tuning
+  - Added informative sidebar caption: "Calibrated default threshold: 0.70"
+
+**User Experience**
+- App automatically loads 0.70 as default on first startup
+- Users see explanation of calibrated default
+- Manual adjustment still available for edge cases
+
+---
