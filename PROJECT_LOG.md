@@ -1198,19 +1198,6 @@ Perform a targeted code-level audit of training, inference, and calibration path
 
 ---
 
-
-### Step 14.1 — Discrepancy Audit Findings (Top 3)
-
-#### Finding 1: Slice Indexing Misalignment in Training Dataset
-
-Problem:
-- Dataset indexed slice positions using `len(valid_slices)` but retrieved data using raw depth indices.
-- This could map filtered slice indices to unintended raw slices.
-
-Risk:
-- Training samples could include near-empty or shifted slices.
-- Silent label-feature inconsistency.
-
 #### Finding 2: 2.5D Context Mismatch Between Train and Inference
 
 Problem:
@@ -1229,5 +1216,23 @@ Problem:
 Risk:
 - Over-optimistic threshold performance.
 - Potential data leakage into decision boundary selection.
+
+---
+
+### Step 14.2 — Fix Implemented: Dataset Indexing and 2.5D Consistency
+
+File Modified:
+- `src/data/mri_dataset.py`
+
+Changes:
+- Added `self.valid_slices_store` for each patient.
+- Stored filtered valid slices during dataset build.
+- Indexed dataset using valid-slice indices only.
+- Updated `__getitem__` to pull `prev/current/next` from valid-slice list, not raw volume depth.
+- Skips patients with zero valid slices.
+
+Impact:
+- Training data now aligns with intended filtered slice population.
+- 2.5D context generation now matches inference behavior exactly.
 
 ---
