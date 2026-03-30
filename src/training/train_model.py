@@ -17,7 +17,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.models.model_factory import create_model
 from src.dataset.mri_dataset import MRISliceDataset, create_train_val_dataloaders
-from src.dataset.split_utils import split_dataset_by_patient
+from src.dataset.split_utils import split_dataset_by_patient, split_dataset_by_patient_balanced_val
 from src.dataset.input_transforms import build_train_transform, build_eval_transform
 from src.training.trainer import Trainer
 
@@ -41,6 +41,8 @@ def parse_arguments():
     parser.add_argument("--scheduler_gamma", type=float, default=0.1)
 
     parser.add_argument("--train_ratio", type=float, default=0.8)
+    parser.add_argument("--balanced_validation", action="store_true", 
+                        help="Use balanced validation set (50%% tumor, 50%% normal)")
     parser.add_argument("--target_size", type=int, default=224)
     parser.add_argument("--center_crop_size", type=int, default=180)
     parser.add_argument("--num_workers", type=int, default=0)
@@ -191,11 +193,20 @@ def main():
 
     print("\n[Step 2/7] Splitting dataset...")
 
-    train_records, val_records = split_dataset_by_patient(
-        dataset=dataset_records,
-        train_ratio=args.train_ratio,
-        seed=args.random_seed
-    )
+    if args.balanced_validation:
+        train_records, val_records = split_dataset_by_patient_balanced_val(
+            dataset=dataset_records,
+            train_ratio=args.train_ratio,
+            val_balance_ratio=0.5,
+            seed=args.random_seed
+        )
+        print("Using balanced validation set (50%% tumor, 50%% normal)")
+    else:
+        train_records, val_records = split_dataset_by_patient(
+            dataset=dataset_records,
+            train_ratio=args.train_ratio,
+            seed=args.random_seed
+        )
 
     print("\n[Step 3/7] Creating datasets...")
 

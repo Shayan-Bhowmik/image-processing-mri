@@ -13,14 +13,19 @@ def print_report(metrics: Dict) -> None:
     precision = metrics.get("precision", 0.0)
     recall = metrics.get("recall", 0.0)
     f1 = metrics.get("f1_score", 0.0)
+    sensitivity = metrics.get("sensitivity", 0.0)
+    specificity = metrics.get("specificity", 0.0)
     cm = metrics.get("confusion_matrix", [[0, 0], [0, 0]])
 
-    print(f"Accuracy:  {accuracy:.4f}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall:    {recall:.4f}")
-    print(f"F1 Score:  {f1:.4f}\n")
+    print(f"Accuracy:    {accuracy:.4f}")
+    print(f"Precision:   {precision:.4f}")
+    print(f"Recall:      {recall:.4f}")
+    print(f"F1 Score:    {f1:.4f}")
+    print(f"Sensitivity: {sensitivity:.4f}  (Tumor detection rate)")
+    print(f"Specificity: {specificity:.4f}  (Normal detection rate)\n")
+    
     if "roc_auc" in metrics:
-        print(f"ROC AUC:   {metrics['roc_auc']:.4f}")
+        print(f"ROC AUC:     {metrics['roc_auc']:.4f}\n")
 
     if len(cm) != 2 or len(cm[0]) != 2:
         raise ValueError("Confusion matrix must be 2x2 for binary classification")

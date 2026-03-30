@@ -562,3 +562,57 @@ Delivered a stable Streamlit baseline with upload, prediction, and Grad-CAM expl
 
 ### Outcome
 Step 15.2 delivered a production-ready Streamlit UX pass over the baseline app: improved visual hierarchy, clearer diagnosis communication, robust explainability presentation, and complete export/report functionality while preserving compatibility with native Streamlit theming behavior.
+
+## Step 16 – Model Reliability Revalidation and Training Hardening (Completed)
+
+---
+
+## Step 16.1 – OASIS False-Positive Investigation (Completed)
+
+### Actions
+- Ran targeted OASIS sanity checks using latest checkpoints to validate real-world behavior.
+- Added `test_oasis_sample.py` for single-case end-to-end diagnostics:
+  - Slice-level class counts
+  - Probability statistics
+  - Top suspicious slices
+  - Patient-level decision summary
+- Added `analyze_dataset.py` to audit dataset composition and class balance.
+
+### Outcome
+Confirmed that high headline validation scores did not fully reflect healthy-control behavior; OASIS checks exposed persistent patient-level false-positive risk requiring training/evaluation hardening.
+
+## Step 16.2 – Training/Evaluation Pipeline Hardening (Completed)
+
+### Actions
+- Added balanced validation split option:
+  - Implemented `split_dataset_by_patient_balanced_val(...)` in `src/dataset/split_utils.py`
+  - Added `--balanced_validation` flag in `src/training/train_model.py`
+- Expanded clinical evaluation metrics:
+  - Added Sensitivity and Specificity in `src/evaluation/metrics.py`
+  - Updated reporting output in `src/evaluation/report.py`
+
+### Outcome
+Training and evaluation now support fairer monitoring for imbalanced classes and provide clinically meaningful performance signals beyond overall accuracy.
+
+## Step 16.3 – Short-Cycle Retraining and Regression Checks (Completed)
+
+### Actions
+- Executed iterative retraining runs (5/10/20 epochs) with balanced validation enabled.
+- Re-ran OASIS diagnostics after each run to measure behavioral change.
+
+### Findings
+- Slice-level behavior improved across retraining cycles (higher normal-slice fraction, lower median tumor probability on OASIS).
+- Remaining issue localized to patient-level aggregation sensitivity: a small number of high-probability slices can still flip final decision.
+
+### Files Modified / Added
+- Added:
+  - `test_oasis_sample.py`
+  - `analyze_dataset.py`
+- Modified:
+  - `src/dataset/split_utils.py`
+  - `src/training/train_model.py`
+  - `src/evaluation/metrics.py`
+  - `src/evaluation/report.py`
+
+### Outcome
+Model reliability work is now correctly tracked under a dedicated training/evaluation parent step, separate from Streamlit UI work. Next hardening item is aggregation-rule unification and thresholding at patient level.

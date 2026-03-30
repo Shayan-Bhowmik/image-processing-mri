@@ -24,11 +24,24 @@ def compute_classification_metrics(
 
     cm = confusion_matrix(true_labels, predicted_labels)
 
+    # Calculate sensitivity (recall for class 1 / tumor class)
+    # sensitivity = TP / (TP + FN) = recall
+    sensitivity = recall
+    
+    # Calculate specificity (recall for class 0 / normal class)
+    # specificity = TN / (TN + FP)
+    tn, fp = cm[0][0], cm[0][1]
+    fn, tp = cm[1][0], cm[1][1]
+    
+    specificity = tn / (tn + fp) if (tn + fp) > 0 else 0.0
+
     metrics = {
         "accuracy": accuracy,
         "precision": precision,
         "recall": recall,
         "f1_score": f1,
+        "sensitivity": sensitivity,
+        "specificity": specificity,
         "confusion_matrix": cm,
     }
 
