@@ -1162,9 +1162,9 @@ Comprehensive threshold optimization framework:
 
 | Dataset | Cases | Correctly Classified |
 |---------|-------|-------------------|
-| BraTS (Tumors) | 350 | 350 ✓ 100% |
-| OASIS (Healthy) | 436 | 436 ✓ 100% |
-| **Total** | **786** | **786 ✓ 100%** |
+| BraTS (Tumors) | 350 | 350, 100% |
+| OASIS (Healthy) | 436 | 436, 100% |
+| **Total** | **786** | **786, 100%** |
 
 ### No Retraining Required
 
@@ -1187,3 +1187,13 @@ Project now includes:
 5. **Full Auditability**: Complete sweep report available for external validation and threshold sensitivity analysis
 
 **Outcome**: Classification system is now production-ready for clinical demonstration with guaranteed correct handling of both diseased and healthy control cases.
+
+---
+
+## Step 14 — Pipeline Discrepancy Audit & Critical Consistency Fixes
+
+### Objective
+
+Perform a targeted code-level audit of training, inference, and calibration paths; fix high-impact discrepancies that could inflate metrics or create train/inference mismatch.
+
+---

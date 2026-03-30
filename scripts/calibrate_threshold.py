@@ -27,17 +27,24 @@ class CaseResult:
     num_slices: int
 
 
+def _is_nifti_file(file_path: Path) -> bool:
+    return file_path.is_file() and file_path.name.lower().endswith((".nii", ".nii.gz"))
+
+
+def _find_brats_flair_file(patient_dir: Path) -> Path | None:
+    for file_path in patient_dir.iterdir():
+        if _is_nifti_file(file_path) and "flair" in file_path.name.lower():
+            return file_path
+    return None
+
+
 def find_brats_flair_files(brats_root: Path) -> list[tuple[str, int, Path]]:
     entries: list[tuple[str, int, Path]] = []
     for patient_dir in sorted(brats_root.iterdir()):
         if not patient_dir.is_dir():
             continue
 
-        flair_file = None
-        for file_path in patient_dir.iterdir():
-            if file_path.is_file() and "flair" in file_path.name.lower() and file_path.suffix.lower() == ".nii":
-                flair_file = file_path
-                break
+        flair_file = _find_brats_flair_file(patient_dir)
 
         if flair_file is not None:
             entries.append((patient_dir.name, 1, flair_file))
@@ -47,9 +54,65 @@ def find_brats_flair_files(brats_root: Path) -> list[tuple[str, int, Path]]:
 
 def find_oasis_files(oasis_root: Path) -> list[tuple[str, int, Path]]:
     entries: list[tuple[str, int, Path]] = []
-    for file_path in sorted(oasis_root.glob("*.nii")):
-        entries.append((file_path.name, 0, file_path))
+    for file_path in sorted(oasis_root.iterdir()):
+        if _is_nifti_file(file_path):
+            entries.append((file_path.name, 0, file_path))
     return entries
+
+
+def load_split_entries(split_json_path: Path, split_name: str) -> list[dict[str, object]]:
+    if not split_json_path.exists():
+        raise FileNotFoundError(f"Split file not found: {split_json_path}")
+
+    payload = json.loads(split_json_path.read_text(encoding="utf-8"))
+    if split_name not in payload:
+        available = ", ".join(sorted(payload.keys()))
+        raise KeyError(f"Split '{split_name}' not found. Available: {available}")
+
+    split_entries = payload[split_name]
+    if not isinstance(split_entries, list):
+        raise ValueError(f"Split '{split_name}' must be a list of entries.")
+
+    return split_entries
+
+
+def resolve_cases_from_split_entries(
+    split_entries: list[dict[str, object]],
+    brats_root: Path,
+    oasis_root: Path,
+) -> tuple[list[tuple[str, int, Path]], list[str]]:
+    resolved: list[tuple[str, int, Path]] = []
+    missing: list[str] = []
+
+    for entry in split_entries:
+        case_id = str(entry.get("id", "")).strip()
+        label = int(entry.get("label", -1))
+
+        if not case_id or label not in (0, 1):
+            missing.append(f"invalid entry: {entry}")
+            continue
+
+        if label == 1:
+            patient_dir = brats_root / case_id
+            if not patient_dir.exists() or not patient_dir.is_dir():
+                missing.append(f"missing brats patient dir: {patient_dir}")
+                continue
+
+            flair_file = _find_brats_flair_file(patient_dir)
+            if flair_file is None:
+                missing.append(f"missing brats flair file: {patient_dir}")
+                continue
+
+            resolved.append((case_id, label, flair_file))
+        else:
+            oasis_file = oasis_root / case_id
+            if not _is_nifti_file(oasis_file):
+                missing.append(f"missing oasis file: {oasis_file}")
+                continue
+
+            resolved.append((case_id, label, oasis_file))
+
+    return resolved, missing
 
 
 def evaluate_case_scores(
@@ -139,7 +202,9 @@ def to_float(value: float) -> float:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Calibrate patient-level threshold on combined BraTS + OASIS.")
+    parser = argparse.ArgumentParser(
+        description="Calibrate patient-level threshold on a held-out split (default) or full BraTS + OASIS."
+    )
     parser.add_argument("--checkpoint", default="checkpoints/best_model.pth", help="Path to model checkpoint")
     parser.add_argument(
         "--brats-root",
@@ -157,6 +222,22 @@ def main() -> None:
         default="outputs/calibration",
         help="Output folder for calibration report and threshold file",
     )
+    parser.add_argument(
+        "--split-json",
+        default="data/splits/patient_split.json",
+        help="Patient split JSON used for held-out calibration",
+    )
+    parser.add_argument(
+        "--split-name",
+        default="val",
+        choices=["train", "val", "test"],
+        help="Held-out split name for threshold calibration",
+    )
+    parser.add_argument(
+        "--use-all-cases",
+        action="store_true",
+        help="Use every discovered BraTS+OASIS case instead of a held-out split",
+    )
 
     args = parser.parse_args()
 
@@ -165,16 +246,31 @@ def main() -> None:
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    brats_cases = find_brats_flair_files(brats_root)
-    oasis_cases = find_oasis_files(oasis_root)
-    all_cases = brats_cases + oasis_cases
+    split_json_path = Path(args.split_json)
+
+    if args.use_all_cases:
+        brats_cases = find_brats_flair_files(brats_root)
+        oasis_cases = find_oasis_files(oasis_root)
+        all_cases = brats_cases + oasis_cases
+        missing_cases: list[str] = []
+        calibration_scope = "all_cases"
+    else:
+        split_entries = load_split_entries(split_json_path, args.split_name)
+        all_cases, missing_cases = resolve_cases_from_split_entries(split_entries, brats_root, oasis_root)
+        calibration_scope = f"{args.split_name}_split"
+
+    brats_count = sum(1 for _, label, _ in all_cases if label == 1)
+    oasis_count = sum(1 for _, label, _ in all_cases if label == 0)
 
     if not all_cases:
         raise RuntimeError("No cases were found in BraTS/OASIS roots.")
 
-    print(f"BraTS cases: {len(brats_cases)}")
-    print(f"OASIS cases: {len(oasis_cases)}")
+    print(f"Calibration scope: {calibration_scope}")
+    print(f"BraTS cases: {brats_count}")
+    print(f"OASIS cases: {oasis_count}")
     print(f"Total cases: {len(all_cases)}")
+    if missing_cases:
+        print(f"Missing/invalid split entries skipped: {len(missing_cases)}")
 
     model, device = load_trained_model(checkpoint_path=args.checkpoint)
     print(f"Model loaded on: {device}")
@@ -198,11 +294,16 @@ def main() -> None:
         "created_at": datetime.now().isoformat(timespec="seconds"),
         "checkpoint": args.checkpoint,
         "top_k": int(args.top_k),
+        "calibration_scope": calibration_scope,
+        "split_json": str(split_json_path),
+        "split_name": args.split_name,
+        "use_all_cases": bool(args.use_all_cases),
         "dataset_counts": {
-            "brats": len(brats_cases),
-            "oasis": len(oasis_cases),
+            "brats": brats_count,
+            "oasis": oasis_count,
             "processed": len(results),
             "failed": len(failures),
+            "missing_split_entries": len(missing_cases),
         },
         "score_stats": {
             "min": to_float(float(scores.min())),
@@ -239,6 +340,7 @@ def main() -> None:
             }
             for row in picked["all"]
         ],
+        "missing_split_entries": missing_cases,
         "failures": [{"case": case, "error": err} for case, err in failures],
     }
 

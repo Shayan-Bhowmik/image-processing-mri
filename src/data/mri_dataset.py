@@ -21,6 +21,7 @@ class MRIDataset(Dataset):
         self.use_2_5d = use_2_5d
         self.index_map = []
         self.volume_store = {}
+        self.valid_slices_store = {}
 
         self.brats_root = "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
         self.oasis_root = "data/raw/oasis/OASIS_Clean_Data/OASIS_Clean_Data"
@@ -57,18 +58,15 @@ class MRIDataset(Dataset):
                 volume = volume[..., 0]
 
             volume = zscore_normalize(volume)
-
+            valid_slices = extract_valid_slices(volume)
+            if not valid_slices:
+                continue
 
             self.volume_store[patient_id] = volume
+            self.valid_slices_store[patient_id] = valid_slices
 
-
-
-
-            valid_slices = extract_valid_slices(volume)
-            valid_indices = list(range(len(valid_slices)))
-
-            for slice_idx in valid_indices:
-                self.index_map.append((patient_id, slice_idx, label))
+            for valid_idx in range(len(valid_slices)):
+                self.index_map.append((patient_id, valid_idx, label))
 
         print(f"Total slices indexed: {len(self.index_map)}")
 
@@ -76,17 +74,16 @@ class MRIDataset(Dataset):
         return len(self.index_map)
 
     def __getitem__(self, index):
-        patient_id, slice_idx, label = self.index_map[index]
+        patient_id, valid_idx, label = self.index_map[index]
 
-        volume = self.volume_store[patient_id]
+        valid_slices = self.valid_slices_store[patient_id]
 
+        prev_idx = max(valid_idx - 1, 0)
+        next_idx = min(valid_idx + 1, len(valid_slices) - 1)
 
-        prev_idx = max(slice_idx - 1, 0)
-        next_idx = min(slice_idx + 1, volume.shape[2] - 1)
-
-        slice_prev = volume[:, :, prev_idx]
-        slice_curr = volume[:, :, slice_idx]
-        slice_next = volume[:, :, next_idx]
+        slice_prev = valid_slices[prev_idx]
+        slice_curr = valid_slices[valid_idx]
+        slice_next = valid_slices[next_idx]
 
 
 
