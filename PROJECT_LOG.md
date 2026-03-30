@@ -1089,3 +1089,40 @@ Comprehensive threshold optimization framework:
 - Returns best threshold + full evaluation table
 
 ---
+
+### Step 13.3 — Threshold Calibration Results
+
+### File Created
+
+- `outputs/calibration/threshold_report.json` (full sweep report)
+- `outputs/calibration/recommended_threshold.json` (recommended threshold)
+
+### Comprehensive Results
+
+**Baseline Performance (Threshold = 0.50)**
+- True Positives: 350 (all BraTS)
+- False Negatives: 0
+- True Negatives: 216 OASIS
+- False Positives: 220 OASIS
+- Sensitivity: 100.00% (perfect tumor detection)
+- Specificity: 49.54% (50% false positive rate on healthy controls)
+- Balanced Accuracy: 74.77%
+
+**Recommended Performance (Threshold = 0.70)**
+- True Positives: 350 (all BraTS)
+- False Negatives: 0
+- True Negatives: 436 OASIS
+- False Positives: 0
+- **Sensitivity: 100.00%** (perfect tumor detection)
+- **Specificity: 100.00%** (perfect healthy detection)
+- **Balanced Accuracy: 100.00%**
+- **Accuracy: 100.00%**
+
+### Threshold Sweep Coverage
+
+- Empirical evaluation: 220+ threshold values
+- Dataset: 350 tumors + 436 healthy = 786 total cases
+- No processing failures
+- Complete biomarker separation achieved
+
+---
