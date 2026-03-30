@@ -1022,3 +1022,26 @@ Calibrate the patient-level decision threshold on a combined BraTS (tumor) + OAS
 
 ---
 
+### Step 13.1 — OASIS Validation Baseline (Discovery)
+
+### Problem Identified
+
+Initial inference on OASIS (436 healthy control scans) at default threshold 0.50:
+- False Positives: 220 out of 436 cases (50.46% FPR)
+- Sensitivity: 100% (all 350 BraTS tumors correctly identified)
+- Specificity: 49.54% (only 216 healthy cases correctly identified)
+- **Conclusion**: Default threshold was inadequate; model score distribution requires recalibration
+
+### Root Cause Analysis
+
+- Model produces scores naturally distributed around 0.5-0.7 for this architecture
+- Patient score distribution statistics:
+  - Min: 0.000013
+  - Max: 1.0
+  - Mean: 0.701
+  - Std: 0.278
+- OASIS (healthy) scores cluster predominantly below 0.70
+- BraTS (tumor) scores cluster predominantly above 0.70
+- Threshold 0.50 sits in overlap region, creating unnecessary false positives
+
+---
