@@ -1,4 +1,5 @@
 import sys
+import json
 from pathlib import Path
 import numpy as np
 import torch
@@ -11,6 +12,7 @@ from src.models.model_factory import create_model
 from src.preprocessing.volume_utils import load_nifti, zscore_normalize, strip_skull
 from src.preprocessing.slice_utils import extract_axial_slices
 from src.dataset.input_transforms import build_eval_transform
+from src.aggregation.topk_aggregation import robust_patient_prediction_from_tumor_probs
 
 
 def get_latest_checkpoint(checkpoint_dir: str = "outputs/checkpoints") -> str:
@@ -23,6 +25,32 @@ def get_latest_checkpoint(checkpoint_dir: str = "outputs/checkpoints") -> str:
         raise FileNotFoundError(f"No .pth files found in {checkpoint_dir}")
     
     return str(pth_files[-1])
+
+
+def load_aggregation_params(config_path: str = "outputs/calibration/aggregation_calibration.json") -> dict:
+    defaults = {
+        "threshold": 0.70,
+        "top_k": 20,
+        "method": "median",
+        "min_suspicious_slices": 8,
+        "suspicious_prob_threshold": 0.90,
+        "min_suspicious_fraction": 0.30,
+    }
+
+    path = Path(config_path)
+    if not path.exists():
+        return defaults
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            payload = json.load(f)
+        best = payload.get("best", {})
+        params = best.get("params", {})
+        merged = defaults.copy()
+        merged.update({k: params[k] for k in defaults.keys() if k in params})
+        return merged
+    except Exception:
+        return defaults
 
 
 def predict_on_mri(
@@ -54,7 +82,10 @@ def predict_on_mri(
     normalized_volume = zscore_normalize(volume)
     
     if apply_skull_strip:
-        normalized_volume = strip_skull(normalized_volume)
+        normalized_volume = np.stack(
+            [strip_skull(normalized_volume[:, :, i]) for i in range(normalized_volume.shape[2])],
+            axis=2,
+        )
     
     slices = extract_axial_slices(normalized_volume)
     
@@ -62,6 +93,12 @@ def predict_on_mri(
         target_size=target_size,
         center_crop_size=center_crop_size
     )
+
+    def _preprocess_slice(slice_2d):
+        slice_2d = np.asarray(slice_2d, dtype=np.float32)
+        stacked = np.stack([slice_2d, slice_2d, slice_2d], axis=0)
+        tensor = torch.from_numpy(stacked).float()
+        return eval_transform(tensor)
     
     model = create_model(architecture='cnn', num_classes=2)
     checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
@@ -79,10 +116,7 @@ def predict_on_mri(
     
     with torch.no_grad():
         for slice_2d in slices:
-            if eval_transform:
-                slice_tensor = eval_transform(slice_2d)
-            else:
-                slice_tensor = torch.from_numpy(slice_2d).float()
+            slice_tensor = _preprocess_slice(slice_2d)
             
             if slice_tensor.ndim == 2:
                 slice_tensor = slice_tensor.unsqueeze(0)
@@ -108,14 +142,22 @@ def predict_on_mri(
     
     avg_tumor_prob = np.mean(tumor_probs_all)
     tumor_slices = sum(1 for p in predictions_all if p == 1)
-    final_pred = 1 if tumor_slices > len(predictions_all) * 0.5 else 0
-    final_confidence = avg_tumor_prob if final_pred == 1 else (1 - avg_tumor_prob)
+    decision = robust_patient_prediction_from_tumor_probs(
+        tumor_probs=tumor_probs_all,
+        **load_aggregation_params(),
+    )
+    final_pred = decision["prediction"]
+    final_confidence = decision["confidence"]
     
     return {
         "prediction": final_pred,
         "confidence": final_confidence,
-        "tumor_probability": avg_tumor_prob,
+        "tumor_probability": decision["risk_score"],
+        "topk_tumor_probability": decision["score"],
+        "mean_tumor_probability": float(avg_tumor_prob),
         "tumor_slices": tumor_slices,
+        "suspicious_slices": decision["suspicious_slices"],
+        "suspicious_fraction": decision["suspicious_fraction"],
         "total_slices": len(predictions_all),
         "checkpoint_used": str(checkpoint_path)
     }

@@ -12,6 +12,7 @@ from src.dataset.input_transforms import build_eval_transform
 
 import pickle
 import gzip
+import json
 from collections import Counter
 import numpy as np
 from pathlib import Path
@@ -29,6 +30,29 @@ def get_latest_checkpoint(checkpoint_dir="outputs/checkpoints"):
         raise FileNotFoundError(f"No checkpoints found in {checkpoint_dir}")
     latest = max(candidates, key=lambda p: p.stat().st_mtime)
     return str(latest)
+
+
+def load_aggregation_params(config_path="outputs/calibration/aggregation_calibration.json"):
+    defaults = {
+        "threshold": 0.70,
+        "top_k": 20,
+        "method": "median",
+        "min_suspicious_slices": 8,
+        "suspicious_prob_threshold": 0.90,
+        "min_suspicious_fraction": 0.30,
+    }
+    path = Path(config_path)
+    if not path.exists():
+        return defaults
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            payload = json.load(f)
+        params = payload.get("best", {}).get("params", {})
+        merged = defaults.copy()
+        merged.update({k: params[k] for k in defaults.keys() if k in params})
+        return merged
+    except Exception:
+        return defaults
 
 
 def select_representative_slice_index(records, preferred_label=None):
@@ -106,10 +130,16 @@ def main():
     predictor.model.eval()
     outputs = predictor.collect_predictions(val_loader)
 
+    aggregation_params = load_aggregation_params()
     patient_preds = topk_patient_prediction(
         records=val_records,
         probs=outputs["probabilities"],
-        k=5
+        k=aggregation_params["top_k"],
+        threshold=aggregation_params["threshold"],
+        method=aggregation_params["method"],
+        min_suspicious_slices=aggregation_params["min_suspicious_slices"],
+        suspicious_prob_threshold=aggregation_params["suspicious_prob_threshold"],
+        min_suspicious_fraction=aggregation_params["min_suspicious_fraction"],
     )
 
     patient_labels = get_patient_labels(val_records)

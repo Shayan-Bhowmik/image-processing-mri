@@ -1,7 +1,3 @@
-"""
-Test script to run OASIS sample through the model and see predictions
-"""
-
 import sys
 from pathlib import Path
 import numpy as np
@@ -14,10 +10,11 @@ from src.preprocessing.volume_utils import load_nifti, zscore_normalize, strip_s
 from src.preprocessing.slice_utils import extract_axial_slices
 from src.models.model_factory import create_model
 from src.dataset.input_transforms import build_eval_transform
+from src.aggregation.topk_aggregation import robust_patient_prediction_from_tumor_probs
+from src.inference import load_aggregation_params
 
 
 def load_model(checkpoint_path=None):
-    """Load the trained model"""
     if checkpoint_path is None:
         checkpoint_dir = Path("outputs/checkpoints")
         pth_files = sorted(checkpoint_dir.glob("*.pth"))
@@ -40,7 +37,6 @@ def load_model(checkpoint_path=None):
 
 
 def preprocess_slice_for_model(slice_2d, target_size=224, center_crop_size=180):
-    """Preprocess a 2D slice for model input"""
     eval_transform = build_eval_transform(
         target_size=target_size,
         center_crop_size=center_crop_size
@@ -58,7 +54,6 @@ def preprocess_slice_for_model(slice_2d, target_size=224, center_crop_size=180):
 
 
 def predict_slices_batch(model, device, slices, max_slices=None):
-    """Run batch predictions on slices"""
     if max_slices is not None:
         slices = slices[:max_slices]
     
@@ -87,7 +82,6 @@ def main():
     print("OASIS Sample Evaluation")
     print("=" * 60)
     
-    # Load OASIS volume
     oasis_path = r"C:\datasets\oasis\OASIS_Clean_Data\OASIS_Clean_Data\OAS1_0028_MR1_mpr_n4_anon_111_t88_masked_gfc.nii"
     print(f"\nLoading OASIS volume: {oasis_path}")
     
@@ -98,13 +92,11 @@ def main():
         print(f"✗ Failed to load volume: {e}")
         return
     
-    # Preprocess volume
     print("\nPreprocessing volume...")
     try:
         volume = zscore_normalize(volume)
         print(f"✓ Z-score normalized")
         
-        # Apply skull stripping slice by slice
         volume = np.stack(
             [strip_skull(volume[:, :, i]) for i in range(volume.shape[2])],
             axis=2
@@ -114,7 +106,6 @@ def main():
         print(f"✗ Preprocessing failed: {e}")
         return
     
-    # Extract axial slices
     print("\nExtracting axial slices...")
     try:
         slices = extract_axial_slices(volume)
@@ -123,7 +114,6 @@ def main():
         print(f"✗ Failed to extract slices: {e}")
         return
     
-    # Load model
     print("\nLoading model...")
     try:
         model, device = load_model()
@@ -132,7 +122,6 @@ def main():
         print(f"✗ Failed to load model: {e}")
         return
     
-    # Run predictions
     print("\nRunning predictions on all slices...")
     try:
         predictions, probabilities = predict_slices_batch(model, device, slices)
@@ -141,7 +130,6 @@ def main():
         print(f"✗ Prediction failed: {e}")
         return
     
-    # Analyze results
     print("\n" + "=" * 60)
     print("Results")
     print("=" * 60)
@@ -163,7 +151,6 @@ def main():
     print(f"  Max:      {np.max(tumor_probs):.4f}")
     print(f"  Std Dev:  {np.std(tumor_probs):.4f}")
     
-    # Show top tumor probability slices
     top_k = 5
     top_indices = sorted(range(len(tumor_probs)), key=lambda i: tumor_probs[i], reverse=True)[:top_k]
     
@@ -171,12 +158,16 @@ def main():
     for i, idx in enumerate(top_indices, 1):
         print(f"  {i}. Slice {idx:3d}: tumor_prob={tumor_probs[idx]:.4f}, normal_prob={normal_probs[idx]:.4f}")
     
-    # Patient-level decision (using top-k aggregation)
-    print(f"\nPatient-level decision (using top-5 aggregation):")
-    top_5_tumor_probs = sorted(tumor_probs, reverse=True)[:5]
-    top_5_mean = np.mean(top_5_tumor_probs)
-    patient_pred = "Tumor Detected" if top_5_mean > 0.5 else "Normal"
-    print(f"  Top-5 mean tumor probability: {top_5_mean:.4f}")
+    print(f"\nPatient-level decision (using robust aggregation):")
+    decision = robust_patient_prediction_from_tumor_probs(
+        tumor_probs=tumor_probs,
+        **load_aggregation_params(),
+    )
+    patient_pred = "Tumor Detected" if decision["prediction"] == 1 else "Normal"
+    print(f"  Top-k score ({decision['method']}): {decision['score']:.4f}")
+    print(f"  Composite risk score:         {decision['risk_score']:.4f}")
+    print(f"  Suspicious slices:            {decision['suspicious_slices']}/{len(tumor_probs)}")
+    print(f"  Suspicious fraction:          {decision['suspicious_fraction']:.4f}")
     print(f"  Decision: {patient_pred}")
     
     print("\n" + "=" * 60)

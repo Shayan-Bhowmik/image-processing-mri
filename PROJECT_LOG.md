@@ -616,3 +616,58 @@ Training and evaluation now support fairer monitoring for imbalanced classes and
 
 ### Outcome
 Model reliability work is now correctly tracked under a dedicated training/evaluation parent step, separate from Streamlit UI work. Next hardening item is aggregation-rule unification and thresholding at patient level.
+
+## Step 16.4 – Aggregation Calibration, Unification, and External OASIS Verification (Completed)
+
+### Actions
+- Implemented robust patient-level aggregation strategy and made it configurable:
+  - Parameters include threshold, top-k, aggregation method, suspicious-slice count, suspicious probability cutoff, and suspicious fraction.
+  - Updated `src/aggregation/topk_aggregation.py` to support parameterized patient prediction.
+
+- Unified patient decision logic across all runtime paths:
+  - `app.py` (Streamlit diagnosis)
+  - `src/inference.py` (CLI/programmatic inference)
+  - `src/evaluation/run_evaluation.py` (evaluation pipeline)
+  - `test_oasis_sample.py` (sanity script)
+
+- Added aggregation calibration pipeline:
+  - Created `src/evaluation/calibrate_aggregation.py`.
+  - Performed grid search over aggregation parameters using validation patients.
+  - Saved best configuration to:
+    - `outputs/calibration/aggregation_calibration.json`
+
+- Added external normal-control batch verification:
+  - Created `src/evaluation/oasis_batch_check.py`.
+  - Evaluated full available OASIS normal cohort with latest checkpoint + calibrated aggregation.
+
+### Best Aggregation Parameters (Current)
+- threshold: `0.90`
+- top_k: `30`
+- method: `median`
+- min_suspicious_slices: `15`
+- suspicious_prob_threshold: `0.85`
+- min_suspicious_fraction: `0.50`
+
+### Results
+- Internal validation remained near-perfect with unified calibrated aggregation.
+- External OASIS batch check summary:
+  - Evaluated: `196`
+  - False Positives: `2`
+  - True Negatives: `194`
+  - False Positive Rate: `0.0102`
+  - Specificity: `0.9898`
+
+### Files Modified / Added
+- Modified:
+  - `src/aggregation/topk_aggregation.py`
+  - `src/inference.py`
+  - `src/evaluation/run_evaluation.py`
+  - `app.py`
+  - `test_oasis_sample.py`
+- Added:
+  - `src/evaluation/calibrate_aggregation.py`
+  - `src/evaluation/oasis_batch_check.py`
+  - `outputs/calibration/aggregation_calibration.json`
+
+### Outcome
+Patient-level decision behavior is now consistent across app, inference, and evaluation. OASIS false-positive behavior has been reduced from the earlier failure mode to a low residual rate (about 1%), while preserving strong tumor detection on validation and known tumor sanity checks.
