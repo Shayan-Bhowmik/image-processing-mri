@@ -5,6 +5,13 @@ import torch
 from pathlib import Path
 import tempfile
 import sys
+from PIL import Image, ImageDraw, ImageFont
+import matplotlib.pyplot as plt
+import matplotlib
+import io
+from datetime import datetime
+
+matplotlib.use('Agg')
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -70,6 +77,29 @@ def preprocess_slice_for_model(slice_2d, target_size=224, center_crop_size=180):
     return slice_tensor
 
 
+def predict_slices_batch(model, device, slices, max_slices=None):
+    """Predict tumor probability for all or most slices"""
+    predictions = []
+    
+    limit = len(slices) if max_slices is None else min(max_slices, len(slices))
+    
+    for i in range(limit):
+        try:
+            slice_tensor = preprocess_slice_for_model(slices[i])
+            slice_tensor = slice_tensor.unsqueeze(0).to(device)
+            
+            with torch.no_grad():
+                output = model(slice_tensor)
+                probs = torch.softmax(output, dim=1)
+                tumor_prob = probs[0, 1].item()
+            
+            predictions.append(tumor_prob)
+        except Exception as e:
+            predictions.append(0.5)
+    
+    return np.array(predictions)
+
+
 def predict_slice(model, device, slice_tensor):
     slice_tensor = slice_tensor.unsqueeze(0).to(device)
     
@@ -119,34 +149,151 @@ def create_heatmap_rgb(cam):
     return heatmap_rgb
 
 
+def create_probability_graph(predictions, theme_mode="dark"):
+    """Create a line graph of tumor probabilities across slices"""
+    is_dark = theme_mode == "dark"
+    fig_bg = "#0F172A" if is_dark else "#FFFFFF"
+    text_col = "#E2E8F0" if is_dark else "#0F172A"
+    grid_col = "#334155" if is_dark else "#CBD5E1"
+
+    fig, ax = plt.subplots(figsize=(12, 5))
+    fig.patch.set_facecolor(fig_bg)
+    ax.set_facecolor(fig_bg)
+    
+    ax.plot(predictions, linewidth=2.5, color='#3B82F6', label='Tumor Probability')
+    ax.fill_between(range(len(predictions)), predictions, alpha=0.22, color='#3B82F6')
+    ax.axhline(y=0.5, color='#64748B', linestyle='--', linewidth=1.2, alpha=0.9, label='Decision Threshold')
+    
+    ax.set_xlabel('Slice Index', fontsize=12, fontweight='bold')
+    ax.set_ylabel('Tumor Probability', fontsize=12, fontweight='bold')
+    ax.set_title('Tumor Probability Across Slices', fontsize=14, fontweight='bold')
+    ax.set_ylim([0, 1])
+    ax.grid(True, alpha=0.35, color=grid_col)
+    ax.legend(loc='upper right')
+
+    ax.tick_params(colors=text_col)
+    ax.xaxis.label.set_color(text_col)
+    ax.yaxis.label.set_color(text_col)
+    ax.title.set_color(text_col)
+    for spine in ax.spines.values():
+        spine.set_color(grid_col)
+    
+    plt.tight_layout()
+    
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', dpi=100, bbox_inches='tight')
+    buf.seek(0)
+    plt.close(fig)
+    
+    return Image.open(buf)
+
+
+def create_gradcam_panel(normalized_slice, heatmap_rgb, overlay):
+    """Combine 3 images into a single panel"""
+    # Convert to PIL Images
+    img1 = Image.fromarray((normalized_slice * 255).astype(np.uint8), mode='L')
+    img2 = Image.fromarray((heatmap_rgb * 255).astype(np.uint8) if heatmap_rgb.max() <= 1 else heatmap_rgb.astype(np.uint8))
+    img3 = Image.fromarray((overlay * 255).astype(np.uint8) if overlay.max() <= 1 else overlay.astype(np.uint8))
+    
+    # Resize to same size
+    size = (350, 350)
+    img1 = img1.resize(size)
+    img2 = img2.resize(size)
+    img3 = img3.resize(size)
+    
+    # Create panel
+    panel = Image.new('RGB', (1100, 400), color='white')
+    
+    # Convert grayscale to RGB
+    img1_rgb = Image.new('RGB', img1.size)
+    img1_rgb.paste(img1)
+    
+    panel.paste(img1_rgb, (10, 25))
+    panel.paste(img2, (360, 25))
+    panel.paste(img3, (710, 25))
+    
+    # Add labels
+    draw = ImageDraw.Draw(panel)
+    try:
+        font = ImageFont.truetype("arial.ttf", 14)
+    except:
+        font = ImageFont.load_default()
+    
+    draw.text((60, 5), "Original MRI", fill='black', font=font)
+    draw.text((385, 5), "Grad-CAM Heatmap", fill='black', font=font)
+    draw.text((710, 5), "MRI + Grad-CAM Overlay", fill='black', font=font)
+    
+    return panel
+
+
+def apply_custom_css():
+    """Apply typography-only CSS; leave colors to native Streamlit theming."""
+    css = """
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+        html, body, [data-testid="stAppViewContainer"], [data-testid="stSidebar"] {
+            font-family: 'Source Sans 3', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif !important;
+            font-weight: 700;
+        }
+
+        .title-main {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary-color, #3B82F6);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
+
 def main():
+    # Page config
     st.set_page_config(
-        page_title="Brain MRI AI Decision Support",
-        page_icon="🧠",
+        page_title="SYNAPSE X",
+        page_icon="",
         layout="wide"
     )
-    
-    st.title("🧠 Brain MRI AI Decision Support System")
-    st.markdown("### 3D MRI Analysis with Explainable AI (Grad-CAM)")
-    st.markdown("---")
-    
+
     with st.sidebar:
-        st.header("📁 Upload & Settings")
+        st.header("Upload & Settings")
         
         uploaded_file = st.file_uploader(
             "Upload MRI file (.nii or .nii.gz)",
             type=["nii", "nii.gz"]
         )
         
-        show_gradcam = st.toggle("Show Grad-CAM", value=True)
+        show_gradcam = st.checkbox("Show Grad-CAM Analysis", value=True)
+        show_probability_graph = st.checkbox("Show Probability Graph", value=True)
         
         st.markdown("---")
-        st.markdown("**Info**")
+        st.markdown("**Information**")
         st.info(
-            "Upload a NIfTI format MRI file to analyze. "
-            "The AI will predict tumor presence on selected slices "
-            "with explainability via Grad-CAM visualization."
+            "Upload a NIfTI format MRI file for analysis. "
+            "SYNAPSE X will predict tumor presence with explainability via Grad-CAM."
         )
+
+    apply_custom_css()
+
+    # Header
+    st.markdown('<div class="title-main">SYNAPSE X</div>', unsafe_allow_html=True)
+    st.markdown('<div class="subtitle">Brain MRI Analysis with Explainable AI</div>', unsafe_allow_html=True)
+    st.markdown("---")
     
     if uploaded_file is None:
         st.warning("Please upload an MRI file to begin analysis.")
@@ -163,8 +310,13 @@ def main():
     with tempfile.NamedTemporaryFile(delete=False, suffix=temp_suffix) as tmp_file:
         tmp_file.write(uploaded_file.getbuffer())
         tmp_path = tmp_file.name
+
+    gradcam_panel_bytes = None
+    prob_graph_bytes = None
+    report_pdf_bytes = None
     
     try:
+        # Load and preprocess volume
         volume = load_nifti(tmp_path)
         normalized_volume = zscore_normalize(volume)
         normalized_volume = strip_skull_volume(normalized_volume)
@@ -176,85 +328,299 @@ def main():
             st.error("No slices were extracted from the uploaded MRI volume.")
             return
         
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Patient ID", patient_id)
-        with col2:
-            st.metric("Volume Shape", f"{volume.shape}")
-        with col3:
+        # Patient Information Section
+        st.subheader("Patient Information")
+        st.markdown(f"**Patient ID:** {patient_id}")
+        info_col1, info_col2 = st.columns(2)
+        with info_col1:
+            st.metric("Volume Shape", str(volume.shape))
+        with info_col2:
             st.metric("Total Slices", total_slices)
         
         st.markdown("---")
-        
+
+        # Load model and make predictions
+        model, device = load_model()
+
+        # Predict for all slices (for graph and highest tumor slice)
+        all_predictions = predict_slices_batch(model, device, slices)
+        highest_tumor_idx = np.argmax(all_predictions)
+        highest_tumor_prob = all_predictions[highest_tumor_idx]
+
+        # Patient-Level Diagnosis (Primary)
+        st.subheader("Patient Diagnosis")
+        patient_tumor_prob = np.mean(all_predictions)
+        patient_pred = "Tumor Detected" if patient_tumor_prob > 0.5 else "Normal"
+
+        diagnosis_confidence = patient_tumor_prob if patient_pred == "Tumor Detected" else (1 - patient_tumor_prob)
+        diag_col1, diag_col2 = st.columns(2)
+        with diag_col1:
+            st.metric("Patient-Level Diagnosis", patient_pred)
+        with diag_col2:
+            st.metric("Confidence", f"{diagnosis_confidence*100:.2f}%")
+
+        st.markdown("---")
+
+        # Slice Selection
+        st.subheader("Slice Selection")
         slice_index = st.slider(
             "Select Slice",
             min_value=0,
             max_value=total_slices - 1,
             value=total_slices // 2
         )
-        
+
         selected_slice = slices[slice_index]
         normalized_slice = normalize_slice(selected_slice)
-        
-        model, device = load_model()
-        
+
+        # Predict for current slice
         slice_tensor = preprocess_slice_for_model(selected_slice)
         pred, confidence, tumor_prob = predict_slice(model, device, slice_tensor)
-        
-        pred_class = "🔴 Tumor" if pred == 1 else "🟢 Normal"
-        pred_color = "red" if pred == 1 else "green"
-        
-        info_col1, info_col2, info_col3, info_col4 = st.columns(4)
-        with info_col1:
+
+        st.markdown("---")
+
+        # Slice-Level Diagnosis (Secondary)
+        st.subheader("Slice-Level Analysis")
+        pred_class = "Tumor" if pred == 1 else "Normal"
+        slice_col1, slice_col2, slice_col3, slice_col4, slice_col5 = st.columns(5)
+
+        with slice_col1:
             st.metric("Slice Index", f"{slice_index} / {total_slices - 1}")
-        with info_col2:
+        with slice_col2:
             st.metric("Prediction", pred_class)
-        with info_col3:
+        with slice_col3:
             st.metric("Confidence", f"{confidence*100:.2f}%")
-        with info_col4:
+        with slice_col4:
             st.metric("Tumor Probability", f"{tumor_prob*100:.2f}%")
+        with slice_col5:
+            st.metric("Highest Tumor Slice", f"#{highest_tumor_idx}")
         
         st.markdown("---")
         
+        # Grad-CAM Analysis
         if show_gradcam:
-            st.subheader("📊 Explainability Analysis")
+            st.subheader("Explainability Analysis")
             
             cam = generate_gradcam(model, device, slice_tensor)
             heatmap_rgb = create_heatmap_rgb(cam)
             overlay = create_overlay(normalized_slice, cam, alpha=0.4)
+
+            # Keep all three panels at exactly the same size so they stay aligned.
+            display_size = (360, 360)
+            original_display = cv2.resize(normalized_slice, display_size, interpolation=cv2.INTER_LINEAR)
+            heatmap_display = cv2.resize(heatmap_rgb, display_size, interpolation=cv2.INTER_LINEAR)
+            overlay_display = cv2.resize(overlay, display_size, interpolation=cv2.INTER_LINEAR)
             
             col1, col2, col3 = st.columns(3)
             
             with col1:
                 st.markdown("**Original MRI Slice**")
-                st.image(normalized_slice, width="stretch", clamp=True)
+                st.image(original_display, width="stretch", clamp=True)
             
             with col2:
                 st.markdown("**Grad-CAM Heatmap**")
-                st.image(heatmap_rgb, width="stretch")
+                st.image(heatmap_display, width="stretch")
             
             with col3:
-                st.markdown("**Overlay (MRI + Grad-CAM)**")
-                st.image(overlay, width="stretch", clamp=True)
+                st.markdown("**MRI + Grad-CAM Overlay**")
+                st.image(overlay_display, width="stretch", clamp=True)
             
             st.info(
-                "The Grad-CAM heatmap highlights the regions the AI model focuses on "
-                "when making predictions. Brighter regions indicate higher importance."
+                "The Grad-CAM heatmap highlights regions the AI focuses on when predicting. "
+                "Brighter colors indicate higher importance for the prediction."
             )
-        else:
-            st.subheader("📊 MRI Visualization")
-            col1, col2 = st.columns(2)
             
-            with col1:
-                st.markdown("**Original MRI Slice**")
-                st.image(normalized_slice, width="stretch", clamp=True)
+            try:
+                gradcam_panel = create_gradcam_panel(normalized_slice, heatmap_rgb, overlay)
+                
+                buf = io.BytesIO()
+                gradcam_panel.save(buf, format='PNG')
+                buf.seek(0)
+                gradcam_panel_bytes = buf.getvalue()
+            except Exception as e:
+                st.warning(f"Could not generate Grad-CAM panel: {e}")
+        
+        # Probability Graph
+        if show_probability_graph:
+            st.markdown("---")
+            st.subheader("Tumor Probability Distribution")
             
-            with col2:
-                st.markdown("**Prediction Details**")
-                st.write(f"**Predicted Class:** {pred_class}")
-                st.write(f"**Confidence Score:** {confidence:.4f}")
-                st.write(f"**Tumor Probability:** {tumor_prob:.4f}")
-                st.write(f"**Normal Probability:** {1-tumor_prob:.4f}")
+            try:
+                is_dark = "dark" in str(st.get_option("theme.base")).lower()
+                prob_graph = create_probability_graph(all_predictions, "dark" if is_dark else "light")
+                st.image(prob_graph, width="stretch")
+                
+                buf_graph = io.BytesIO()
+                prob_graph.save(buf_graph, format='PNG')
+                buf_graph.seek(0)
+                prob_graph_bytes = buf_graph.getvalue()
+            except Exception as e:
+                st.warning(f"Could not generate probability graph: {e}")
+        
+        try:
+            from reportlab.lib.pagesizes import letter
+            from reportlab.lib import colors
+            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image as RLImage, PageBreak
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib.units import inch
+            from reportlab.lib.enums import TA_CENTER, TA_LEFT
+            
+            report_buffer = io.BytesIO()
+            doc = SimpleDocTemplate(report_buffer, pagesize=letter)
+            story = []
+            styles = getSampleStyleSheet()
+            
+            # Custom styles
+            title_style = ParagraphStyle(
+                'CustomTitle',
+                parent=styles['Heading1'],
+                fontSize=24,
+                textColor=colors.HexColor('#1f77b4'),
+                spaceAfter=12,
+                alignment=TA_CENTER,
+                fontName='Helvetica-Bold'
+            )
+            
+            heading_style = ParagraphStyle(
+                'CustomHeading',
+                parent=styles['Heading2'],
+                fontSize=14,
+                textColor=colors.HexColor('#1f77b4'),
+                spaceAfter=12,
+                spaceBefore=12,
+                fontName='Helvetica-Bold'
+            )
+            
+            # Title
+            story.append(Paragraph("SYNAPSE X - Brain MRI Analysis Report", title_style))
+            story.append(Spacer(1, 0.2*inch))
+            
+            # Patient Info
+            story.append(Paragraph("Patient Information", heading_style))
+            patient_data = [
+                ['Patient ID', patient_id],
+                ['Volume Shape', str(volume.shape)],
+                ['Total Slices', str(total_slices)],
+                ['Analysis Date', datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
+            ]
+            patient_table = Table(patient_data, colWidths=[2*inch, 4*inch])
+            patient_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#e8f0f7')),
+                ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 11),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+                ('GRID', (0, 0), (-1, -1), 1, colors.grey)
+            ]))
+            story.append(patient_table)
+            story.append(Spacer(1, 0.2*inch))
+            
+            # Diagnosis
+            story.append(Paragraph("Diagnosis Summary", heading_style))
+            diagnosis_data = [
+                ['Patient-Level Diagnosis', patient_pred],
+                ['Confidence', f'{patient_tumor_prob*100:.2f}%'],
+                ['Highest Tumor Slice', f'#{highest_tumor_idx}'],
+                ['Highest Tumor Probability', f'{highest_tumor_prob*100:.2f}%']
+            ]
+            diagnosis_table = Table(diagnosis_data, colWidths=[2*inch, 4*inch])
+            diagnosis_color = colors.HexColor('#f8d7da') if patient_pred == "Tumor Detected" else colors.HexColor('#d4edda')
+            diagnosis_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#e8f0f7')),
+                ('BACKGROUND', (1, 0), (1, -1), diagnosis_color),
+                ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 11),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+                ('GRID', (0, 0), (-1, -1), 1, colors.grey)
+            ]))
+            story.append(diagnosis_table)
+            story.append(Spacer(1, 0.2*inch))
+            
+            # Slice Analysis
+            story.append(Paragraph("Current Slice Analysis", heading_style))
+            slice_data = [
+                ['Slice Index', f'{slice_index} / {total_slices - 1}'],
+                ['Slice Prediction', "Tumor" if pred == 1 else "Normal"],
+                ['Slice Confidence', f'{confidence*100:.2f}%'],
+                ['Slice Tumor Probability', f'{tumor_prob*100:.2f}%']
+            ]
+            slice_table = Table(slice_data, colWidths=[2*inch, 4*inch])
+            slice_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#e8f0f7')),
+                ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 11),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+                ('GRID', (0, 0), (-1, -1), 1, colors.grey)
+            ]))
+            story.append(slice_table)
+            story.append(Spacer(1, 0.2*inch))
+
+            story.append(Paragraph("Visual Evidence", heading_style))
+            if gradcam_panel_bytes is not None:
+                gradcam_img = RLImage(io.BytesIO(gradcam_panel_bytes), width=6.5 * inch, height=2.35 * inch)
+                story.append(Paragraph("Grad-CAM Panel", styles['Normal']))
+                story.append(Spacer(1, 0.08 * inch))
+                story.append(gradcam_img)
+                story.append(Spacer(1, 0.2 * inch))
+            else:
+                story.append(Paragraph("Grad-CAM Panel: Not available for this export.", styles['Normal']))
+                story.append(Spacer(1, 0.12 * inch))
+
+            if prob_graph_bytes is not None:
+                prob_img = RLImage(io.BytesIO(prob_graph_bytes), width=6.5 * inch, height=2.7 * inch)
+                story.append(Paragraph("Tumor Probability Distribution", styles['Normal']))
+                story.append(Spacer(1, 0.08 * inch))
+                story.append(prob_img)
+                story.append(Spacer(1, 0.2 * inch))
+            else:
+                story.append(Paragraph("Probability Graph: Not available for this export.", styles['Normal']))
+                story.append(Spacer(1, 0.12 * inch))
+            
+            story.append(Paragraph("Notes", heading_style))
+            story.append(Paragraph(
+                "This report was generated by SYNAPSE X, an AI-assisted diagnostic tool. "
+                "All results should be reviewed by qualified medical professionals. "
+                "The model provides probabilistic predictions based on learned patterns in training data.",
+                styles['Normal']
+            ))
+            
+            doc.build(story)
+            report_buffer.seek(0)
+            report_pdf_bytes = report_buffer.getvalue()
+        except ImportError:
+            st.warning("ReportLab not installed. PDF download unavailable. Install with: pip install reportlab")
+        except Exception as e:
+            st.warning(f"Could not generate PDF report: {e}")
+
+        with st.sidebar:
+            st.markdown("---")
+            st.markdown("**Exports**")
+            if report_pdf_bytes is not None:
+                st.download_button(
+                    label="Download Full Report (PDF)",
+                    data=report_pdf_bytes,
+                    file_name=f"{patient_id}_report.pdf",
+                    mime="application/pdf"
+                )
+            if gradcam_panel_bytes is not None:
+                st.download_button(
+                    label="Download Grad-CAM Panel (PNG)",
+                    data=gradcam_panel_bytes,
+                    file_name=f"{patient_id}_gradcam_{slice_index}.png",
+                    mime="image/png"
+                )
+            if prob_graph_bytes is not None:
+                st.download_button(
+                    label="Download Probability Graph (PNG)",
+                    data=prob_graph_bytes,
+                    file_name=f"{patient_id}_probability_graph.png",
+                    mime="image/png"
+                )
     
     finally:
         Path(tmp_path).unlink(missing_ok=True)

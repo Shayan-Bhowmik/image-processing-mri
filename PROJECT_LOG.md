@@ -495,7 +495,7 @@ Grad-CAM quality improved from edge-dominant activations toward more internal, c
 ### Outcome
 Successfully implemented production-ready inference wrapper decoupling analysis logic from UI implementation. The module provides a clean, reusable interface for Streamlit integration without tight coupling. Supports both CLI and programmatic usage. Ready for Streamlit application development.
 
-## Step 15 – Streamlit Application Development
+## Step 15 – Streamlit Application Development (Completed)
 
 ---
 
@@ -515,3 +515,50 @@ Successfully implemented production-ready inference wrapper decoupling analysis 
 
 ### Outcome
 Delivered a stable Streamlit baseline with upload, prediction, and Grad-CAM explainability. Ready for creative UI enhancements in the next iteration.
+
+## Step 15.2 – Streamlit UI Refinement and Export Workflow (Completed)
+
+### Actions
+- Rebranded UI to **SYNAPSE X** and updated header hierarchy for a cleaner product identity.
+- Removed emoji-based visual elements and standardized professional text-first presentation.
+- Applied typography upgrade: **Playfair Display** (headings) + **Source Sans 3** (body).
+- Restructured page flow for clearer clinical reading order:
+  1. Patient Information
+  2. Patient Diagnosis
+  3. Slice Selection
+  4. Slice-Level Analysis
+  5. Explainability / Probability sections
+- Improved Patient Information readability:
+  - Patient ID placed on a dedicated full-width line.
+  - Volume Shape and Total Slices moved to the next row.
+- Implemented dual-level diagnosis UX:
+  - Patient-level diagnosis card/metrics as primary output.
+  - Slice-level diagnosis as secondary output.
+- Added whole-volume probability inference utilities:
+  - Slice-wise probability scan across the uploaded volume.
+  - Highest tumor-probability slice identification.
+- Added probability distribution visualization across slices and updated to blue-theme styling.
+- Fixed Grad-CAM panel consistency:
+  - Uniform image sizing across Original / Heatmap / Overlay panels.
+  - Improved layout alignment and section spacing.
+- Removed deprecated Streamlit image sizing usage and migrated to current supported arguments.
+- Implemented export workflow improvements:
+  - Sidebar **Exports** section for all download actions.
+  - Grad-CAM panel PNG export.
+  - Probability graph PNG export.
+  - Full PDF report export.
+- Enhanced PDF report content so it acts like a printable bundle:
+  - Includes patient/slice summaries.
+  - Embeds Grad-CAM panel and probability graph in report body.
+- Performed theme reliability pass:
+  - Removed unstable in-app theme switch.
+  - Restored native Streamlit Light/Dark control from top-right menu.
+  - Reduced custom CSS scope to avoid breaking widget behavior and image interactions.
+
+### Files Modified / Added
+- app.py
+- requirements.txt
+- PROJECT_LOG.md
+
+### Outcome
+Step 15.2 delivered a production-ready Streamlit UX pass over the baseline app: improved visual hierarchy, clearer diagnosis communication, robust explainability presentation, and complete export/report functionality while preserving compatibility with native Streamlit theming behavior.
