@@ -1045,3 +1045,47 @@ Initial inference on OASIS (436 healthy control scans) at default threshold 0.50
 - Threshold 0.50 sits in overlap region, creating unnecessary false positives
 
 ---
+
+### Step 13.2 — Automatic Threshold Calibration Pipeline
+
+### File Created
+
+- `scripts/calibrate_threshold.py`
+
+### Implementation
+
+Comprehensive threshold optimization framework:
+
+**Data Collection Module**
+- `find_brats_flair_files()`: Scans BraTS directory structure for FLAIR modality
+- `find_oasis_files()`: Collects all OASIS `.nii` volumes
+- Combined dataset: 350 BraTS + 436 OASIS = 786 total cases
+
+**Inference Execution Module**
+- `evaluate_case_scores()`: Runs full inference pipeline on all 786 cases
+- Reuses production inference path:
+  - `preprocess_uploaded_nifti()` for consistency
+  - `predict_slices()` for slice-level predictions
+  - `aggregate_patient_score()` with top-k=10 aggregation
+- Tracks failures and successfully processed cases
+
+**Threshold Sweep Module**
+- `build_threshold_grid()`: Creates 200+ test thresholds from 0.0 to 1.0
+- Includes all unique patient scores for granular sweep
+- `confusion_from_threshold()`: Computes confusion matrix for each threshold
+- `metrics_from_confusion()`: Calculates 4 key metrics per threshold:
+  - Sensitivity (true positive rate)
+  - Specificity (true negative rate)
+  - Balanced Accuracy = 0.5×(Sensitivity + Specificity)
+  - Accuracy
+
+**Optimal Selection Logic**
+- `pick_best_threshold()`: Multi-criteria optimization
+- Criteria (priority order):
+  1. Maximize balanced accuracy
+  2. Maximize specificity (ability to correctly identify healthy as healthy)
+  3. Maximize sensitivity (ability to correctly identify tumors)
+  4. Prefer threshold close to 0.5 (stability)
+- Returns best threshold + full evaluation table
+
+---
