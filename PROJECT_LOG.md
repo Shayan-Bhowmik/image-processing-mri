@@ -1166,13 +1166,17 @@ Comprehensive threshold optimization framework:
 | OASIS (Healthy) | 436 | 436, 100% |
 | **Total** | **786** | **786, 100%** |
 
-### No Retraining Required
+### No Retraining Required (At This Step Only)
 
 - ✓ Model weights unchanged
 - ✓ Inference pipeline unchanged
 - ✓ Only decision boundary optimized (post-hoc)
 - ✓ Decision boundary now aligned with natural score distribution
 - ✓ Threshold immediately deployable without model modification
+
+Note:
+- This statement applied to Step 13 threshold-only updates.
+- Step 14 later introduced data-pipeline consistency fixes, which require full retraining.
 
 ---
 
@@ -1197,6 +1201,18 @@ Project now includes:
 Perform a targeted code-level audit of training, inference, and calibration paths; fix high-impact discrepancies that could inflate metrics or create train/inference mismatch.
 
 ---
+
+### Step 14.1 — Discrepancy Audit Findings (Top 3)
+
+#### Finding 1: Slice Indexing Misalignment in Training Dataset
+
+Problem:
+- Dataset indexed slice positions using `len(valid_slices)` but retrieved data using raw depth indices.
+- This could map filtered slice indices to unintended raw slices.
+
+Risk:
+- Training samples could include near-empty or shifted slices.
+- Silent label-feature inconsistency.
 
 #### Finding 2: 2.5D Context Mismatch Between Train and Inference
 
@@ -1259,3 +1275,42 @@ Impact:
 - Reduces leakage risk and improves scientific validity.
 
 ---
+
+### Step 14.4 — Validation
+
+Syntax validation completed successfully after fixes:
+
+- `python -m py_compile src/data/mri_dataset.py scripts/calibrate_threshold.py`
+
+Result:
+- No syntax errors.
+
+---
+
+### Step 14.5 — Required Workflow Update
+
+Important:
+- Because training data construction changed, existing checkpoint metrics are no longer directly comparable.
+- Full retraining is required.
+
+New recommended sequence:
+
+1. Retrain model:
+  - `python train.py`
+2. Recalibrate threshold on held-out split:
+  - `python scripts/calibrate_threshold.py`
+3. Use regenerated `checkpoints/best_model.pth` and updated calibration outputs in app.
+
+---
+
+### Step 14 Summary
+
+Project now has:
+
+1. Correct slice indexing in training dataset
+2. Train/inference 2.5D preprocessing parity
+3. Leakage-safe threshold calibration default
+4. Explicit retrain + recalibration operational workflow
+
+Outcome:
+Model development pipeline is now statistically cleaner and behaviorally consistent end-to-end.
