@@ -1236,3 +1236,26 @@ Impact:
 - 2.5D context generation now matches inference behavior exactly.
 
 ---
+
+### Step 14.3 — Fix Implemented: Held-Out Calibration by Default
+
+File Modified:
+- `scripts/calibrate_threshold.py`
+
+Changes:
+- Added held-out split calibration support:
+  - `--split-json` (default: `data/splits/patient_split.json`)
+  - `--split-name` (default: `val`)
+- Added `--use-all-cases` flag for explicit legacy behavior.
+- Added split entry resolver to map `(id, label)` to actual BraTS/OASIS files.
+- Added robust reporting fields:
+  - `calibration_scope`
+  - `missing_split_entries`
+  - split metadata in report payload
+- Extended NIfTI discovery compatibility to include both `.nii` and `.nii.gz` in calibration flow.
+
+Impact:
+- Default threshold selection now uses held-out data.
+- Reduces leakage risk and improves scientific validity.
+
+---
