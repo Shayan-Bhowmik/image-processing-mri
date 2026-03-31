@@ -1,13 +1,13 @@
 {
-  "created_at": "2026-03-31T00:45:22",
+  "created_at": "2026-03-31T07:50:14",
   "checkpoint": "checkpoints/best_model.pth",
-  "recommended_threshold": 0.699996,
+  "recommended_threshold": 0.5,
   "top_k": 10,
   "metrics": {
-    "threshold": 0.699996,
-    "tp": 350,
+    "threshold": 0.5,
+    "tp": 49,
     "fn": 0,
-    "tn": 436,
+    "tn": 69,
     "fp": 0,
     "sensitivity": 1.0,
     "specificity": 1.0,

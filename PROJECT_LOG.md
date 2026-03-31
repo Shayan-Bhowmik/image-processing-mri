@@ -1314,3 +1314,80 @@ Project now has:
 
 Outcome:
 Model development pipeline is now statistically cleaner and behaviorally consistent end-to-end.
+
+---
+
+## Step 15 — Post-Fix Retraining & Held-Out Calibration Validation
+
+### Objective
+
+Execute the required post-fix workflow from Step 14 and verify that retrained model behavior remains stable under leakage-safe held-out calibration.
+
+---
+
+### Step 15.1 — Full Model Retraining Completed
+
+Action:
+- Ran training pipeline after applying dataset indexing and train/inference 2.5D consistency fixes.
+
+Command:
+- `python train.py`
+
+Status:
+- Retraining completed successfully.
+
+---
+
+### Step 15.2 — Held-Out Threshold Recalibration Completed
+
+Action:
+- Ran recalibration using the new default held-out scope (`val` split).
+
+Command:
+- `python scripts/calibrate_threshold.py`
+
+Console Output Summary:
+- Calibration scope: `val_split`
+- BraTS cases: 49
+- OASIS cases: 69
+- Total cases: 118
+- Processed cases: 118 (failed: 0)
+- Model device: cuda
+
+Metrics:
+
+Baseline @ threshold 0.50:
+- Sensitivity = 1.0000
+- Specificity = 1.0000
+- Balanced Accuracy = 1.0000
+- Confusion: TP=49, FN=0, TN=69, FP=0
+
+Recommended threshold:
+- Threshold = 0.5000
+- Sensitivity = 1.0000
+- Specificity = 1.0000
+- Balanced Accuracy = 1.0000
+- Confusion: TP=49, FN=0, TN=69, FP=0
+
+Artifacts saved:
+- `outputs/calibration/threshold_report.json`
+- `outputs/calibration/recommended_threshold.json`
+
+---
+
+### Step 15.3 — Interpretation
+
+- After retraining with corrected data pipeline logic, the held-out validation split remains perfectly separable.
+- Calibration did not need to shift threshold from 0.50 for this split.
+- This confirms stable performance under the leakage-safe calibration procedure.
+
+---
+
+### Step 15 Summary
+
+1. Retraining after Step 14 fixes completed successfully.
+2. Held-out validation calibration executed successfully.
+3. Recommended threshold is currently 0.50 with perfect sensitivity and specificity on `val_split`.
+
+Outcome:
+Post-fix model + calibration pipeline is operational and internally consistent, ready for final smoke testing and optional test-split confirmation.
