@@ -7,10 +7,15 @@ from datetime import datetime
 from pathlib import Path
 import json
 import re
+import sys
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from PIL import Image, ImageDraw, ImageFont
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.inference import (
     aggregate_patient_score,
