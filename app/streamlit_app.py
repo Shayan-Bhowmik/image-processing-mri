@@ -1,4 +1,5 @@
-﻿import numpy as np
+﻿import io
+import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -16,24 +17,111 @@ from src.inference import (
 )
 
 
-st.set_page_config(page_title="Brain MRI Decision Support", page_icon="🧠", layout="wide")
+DARK_THEME = {
+    "bg_main": "#0d1317",
+    "bg_sidebar": "#101d42",
+    "bg_header": "#0d1317",
+    "bg_card": "#101d42",
+    "bg_surface": "#0d1317",
+    "text_main": "#ffffff",
+    "text_muted": "#ffffff",
+    "accent": "#232ed1",
+    "accent_soft": "#6564db",
+    "border": "#232ed1",
+    "shadow": "rgba(13, 19, 23, 0.72)",
+    "on_accent": "#ffffff",
+    "summary_1": "#232ed1",
+    "summary_2": "#6564db",
+    "summary_3": "#101d42",
+    "summary_4": "#0d1317",
+    "chart_bg": "#0d1317",
+    "chart_panel": "#101d42",
+    "chart_grid": "#232ed1",
+    "chart_legend": "#0d1317",
+    "chart_text": "#ffffff",
+    "chart_line": "#89d2dc",
+    "chart_fill": "rgba(137, 210, 220, 0.14)",
+    "chart_threshold": "#7fffd4",
+    "chart_selected": "#ffffff",
+    "control_icon": "#ffffff",
+    "control_bg": "transparent",
+}
+
+LIGHT_THEME = {
+    "bg_main": "#f4f7fb",
+    "bg_sidebar": "#e8eefc",
+    "bg_header": "#f4f7fb",
+    "bg_card": "#ffffff",
+    "bg_surface": "#eef3ff",
+    "text_main": "#0f172a",
+    "text_muted": "#334155",
+    "accent": "#2742b7",
+    "accent_soft": "#3555d1",
+    "border": "#b8c9e6",
+    "shadow": "rgba(22, 34, 68, 0.12)",
+    "on_accent": "#ffffff",
+    "summary_1": "#dfe7ff",
+    "summary_2": "#cfd8ff",
+    "summary_3": "#eef2ff",
+    "summary_4": "#ffffff",
+    "chart_bg": "#f4f7fb",
+    "chart_panel": "#ffffff",
+    "chart_grid": "#c7d4ef",
+    "chart_legend": "#f8fafc",
+    "chart_text": "#172033",
+    "chart_line": "#2742b7",
+    "chart_fill": "rgba(39, 66, 183, 0.12)",
+    "chart_threshold": "#0f172a",
+    "chart_selected": "#3555d1",
+    "control_icon": "#000000",
+    "control_bg": "#dbe4f3",
+}
+
+
+def get_theme(light_mode: bool) -> dict[str, str]:
+    return LIGHT_THEME if light_mode else DARK_THEME
+
+
+st.set_page_config(page_title="Synapse X", page_icon="𝕏", layout="wide")
+
+light_mode = st.sidebar.toggle("Light mode", value=False, help="Switch between dark and light appearance.")
+theme = get_theme(light_mode)
+
+theme_vars = f"""
+:root {{
+    --bg-main: {theme['bg_main']};
+    --bg-sidebar: {theme['bg_sidebar']};
+    --bg-header: {theme['bg_header']};
+    --bg-card: {theme['bg_card']};
+    --bg-surface: {theme['bg_surface']};
+    --text-main: {theme['text_main']};
+    --text-muted: {theme['text_muted']};
+    --accent: {theme['accent']};
+    --accent-soft: {theme['accent_soft']};
+    --border: {theme['border']};
+    --shadow: {theme['shadow']};
+    --on-accent: {theme['on_accent']};
+    --summary-1: {theme['summary_1']};
+    --summary-2: {theme['summary_2']};
+    --summary-3: {theme['summary_3']};
+    --summary-4: {theme['summary_4']};
+    --chart-bg: {theme['chart_bg']};
+    --chart-panel: {theme['chart_panel']};
+    --chart-grid: {theme['chart_grid']};
+    --chart-legend: {theme['chart_legend']};
+    --chart-text: {theme['chart_text']};
+    --control-icon: {theme['control_icon']};
+    --control-bg: {theme['control_bg']};
+}}
+"""
 
 st.markdown(
     """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;600&display=swap');
-
-:root {
-    --bg-main: #0d1317;
-    --bg-card: #101d42;
-    --bg-card-2: #232ed1;
-    --text-main: #89d2dc;
-    --text-muted: #6564db;
-    --accent: #232ed1;
-    --accent-soft: #6564db;
-    --danger: #101d42;
-    --safe: #6564db;
-}
+"""
+    + theme_vars
+    + """
 
 .stApp {
     background: var(--bg-main);
@@ -55,13 +143,13 @@ body, p, div, span, label {
 }
 
 .hero {
-    background: #101d42;
+    background: var(--bg-card);
     border-radius: 18px;
     padding: 22px 26px;
-    color: #89d2dc;
+    color: var(--text-main);
     margin-bottom: 16px;
-    border: 1px solid #232ed1;
-    box-shadow: 0 8px 20px #0d1317;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 20px var(--shadow);
     animation: rise-in 420ms ease-out;
 }
 
@@ -74,7 +162,7 @@ body, p, div, span, label {
 .hero-subtitle {
     opacity: 0.92;
     font-size: 0.95rem;
-    color: #6564db;
+    color: var(--text-muted);
 }
 
 .chip {
@@ -88,18 +176,18 @@ body, p, div, span, label {
 }
 
 .chip-safe {
-    background: #6564db;
-    color: #0d1317;
+    background: var(--accent-soft);
+    color: var(--on-accent);
 }
 
 .chip-risk {
-    background: #101d42;
-    color: #89d2dc;
+    background: var(--bg-card);
+    color: var(--text-main);
 }
 
 .section-wrap {
-    background: #101d42;
-    border: 1px solid #232ed1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: 14px;
     padding: 14px;
     margin-bottom: 14px;
@@ -107,10 +195,10 @@ body, p, div, span, label {
 
 .info-card {
     background: var(--bg-card);
-    border: 1px solid #232ed1;
+    border: 1px solid var(--border);
     border-radius: 14px;
     padding: 12px 14px;
-    box-shadow: 0 4px 10px #0d1317;
+    box-shadow: 0 4px 10px var(--shadow);
     margin-bottom: 0.65rem;
 }
 
@@ -138,9 +226,13 @@ body, p, div, span, label {
 
 [data-testid="stMetric"] {
     background: var(--bg-card);
-    border: 1px solid #232ed1;
+    border: 1px solid var(--border);
     border-radius: 14px;
     padding: 12px;
+}
+
+[data-testid="stMetric"] * {
+    color: var(--text-main) !important;
 }
 
 .summary-grid {
@@ -151,48 +243,48 @@ body, p, div, span, label {
 }
 
 .summary-card {
-    background: #101d42;
-    border: 1px solid #101d42;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: 16px;
     padding: 14px;
-    box-shadow: 0 8px 16px #0d1317;
+    box-shadow: 0 8px 16px var(--shadow);
     transition: transform 180ms ease, border-color 180ms ease;
 }
 
 .summary-card:nth-child(1) {
-    background: #232ed1;
-    border-color: #232ed1;
+    background: var(--summary-1);
+    border-color: var(--accent);
 }
 
 .summary-card:nth-child(2) {
-    background: #6564db;
-    border-color: #6564db;
+    background: var(--summary-2);
+    border-color: var(--accent-soft);
 }
 
 .summary-card:nth-child(3) {
-    background: #101d42;
-    border-color: #101d42;
+    background: var(--summary-3);
+    border-color: var(--border);
 }
 
 .summary-card:nth-child(4) {
-    background: #0d1317;
-    border-color: #0d1317;
+    background: var(--summary-4);
+    border-color: var(--border);
 }
 
 .summary-card:hover {
     transform: translateY(-2px);
-    border-color: #6564db;
+    border-color: var(--accent-soft);
 }
 
 .summary-label {
-    color: #89d2dc;
+    color: var(--text-main);
     font-size: 0.84rem;
     margin-bottom: 4px;
     letter-spacing: 0.15px;
 }
 
 .summary-value {
-    color: #89d2dc;
+    color: var(--text-main);
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 700;
     font-size: 2rem;
@@ -201,7 +293,7 @@ body, p, div, span, label {
 }
 
 .summary-value-sm {
-    color: #89d2dc;
+    color: var(--text-main);
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 700;
     font-size: 1.35rem;
@@ -211,7 +303,7 @@ body, p, div, span, label {
 }
 
 .summary-helper {
-    color: #89d2dc;
+    color: var(--text-main);
     font-size: 0.79rem;
     margin-top: 2px;
 }
@@ -224,21 +316,21 @@ body, p, div, span, label {
 }
 
 .detail-card {
-    background: #101d42;
-    border: 1px solid #232ed1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: 14px;
     padding: 12px 14px;
-    box-shadow: 0 5px 12px #0d1317;
+    box-shadow: 0 5px 12px var(--shadow);
 }
 
 .detail-label {
-    color: #6564db;
+    color: var(--text-muted);
     font-size: 0.82rem;
     margin-bottom: 3px;
 }
 
 .detail-value {
-    color: #89d2dc;
+    color: var(--text-main);
     font-family: 'Space Grotesk', sans-serif;
     font-size: 1.55rem;
     font-weight: 700;
@@ -246,14 +338,14 @@ body, p, div, span, label {
 }
 
 .detail-helper {
-    color: #6564db;
+    color: var(--text-muted);
     font-size: 0.77rem;
     margin-top: 3px;
 }
 
 .section-divider {
     margin: 14px 0 10px 0;
-    border-top: 1px solid #232ed1;
+    border-top: 1px solid var(--border);
 }
 
 .chip-row {
@@ -272,14 +364,14 @@ body, p, div, span, label {
 }
 
 .status-pill {
-    background: #101d42;
-    border: 1px solid #232ed1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: 999px;
-    padding: 9px 13px;
+    padding: 10px 14px;
     display: flex;
     align-items: center;
     gap: 10px;
-    box-shadow: 0 6px 14px #0d1317;
+    box-shadow: 0 6px 14px var(--shadow);
     min-width: 0;
 }
 
@@ -289,47 +381,63 @@ body, p, div, span, label {
     border-radius: 50%;
     flex: 0 0 auto;
     margin-left: 2px;
+    transition: background-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
 .status-pill > div {
-    padding-left: 3px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
     min-width: 0;
 }
 
 .status-dot-ok {
-    background: #6564db;
-    box-shadow: 0 0 0 4px #232ed1;
+    background: #7fffd4;
+    box-shadow: 0 0 0 4px rgba(127, 255, 212, 0.18);
 }
 
 .status-dot-wait {
-    background: #232ed1;
-    box-shadow: 0 0 0 4px #101d42;
+    background: #8b95a7;
+    box-shadow: 0 0 0 4px rgba(139, 149, 167, 0.18);
+}
+
+.status-pill:hover .status-dot {
+    transform: scale(1.08);
 }
 
 .status-label {
     color: var(--text-muted);
     font-size: 0.76rem;
     letter-spacing: 0.18px;
-    line-height: 1.1;
-    margin-bottom: 4px;
+    line-height: 1;
+    margin-bottom: 0;
 }
 
 .status-value {
-    color: #89d2dc;
+    color: var(--text-main);
     font-size: 0.88rem;
     font-weight: 600;
-    line-height: 1.1;
+    line-height: 1.05;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.status-value-wait {
+    font-size: 0.95rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.18);
 }
 
 [data-baseweb="tab-list"] {
     gap: 8px;
     padding: 4px;
     border-radius: 999px;
-    background: #101d42;
-    border: 1px solid #232ed1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     width: fit-content;
     margin-top: 0.2rem;
     margin-bottom: 0.65rem;
@@ -338,7 +446,7 @@ body, p, div, span, label {
 [data-baseweb="tab"] {
     border-radius: 999px;
     border: 1px solid transparent;
-    color: #6564db;
+    color: var(--text-muted);
     font-weight: 600;
     font-size: 0.9rem;
     padding: 7px 16px;
@@ -346,15 +454,15 @@ body, p, div, span, label {
 }
 
 [data-baseweb="tab"][aria-selected="true"] {
-    color: #89d2dc;
-    border-color: #6564db;
-    background: #232ed1;
-    box-shadow: 0 0 0 1px #6564db, 0 6px 14px #0d1317;
+    color: var(--text-main);
+    border-color: var(--accent-soft);
+    background: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent-soft), 0 6px 14px var(--shadow);
 }
 
 [data-baseweb="tab"]:hover {
-    color: #89d2dc;
-    border-color: #6564db;
+    color: var(--text-main);
+    border-color: var(--accent-soft);
 }
 
 .viz-strip {
@@ -370,13 +478,13 @@ body, p, div, span, label {
     font-family: 'Space Grotesk', sans-serif;
     font-size: 1rem;
     font-weight: 700;
-    color: #89d2dc;
+    color: var(--text-main);
     letter-spacing: 0.18px;
 }
 
 .viz-note {
     font-size: 0.82rem;
-    color: #6564db;
+    color: var(--text-muted);
 }
 
 .viz-chip {
@@ -387,35 +495,35 @@ body, p, div, span, label {
     padding: 5px 11px;
     font-size: 0.78rem;
     font-weight: 600;
-    border: 1px solid #6564db;
-    background: #101d42;
-    color: #89d2dc;
+    border: 1px solid var(--accent-soft);
+    background: var(--bg-card);
+    color: var(--text-main);
 }
 
 .viz-panel-title {
     font-family: 'Space Grotesk', sans-serif;
     font-size: 0.95rem;
     font-weight: 600;
-    color: #89d2dc;
+    color: var(--text-main);
     margin: 0 0 6px 4px;
 }
 
 [data-testid="stImage"] img {
     border-radius: 14px;
-    border: 1px solid #232ed1;
-    box-shadow: 0 8px 16px #0d1317;
-    background: #101d42;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 16px var(--shadow);
+    background: var(--bg-card);
 }
 
 [data-testid="stImage"] {
     padding: 6px;
     border-radius: 16px;
-    background: #101d42;
-    border: 1px solid #232ed1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
 }
 
 [data-testid="stImage"] + div {
-    color: #6564db;
+    color: var(--text-muted);
     font-size: 0.82rem;
 }
 
@@ -444,20 +552,42 @@ body, p, div, span, label {
 }
 
 [data-testid="stSidebar"] {
-    background: #101d42;
+    background: var(--bg-sidebar);
 }
 
 [data-testid="stSidebar"] * {
-    color: #89d2dc;
+    color: var(--text-main);
 }
 
 .stMarkdown, .stCaption, .stSlider, .stTextInput, .stToggle {
     color: var(--text-main);
 }
 
+.stButton button,
+.stDownloadButton button,
+[data-testid="stBaseButton-primary"],
+[data-testid="stBaseButton-secondary"] {
+    color: var(--on-accent) !important;
+    -webkit-text-fill-color: var(--on-accent) !important;
+    font-weight: 700;
+}
+
+[data-testid="stBaseButton-primary"] *,
+[data-testid="stBaseButton-secondary"] *,
+.stButton button *,
+.stDownloadButton button * {
+    color: var(--on-accent) !important;
+    -webkit-text-fill-color: var(--on-accent) !important;
+}
+
+[data-testid="stAlert"],
+[data-testid="stAlert"] * {
+    color: var(--text-main) !important;
+}
+
 [data-testid="stHeader"] {
-    background: #0d1317;
-    border-bottom: 1px solid #232ed1;
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
     backdrop-filter: blur(9px) saturate(120%);
 }
 
@@ -483,23 +613,25 @@ body, p, div, span, label {
 
 [data-testid="collapsedControl"] button {
     border: 1px solid transparent !important;
-    background: transparent !important;
+    background: var(--control-bg) !important;
     padding: 0.24rem !important;
     min-width: 1.8rem !important;
+    position: relative !important;
+    color: transparent !important;
 }
 
 [data-testid="collapsedControl"] button:hover {
     border-color: transparent !important;
-    background: transparent !important;
+    background: var(--control-bg) !important;
 }
 
 [data-testid="stToolbar"] button,
 [data-testid="stToolbar"] a,
 [data-testid="collapsedControl"] button {
     border-radius: 999px !important;
-    border: 1px solid #232ed1 !important;
-    background: #101d42 !important;
-    color: #89d2dc !important;
+    border: 1px solid var(--border) !important;
+    background: var(--bg-card) !important;
+    color: var(--text-main) !important;
     padding: 0.28rem 0.72rem !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -509,63 +641,72 @@ body, p, div, span, label {
     transition: all 170ms ease;
 }
 
+[data-testid="collapsedControl"] button *,
+[data-testid="collapsedControl"] button svg {
+    color: var(--control-icon) !important;
+    fill: var(--control-icon) !important;
+    stroke: var(--control-icon) !important;
+}
+
+[data-testid="collapsedControl"] button svg,
+[data-testid="collapsedControl"] button svg * {
+    display: none !important;
+}
+
 [data-testid="stToolbar"] button:hover,
 [data-testid="stToolbar"] a:hover,
 [data-testid="collapsedControl"] button:hover {
-    border-color: #6564db !important;
-    background: #232ed1 !important;
+    border-color: var(--accent-soft) !important;
+    background: var(--accent) !important;
 }
 
 [data-testid="stToolbar"] * {
-    color: #89d2dc !important;
-}
-
-[data-testid="collapsedControl"] button svg {
-    display: none !important;
+    color: var(--text-main) !important;
 }
 
 [data-testid="collapsedControl"] button::before {
     content: "";
     display: block;
-    width: 18px;
-    height: 3px;
-    background: #89d2dc;
-    border-radius: 999px;
-    box-shadow: 0 -6px 0 #89d2dc, 0 6px 0 #89d2dc;
+    width: 9px;
+    height: 9px;
+    border-top: 3px solid var(--control-icon);
+    border-right: 3px solid var(--control-icon);
+    transform: rotate(45deg) translateY(-1px);
+    margin-left: 1px;
 }
 
 /* Replace default red accents in native Streamlit controls */
 .stSlider [data-baseweb="slider"] div[role="slider"] {
-    background: #89d2dc !important;
-    border-color: #89d2dc !important;
+    background: var(--text-main) !important;
+    border-color: var(--text-main) !important;
 }
 
 .stSlider [data-baseweb="slider"] * {
-    color: #89d2dc !important;
+    color: var(--text-main) !important;
 }
 
 .stToggle [data-baseweb="switch"] {
-    background: #6564db !important;
+    background: #89d2dc !important;
 }
 
 .stToggle [data-baseweb="switch"] [data-testid="stMarkdownContainer"] {
-    color: #89d2dc !important;
+    color: var(--text-main) !important;
 }
 
 .stToggle button[role="switch"][aria-checked="true"] {
-    background: #6564db !important;
+    background: #89d2dc !important;
 }
 
 .stToggle button[role="switch"] > div {
-    background: #89d2dc !important;
+    background: var(--text-main) !important;
 }
 
 .stProgress > div > div > div > div {
-    background: #89d2dc !important;
+    background: var(--text-main) !important;
 }
 
 [data-baseweb="tab-highlight"] {
-    background: #89d2dc !important;
+    background: var(--text-main) !important;
 }
 
 @keyframes rise-in {
@@ -586,7 +727,7 @@ body, p, div, span, label {
 st.markdown(
     """
 <div class="hero">
-  <div class="hero-title">Brain MRI Decision Support</div>
+    <div class="hero-title">Synapse X</div>
   <div class="hero-subtitle">Upload a NIfTI volume, inspect the model's prediction, and review Grad-CAM attention maps per slice.</div>
 </div>
 """,
@@ -603,8 +744,10 @@ def get_model(checkpoint_path: str):
 def render_status_bar(slot, model_ready: bool, file_name: str | None):
     model_state = "Loaded" if model_ready else "Waiting"
     model_dot_class = "status-dot-ok" if model_ready else "status-dot-wait"
+    model_value_class = "status-value" if model_ready else "status-value status-value-wait"
     file_state = file_name if file_name else "No file uploaded"
     file_dot_class = "status-dot-ok" if file_name else "status-dot-wait"
+    file_value_class = "status-value" if file_name else "status-value status-value-wait"
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     slot.markdown(
         f"""
@@ -613,14 +756,14 @@ def render_status_bar(slot, model_ready: bool, file_name: str | None):
         <span class="status-dot {model_dot_class}"></span>
         <div>
             <div class="status-label">Model</div>
-            <div class="status-value">{model_state}</div>
+            <div class="{model_value_class}">{model_state}</div>
         </div>
     </div>
     <div class="status-pill">
         <span class="status-dot {file_dot_class}"></span>
         <div>
             <div class="status-label">File</div>
-            <div class="status-value">{file_state}</div>
+            <div class="{file_value_class}">{file_state}</div>
         </div>
     </div>
     <div class="status-pill">
@@ -645,6 +788,56 @@ def summarize_decision(score: float, threshold_value: float) -> tuple[str, str]:
     if margin >= -0.1:
         return "Borderline negative signal", f"Score below threshold by {abs(margin):.3f}"
     return "Strong negative signal", f"Score below threshold by {abs(margin):.3f}"
+
+
+def download_stem(filename: str) -> str:
+    name = Path(filename).name
+    if name.lower().endswith(".nii.gz"):
+        return name[:-7]
+    return Path(name).stem
+
+
+def build_study_report(
+    uploaded_name: str,
+    patient_score: float,
+    threshold: float,
+    pred_text: str,
+    decision_title: str,
+    decision_detail: str,
+    confidence_score: float,
+    uncertainty: float,
+    slice_consistency: float,
+    valid_slice_count: int,
+    selected_slice_index: int,
+    selected_slice_probability: float,
+    top_indices: np.ndarray,
+    slice_probs: np.ndarray,
+) -> str:
+    lines = [
+        "Synapse X Report",
+        "",
+        f"File: {uploaded_name}",
+        f"Patient score: {patient_score:.3f}",
+        f"Decision threshold: {threshold:.2f}",
+        f"Model decision: {pred_text}",
+        f"Decision summary: {decision_title}",
+        f"Decision detail: {decision_detail}",
+        f"Confidence score: {confidence_score * 100:.1f}%",
+        f"Uncertainty: {uncertainty * 100:.1f}%",
+        f"Slice consistency: {slice_consistency * 100:.1f}%",
+        f"Valid slices: {valid_slice_count}",
+        f"Selected slice index: {selected_slice_index}",
+        f"Selected slice probability: {selected_slice_probability:.3f}",
+        "",
+        "Top slices:",
+    ]
+
+    for rank, idx in enumerate(top_indices, start=1):
+        lines.append(f"  {rank}. Slice {int(idx)} - probability {float(slice_probs[idx]):.3f}")
+
+    lines.append("")
+    lines.append("Generated by Synapse X.")
+    return "\n".join(lines)
 
 
 @st.cache_data
@@ -690,7 +883,7 @@ def load_calibrated_threshold(
 
 
 st.sidebar.header("Controls")
-checkpoint_path = st.sidebar.text_input("Checkpoint path", "checkpoints/best_model.pth")
+checkpoint_path = "checkpoints/best_model.pth"
 default_threshold = load_calibrated_threshold()
 threshold = st.sidebar.slider(
     "Decision threshold",
@@ -785,6 +978,7 @@ st.markdown('<div class="section-wrap">', unsafe_allow_html=True)
 st.subheader("Study Snapshot")
 
 uploaded_name = uploaded_file.name
+download_base_name = download_stem(uploaded_name)
 st.markdown(
     f"""
 <div class="subtle">Loaded volume</div>
@@ -926,6 +1120,36 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+report_text = build_study_report(
+    uploaded_name=uploaded_name,
+    patient_score=float(patient_score),
+    threshold=float(threshold),
+    pred_text=pred_text,
+    decision_title=decision_title,
+    decision_detail=decision_detail,
+    confidence_score=float(confidence_score),
+    uncertainty=float(uncertainty),
+    slice_consistency=float(slice_consistency),
+    valid_slice_count=len(valid_slices),
+    selected_slice_index=slice_index,
+    selected_slice_probability=selected_prob,
+    top_indices=top_indices,
+    slice_probs=slice_probs,
+)
+
+st.subheader("Downloads")
+download_report_col, download_hint_col = st.columns([1, 1])
+with download_report_col:
+    st.download_button(
+        label="Download report",
+        data=report_text.encode("utf-8"),
+        file_name=f"{download_base_name}_report.txt",
+        mime="text/plain",
+        use_container_width=True,
+    )
+with download_hint_col:
+    st.caption("Use the report button for the text summary. The Grad-CAM image download appears below the gallery when Grad-CAM is enabled.")
+
 viz_tab, chart_tab, ranking_tab = st.tabs(["Slice Viewer", "Probability Trend", "Top Slices"])
 
 with viz_tab:
@@ -989,6 +1213,17 @@ with viz_tab:
         c2.image(heatmap_on_brain, use_container_width=True, clamp=True)
         c3.markdown('<div class="viz-panel-title">Overlay</div>', unsafe_allow_html=True)
         c3.image(overlay, use_container_width=True, clamp=True)
+
+        overlay_buffer = io.BytesIO()
+        plt.imsave(overlay_buffer, overlay)
+        overlay_buffer.seek(0)
+        st.download_button(
+            label="Download Grad-CAM image",
+            data=overlay_buffer.getvalue(),
+            file_name=f"{download_base_name}_gradcam_overlay.png",
+            mime="image/png",
+            use_container_width=True,
+        )
     else:
         st.markdown('<div class="viz-panel-title">MRI Slice</div>', unsafe_allow_html=True)
         st.image(slice_img, use_container_width=True, clamp=True)
@@ -996,23 +1231,39 @@ with viz_tab:
 with chart_tab:
     trend_x = np.arange(len(slice_probs))
     fig, ax = plt.subplots(figsize=(10, 4))
-    fig.patch.set_facecolor("#0d1317")
-    ax.set_facecolor("#101d42")
-    ax.plot(trend_x, slice_probs, color="#232ed1", linewidth=2.0, label="Tumor probability")
-    ax.axhline(y=threshold, color="#6564db", linestyle="--", linewidth=1.4, label="Decision threshold")
-    ax.axvline(x=slice_index, color="#89d2dc", linestyle=":", linewidth=1.2, label="Selected slice")
+    fig.patch.set_facecolor(theme["chart_bg"])
+    ax.set_facecolor(theme["chart_panel"])
+    ax.plot(
+        trend_x,
+        slice_probs,
+        color=theme["chart_line"],
+        linewidth=2.8,
+        marker="o",
+        markersize=4.5,
+        markerfacecolor=theme["chart_line"],
+        markeredgecolor=theme["chart_panel"],
+        markeredgewidth=0.9,
+        label="Tumor probability",
+        zorder=3,
+    )
+    ax.fill_between(trend_x, slice_probs, 0.0, color=theme["chart_line"], alpha=0.12, zorder=1)
+    ax.axhline(y=threshold, color=theme["chart_threshold"], linestyle="--", linewidth=1.8, label="Decision threshold", zorder=2)
+    ax.axvline(x=slice_index, color=theme["chart_selected"], linestyle=":", linewidth=1.6, label="Selected slice", zorder=2)
+    ax.scatter([slice_index], [selected_prob], color=theme["chart_selected"], s=54, zorder=4, edgecolors=theme["chart_panel"], linewidths=1.0)
     ax.set_ylim(0.0, 1.0)
-    ax.set_xlabel("Slice index", color="#89d2dc")
-    ax.set_ylabel("Probability", color="#89d2dc")
-    ax.tick_params(colors="#89d2dc")
+    ax.set_xlim(-0.5, max(len(slice_probs) - 0.5, 0.5))
+    ax.set_xlabel("Slice index", color=theme["chart_text"], labelpad=8)
+    ax.set_ylabel("Probability", color=theme["chart_text"], labelpad=8)
+    ax.tick_params(colors=theme["chart_text"], labelsize=9, width=0.8, length=4)
     for spine in ax.spines.values():
-        spine.set_color("#232ed1")
-    ax.grid(color="#232ed1")
+        spine.set_color(theme["border"])
+        spine.set_linewidth(1.0)
+    ax.grid(color=theme["chart_grid"], alpha=0.32, linewidth=0.8)
     legend = ax.legend(loc="upper right")
-    legend.get_frame().set_facecolor("#0d1317")
-    legend.get_frame().set_edgecolor("#232ed1")
+    legend.get_frame().set_facecolor(theme["chart_legend"])
+    legend.get_frame().set_edgecolor(theme["border"])
     for text in legend.get_texts():
-        text.set_color("#89d2dc")
+        text.set_color(theme["chart_text"])
     st.pyplot(fig, use_container_width=True)
     plt.close(fig)
     st.caption("Peaks indicate slices the model considers most suspicious.")
