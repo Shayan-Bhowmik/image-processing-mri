@@ -1423,6 +1423,8 @@ Changes:
 
 App now defaults to light theme permanently with cleaner sidebar appearance.
 
+---
+
 ### Step 16.1 - Report Download Format Update (Text to PDF)
 
 #### Objective
@@ -1467,6 +1469,8 @@ Changes:
 #### Outcome
 
 Users now download report as a properly formatted PDF file instead of plain text, improving professional presentation and usability.
+
+---
 
 ### Step 16.2 - Grad-CAM Composite Download (Three-Panel Image)
 
@@ -1513,6 +1517,8 @@ Changes:
 
 Users now download all three Grad-CAM visualization panels as a single composite image with clear headings, improving convenience and diagnosis documentation.
 
+---
+
 ### Step 16.3 - Tab Color Update (Dark Blue to Light Blue)
 
 #### Objective
@@ -1538,6 +1544,8 @@ Changes:
 #### Outcome
 
 Active tabs now display with light blue background instead of dark blue, improving visual polish of the interface.
+
+---
 
 ### Step 16.4 - Top Slices Table Color Update (Light Blue Theme)
 
@@ -1568,6 +1576,8 @@ Changes:
 
 Top Slices table now displays with light blue header and alternating row colors, improving visual consistency and readability with the light theme.
 
+---
+
 ### Step 16.5 - Top Slices Table Light-Blue Styling Refinement
 
 #### Objective
@@ -1587,6 +1597,8 @@ Changes:
 #### Outcome
 
 Top Slices now renders with a clear light-blue table appearance in the UI.
+
+---
 
 ### Step 16.6 - Patient-Level Score Bar Beautification
 
