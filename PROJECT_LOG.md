@@ -1391,3 +1391,227 @@ Artifacts saved:
 
 Outcome:
 Post-fix model + calibration pipeline is operational and internally consistent, ready for final smoke testing and optional test-split confirmation.
+
+---
+
+## Step 16 - Streamlit UI Theme Simplification
+
+### Objective
+
+Simplify the Streamlit app UI by removing the light/dark mode toggle and defaulting to light mode only.
+
+### Changes Implemented
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Removed sidebar theme toggle control
+- Previously: `st.sidebar.toggle("Light mode", value=False)`
+- Now: Hardcoded `light_mode = True`
+- Light theme applied automatically on app load
+- Eliminated theme switching logic
+
+### Rationale
+
+- Light mode provides better readability and professional appearance for MRI decision-support interface
+- Reduces UI cognitive load by removing theme selection
+- Simplifies state management (no theme toggling)
+- Aligns with medical application conventions (light backgrounds for technical dashboards)
+
+### Outcome
+
+App now defaults to light theme permanently with cleaner sidebar appearance.
+
+### Step 16.1 - Report Download Format Update (Text to PDF)
+
+#### Objective
+
+Change the report download format from plain text (.txt) to PDF (.pdf) for professional presentation and better formatting.
+
+#### Changes Implemented
+
+Files Modified:
+- `app/streamlit_app.py`
+
+Changes:
+1. Added reportlab imports:
+   - `from reportlab.lib.pagesizes import letter`
+   - `from reportlab.pdfgen import canvas`
+   - `from reportlab.lib.units import inch`
+
+2. Created new function `generate_pdf_report()`:
+   - Takes report text as input
+   - Generates formatted PDF document
+   - Handles page breaks automatically
+   - Returns bytes for direct download
+   - Uses professional formatting with title and margins
+
+3. Updated download button:
+   - Changed data source from `report_text.encode("utf-8")` to `generate_pdf_report(report_text)`
+   - Updated file extension: `.txt` → `.pdf`
+   - Updated MIME type: `text/plain` → `application/pdf`
+   - Updated button hint: "text summary" → "PDF summary"
+
+#### Rationale
+
+- PDF format provides professional appearance suitable for medical reports
+- Better suited for printing and archival
+- Proper formatting with title, margins, and page breaks
+- Consistency with medical/clinical documentation standards
+
+#### Dependencies
+
+- reportlab (version 4.2.5) - already in requirements.txt
+
+#### Outcome
+
+Users now download report as a properly formatted PDF file instead of plain text, improving professional presentation and usability.
+
+### Step 16.2 - Grad-CAM Composite Download (Three-Panel Image)
+
+#### Objective
+
+Change the Grad-CAM download button to download all three visualization panels (MRI Slice, Grad-CAM on Brain, Overlay) together in a single composite image with headings, instead of just the overlay.
+
+#### Changes Implemented
+
+Files Modified:
+- `app/streamlit_app.py`
+
+Changes:
+1. Added PIL (Pillow) import:
+   - `from PIL import Image, ImageDraw, ImageFont`
+
+2. Created new function `create_gradcam_composite_image()`:
+   - Takes three image arrays as input: `slice_img`, `heatmap_on_brain`, `overlay`
+   - Resizes all images to consistent dimensions for alignment
+   - Creates composite image with three panels side-by-side
+   - Adds titled headings above each panel:
+     - "MRI Slice"
+     - "Grad-CAM on Brain"
+     - "Overlay"
+   - Returns bytes as PNG for direct download
+
+3. Updated download button:
+   - Changed from downloading only overlay to downloading composite image
+   - Updated file naming: `_gradcam_overlay.png` → `_gradcam_composite.png`
+   - Button now calls `create_gradcam_composite_image()` function
+
+#### Rationale
+
+- Provides complete diagnostic view in a single downloadable file
+- Titles help identify each visualization panel for reporting
+- More convenient for users to share or include in clinical documentation
+- Single composite image better suited for presentations
+
+#### Dependencies
+
+- PIL/Pillow (already in environment via pillow package)
+
+#### Outcome
+
+Users now download all three Grad-CAM visualization panels as a single composite image with clear headings, improving convenience and diagnosis documentation.
+
+### Step 16.3 - Tab Color Update (Dark Blue to Light Blue)
+
+#### Objective
+
+Change the active tab highlight color from dark blue to light blue for improved visual appearance.
+
+#### Changes Implemented
+
+Files Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Located CSS rule for active tabs: `[data-baseweb="tab"][aria-selected="true"]`
+- Changed background color: `var(--accent)` (#2742b7 dark blue) → `#5aa7ff` (light blue)
+- Maintains shadow and border styling
+
+#### Rationale
+
+- Light blue provides softer, more modern appearance
+- Improves visual hierarchy while maintaining readability
+- Aligns with light theme aesthetics
+
+#### Outcome
+
+Active tabs now display with light blue background instead of dark blue, improving visual polish of the interface.
+
+### Step 16.4 - Top Slices Table Color Update (Light Blue Theme)
+
+#### Objective
+
+Change the Top Slices dataframe table colors from dark theme to light blue theme for better visual consistency with light mode.
+
+#### Changes Implemented
+
+Files Modified:
+- app/streamlit_app.py
+
+Changes:
+- Added CSS styling for dataframe table ([data-testid=\"stDataFrame\"]):
+  - Header background: Light blue (#5aa7ff) with white text
+  - Row background: Light surface color with alternating very light blue (#e3f2fd) for odd rows
+  - Text color: Theme text color for readability
+- Applied to all dataframe elements in the app
+
+#### Rationale
+
+- Light blue header improves visual hierarchy
+- Alternating row colors improve readability
+- Consistent with app's light theme palette
+- Better contrast and professional appearance
+
+#### Outcome
+
+Top Slices table now displays with light blue header and alternating row colors, improving visual consistency and readability with the light theme.
+
+### Step 16.5 - Top Slices Table Light-Blue Styling Refinement
+
+#### Objective
+
+Finalize the Top Slices table so the displayed table itself consistently renders in light blue.
+
+#### Changes Implemented
+
+Files Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Updated the Top Slices rendering to use a pandas Styler before `st.dataframe(...)`
+- Applied light-blue header styling and very light-blue cell background styling
+- Kept text dark for readability and preserved existing table structure/content
+
+#### Outcome
+
+Top Slices now renders with a clear light-blue table appearance in the UI.
+
+### Step 16.6 - Patient-Level Score Bar Beautification
+
+#### Objective
+
+Improve the visual quality of the patient-level score bar with a cleaner, modern light-theme design.
+
+#### Changes Implemented
+
+Files Modified:
+- app/streamlit_app.py
+
+Changes:
+- Replaced default Streamlit `st.progress(...)` score display with a custom HTML/CSS score component
+- Added a dedicated renderer function for the score bar with clamped score/threshold values
+- Added light-blue gradient fill, rounded track, and subtle depth styling
+- Added a visible threshold marker on the bar
+- Added compact legend labels (`0.00`, threshold value, `1.00`) and a right-aligned score value
+
+#### Rationale
+
+- Improves readability and visual polish of the primary prediction signal
+- Makes threshold context clearer directly on the bar
+- Better alignment with the app's light-blue design language
+
+#### Outcome
+
+Patient-level score now appears as a styled, information-rich bar that is easier to interpret and visually consistent with the overall UI.
