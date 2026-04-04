@@ -127,10 +127,18 @@ theme_vars = f"""
 st.markdown(
     """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
 """
     + theme_vars
     + """
+
+:root {
+    --app-font: 'Space Grotesk', sans-serif;
+}
+
+* {
+    font-family: var(--app-font) !important;
+}
 
 .stApp {
     background: var(--bg-main);
@@ -143,12 +151,12 @@ st.markdown(
 }
 
 h1, h2, h3 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: var(--app-font);
     letter-spacing: 0.2px;
 }
 
 body, p, div, span, label {
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: var(--app-font);
 }
 
 .hero {
@@ -224,7 +232,7 @@ body, p, div, span, label {
 }
 
 .mono {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: var(--app-font);
     font-size: 0.86rem;
 }
 
@@ -315,6 +323,80 @@ body, p, div, span, label {
     color: var(--text-main);
     font-size: 0.79rem;
     margin-top: 2px;
+}
+
+.slice-analysis-wrap {
+    margin: 10px 0 14px 0;
+    padding: 6px 0 0 0;
+}
+
+.slice-analysis-title {
+    color: var(--text-main);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    margin-bottom: 14px;
+}
+
+.slice-analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    align-items: stretch;
+}
+
+.slice-analysis-card {
+    background: transparent;
+    border: none;
+    border-radius: 18px;
+    padding: 6px 8px 6px 0;
+    min-height: 118px;
+}
+
+.slice-analysis-label {
+    color: var(--text-main);
+    font-size: 1rem;
+    line-height: 1.1;
+    margin-bottom: 10px;
+}
+
+.slice-analysis-value {
+    color: var(--text-main);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.45rem;
+    line-height: 1;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+}
+
+.slice-analysis-value-sm {
+    color: var(--text-main);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.1rem;
+    line-height: 1;
+    font-weight: 400;
+}
+
+.slice-analysis-helper {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    margin-top: 8px;
+}
+
+.slice-analysis-arrow {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 1.4rem;
+    line-height: 1;
+    margin-top: 24px;
 }
 
 .detail-grid {
@@ -541,6 +623,10 @@ body, p, div, span, label {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .slice-analysis-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .detail-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -552,6 +638,10 @@ body, p, div, span, label {
 
 @media (max-width: 640px) {
     .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .slice-analysis-grid {
         grid-template-columns: 1fr;
     }
 
@@ -925,6 +1015,108 @@ def render_patient_score_bar(score: float, threshold_value: float) -> None:
     )
 
 
+def compute_gradcam_visibility_score(heatmap: np.ndarray) -> float:
+    """Estimate how visible and interpretable a Grad-CAM map is."""
+    if heatmap.size == 0:
+        return 0.0
+
+    active_pixels = heatmap[heatmap > 0]
+    if active_pixels.size == 0:
+        return 0.0
+
+    coverage = float(active_pixels.size) / float(heatmap.size)
+    mean_activation = float(active_pixels.mean())
+    peak_activation = float(active_pixels.max())
+
+    visibility_score = (0.35 * coverage) + (0.35 * mean_activation) + (0.30 * peak_activation)
+    return float(np.clip(visibility_score, 0.0, 1.0))
+
+
+def compute_brain_visibility_score(slice_image: np.ndarray) -> float:
+    """Estimate how clearly the brain anatomy is visible in a slice."""
+    if slice_image.size == 0:
+        return 0.0
+
+    visible_pixels = slice_image[slice_image > 0.08]
+    if visible_pixels.size == 0:
+        return 0.0
+
+    coverage = float(visible_pixels.size) / float(slice_image.size)
+    intensity = float(visible_pixels.mean())
+    contrast = float(visible_pixels.std())
+
+    visibility_score = (0.40 * coverage) + (0.35 * intensity) + (0.25 * contrast)
+    return float(np.clip(visibility_score, 0.0, 1.0))
+
+
+def build_gradcam_slice_ranking(
+    model,
+    device,
+    input_batch,
+    slice_probs,
+    slice_preds,
+    gradcam_smooth_kernel,
+    gradcam_clip_low,
+    gradcam_clip_high,
+):
+    """Rank middle slices by Grad-CAM clarity, brain visibility, and center proximity."""
+    total_slices = len(slice_probs)
+    middle_start = max(0, int(total_slices * 0.25))
+    middle_end = max(middle_start + 1, int(total_slices * 0.75))
+    candidate_indices = np.arange(middle_start, middle_end)
+
+    if candidate_indices.size < 5:
+        candidate_indices = np.arange(total_slices)
+
+    ranking_rows = []
+
+    for idx in candidate_indices:
+        slice_image = input_batch[idx][1].detach().cpu().numpy()
+        brain_visibility = compute_brain_visibility_score(slice_image)
+        heatmap = build_gradcam_for_slice(
+            model,
+            device,
+            input_batch[idx],
+            target_class=1,
+            smooth_kernel=gradcam_smooth_kernel,
+            clip_percentiles=(gradcam_clip_low, gradcam_clip_high),
+            apply_brain_mask=True,
+            brain_mask_threshold=0.05,
+        )
+        gradcam_visibility = compute_gradcam_visibility_score(heatmap)
+        center_distance = abs(idx - (total_slices - 1) / 2.0)
+        center_proximity = 1.0 - float(center_distance / max((total_slices - 1) / 2.0, 1.0))
+        combined_score = float(
+            np.clip(
+                (gradcam_visibility * 0.45)
+                + (brain_visibility * 0.35)
+                + (center_proximity * 0.20),
+                0.0,
+                1.0,
+            )
+        )
+
+        ranking_rows.append(
+            {
+                "slice_index": int(idx),
+                "tumor_probability": float(slice_probs[idx]),
+                "predicted_class": int(slice_preds[idx]),
+                "slice_decision": "Tumor" if int(slice_preds[idx]) == 1 else "Normal",
+                "brain_visibility": brain_visibility,
+                "gradcam_visibility": gradcam_visibility,
+                "center_proximity": center_proximity,
+                "combined_score": combined_score,
+            }
+        )
+
+    ranking_df = pd.DataFrame(ranking_rows)
+    ranking_df = ranking_df.sort_values(
+        by=["combined_score", "gradcam_visibility", "brain_visibility"],
+        ascending=False,
+    ).reset_index(drop=True)
+    return ranking_df
+
+
 def download_stem(filename: str) -> str:
     name = Path(filename).name
     if name.lower().endswith(".nii.gz"):
@@ -1181,7 +1373,7 @@ decision_title, decision_detail = summarize_decision(float(patient_score), float
 predicted_class_probability = float(patient_score if pred_label == 1 else (1.0 - patient_score))
 decision_margin = float(abs(patient_score - threshold))
 
-slice_binary = (slice_probs >= threshold).astype(np.int32)
+slice_binary = slice_preds.astype(np.int32)
 slice_consistency = float(np.mean(slice_binary == pred_label)) if len(slice_binary) > 0 else 0.0
 
 entropy = -(patient_score * np.log(patient_score + 1e-8) + (1.0 - patient_score) * np.log(1.0 - patient_score + 1e-8))
@@ -1253,11 +1445,8 @@ reference_accuracy = reference_metrics.get("test_accuracy")
 reference_patient_accuracy = reference_metrics.get("patient_accuracy")
 reference_auc = reference_metrics.get("roc_auc")
 
-reference_text = (
-    f"{reference_accuracy:.2f}%"
-    if reference_accuracy is not None
-    else "N/A"
-)
+max_model_accuracy_candidates = [m for m in [reference_accuracy, reference_patient_accuracy] if m is not None]
+max_model_accuracy_text = f"{max(max_model_accuracy_candidates):.2f}%" if max_model_accuracy_candidates else "N/A"
 
 st.markdown(
     f"""
@@ -1278,9 +1467,9 @@ st.markdown(
         <div class="detail-helper">Slices agreeing with patient decision</div>
     </div>
     <div class="detail-card">
-        <div class="detail-label">Reference test accuracy</div>
-        <div class="detail-value">{reference_text}</div>
-        <div class="detail-helper">Most recent project benchmark</div>
+        <div class="detail-label">Max model accuracy</div>
+        <div class="detail-value">{max_model_accuracy_text}</div>
+        <div class="detail-helper">Best benchmark from recorded model metrics</div>
     </div>
 </div>
 """,
@@ -1333,6 +1522,65 @@ else:
 
 slice_img = np.clip((slice_img - p_low) / (p_high - p_low + 1e-8), 0.0, 1.0)
 selected_prob = float(slice_probs[slice_index])
+
+gradcam_ranking_df = build_gradcam_slice_ranking(
+    model=model,
+    device=device,
+    input_batch=input_batch,
+    slice_probs=slice_probs,
+    slice_preds=slice_preds,
+    gradcam_smooth_kernel=gradcam_smooth_kernel,
+    gradcam_clip_low=gradcam_clip_low,
+    gradcam_clip_high=gradcam_clip_high,
+)
+
+best_explanation_slice_index = int(gradcam_ranking_df.iloc[0]["slice_index"])
+best_explanation_slice_label = f"#{best_explanation_slice_index + 1}"
+
+current_slice_display = f"{slice_index + 1} / {len(valid_slices)}"
+prediction_display = "Tumor" if pred_label == 1 else "Normal"
+confidence_display = f"{confidence_score * 100:.2f}%"
+tumor_probability_display = f"{patient_score * 100:.2f}%"
+best_explanation_slice = best_explanation_slice_label
+
+st.markdown(
+    f"""
+<div class="slice-analysis-wrap">
+    <div class="slice-analysis-title">Slice-Level Analysis</div>
+    <div class="slice-analysis-grid">
+        <div class="slice-analysis-card">
+            <div class="slice-analysis-label">Slice Index</div>
+            <div class="slice-analysis-value">{current_slice_display}</div>
+            <div class="slice-analysis-helper">Current valid slice out of total</div>
+        </div>
+        <div class="slice-analysis-card">
+            <div class="slice-analysis-label">Prediction</div>
+            <div class="slice-analysis-value-sm">{prediction_display}</div>
+            <div class="slice-analysis-helper">Model decision for the selected slice</div>
+        </div>
+        <div class="slice-analysis-card">
+            <div class="slice-analysis-label">Confidence</div>
+            <div class="slice-analysis-value">{confidence_display}</div>
+            <div class="slice-analysis-helper">MRI-level confidence for this model decision</div>
+        </div>
+        <div class="slice-analysis-card">
+            <div class="slice-analysis-label">Tumor Probability</div>
+            <div class="slice-analysis-value">{tumor_probability_display}</div>
+            <div class="slice-analysis-helper">Aggregated tumor probability for this MRI file</div>
+        </div>
+        <div class="slice-analysis-card">
+            <div class="slice-analysis-label">Best Explanation Slice</div>
+            <div class="slice-analysis-value">{best_explanation_slice}</div>
+            <div class="slice-analysis-helper">Best Grad-CAM explanation with clear brain visibility</div>
+        </div>
+    </div>
+</div>
+""",
+    unsafe_allow_html=True,
+)
+
+st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+st.subheader("Result Reliability")
 
 st.markdown(
     f"""
@@ -1452,31 +1700,32 @@ with viz_tab:
         st.image(slice_img, use_container_width=True, clamp=True)
 
 with chart_tab:
-    trend_x = np.arange(len(slice_probs))
+    explainability_trend_df = gradcam_ranking_df.sort_values(by="slice_index").reset_index(drop=True)
+    trend_x = explainability_trend_df["slice_index"].to_numpy()
+    trend_y = explainability_trend_df["combined_score"].to_numpy()
+    best_slice_x = int(gradcam_ranking_df.iloc[0]["slice_index"])
+    best_slice_y = float(gradcam_ranking_df.iloc[0]["combined_score"])
+
     fig, ax = plt.subplots(figsize=(10, 4))
     fig.patch.set_facecolor(theme["chart_bg"])
     ax.set_facecolor(theme["chart_panel"])
     ax.plot(
         trend_x,
-        slice_probs,
-        color=theme["chart_line"],
-        linewidth=2.8,
-        marker="o",
-        markersize=4.5,
-        markerfacecolor=theme["chart_line"],
-        markeredgecolor=theme["chart_panel"],
-        markeredgewidth=0.9,
-        label="Tumor probability",
+        trend_y,
+        color="#3b82f6",
+        linewidth=2.5,
+        label="Grad-CAM explainability",
         zorder=3,
     )
-    ax.fill_between(trend_x, slice_probs, 0.0, color=theme["chart_line"], alpha=0.12, zorder=1)
-    ax.axhline(y=threshold, color=theme["chart_threshold"], linestyle="--", linewidth=1.8, label="Decision threshold", zorder=2)
-    ax.axvline(x=slice_index, color=theme["chart_selected"], linestyle=":", linewidth=1.6, label="Selected slice", zorder=2)
-    ax.scatter([slice_index], [selected_prob], color=theme["chart_selected"], s=54, zorder=4, edgecolors=theme["chart_panel"], linewidths=1.0)
+    ax.fill_between(trend_x, trend_y, 0.0, color="#3b82f6", alpha=0.18, zorder=1)
+    ax.scatter([best_slice_x], [best_slice_y], color="#fbbf24", s=70, zorder=4, edgecolors="#0f172a", linewidths=0.8, label="Best explanation slice")
     ax.set_ylim(0.0, 1.0)
-    ax.set_xlim(-0.5, max(len(slice_probs) - 0.5, 0.5))
-    ax.set_xlabel("Slice index", color=theme["chart_text"], labelpad=8)
-    ax.set_ylabel("Probability", color=theme["chart_text"], labelpad=8)
+    ax.set_xlim(float(trend_x.min()) - 0.5, float(trend_x.max()) + 0.5)
+    tick_step = max(1, len(trend_x) // 8)
+    ax.set_xticks(trend_x[::tick_step])
+    ax.set_title("Slice vs Grad-CAM Explainability", color=theme["chart_text"], pad=10, fontsize=16, fontweight="bold")
+    ax.set_xlabel("Slice Index", color=theme["chart_text"], labelpad=8, fontsize=13, fontweight="bold")
+    ax.set_ylabel("Explainability Score", color=theme["chart_text"], labelpad=8, fontsize=13, fontweight="bold")
     ax.tick_params(colors=theme["chart_text"], labelsize=9, width=0.8, length=4)
     for spine in ax.spines.values():
         spine.set_color(theme["border"])
@@ -1489,19 +1738,27 @@ with chart_tab:
         text.set_color(theme["chart_text"])
     st.pyplot(fig, use_container_width=True)
     plt.close(fig)
-    st.caption("Peaks indicate slices the model considers most suspicious.")
+    st.caption("Trend of Grad-CAM explainability score across candidate slices, with the best explanation slice highlighted.")
 
 with ranking_tab:
-    ranking_df = pd.DataFrame(
-        {
-            "rank": np.arange(1, top_k_slices + 1),
-            "slice_index": top_indices,
-            "tumor_probability": [float(slice_probs[idx]) for idx in top_indices],
-            "predicted_class": [int(slice_preds[idx]) for idx in top_indices],
-        }
+    st.markdown(
+        "<div style='text-align:center;'><h3 style='margin: 0 0 0.5rem 0;'>Top Slices</h3></div>",
+        unsafe_allow_html=True,
     )
+    with st.spinner("Selecting the 5 slices with the clearest Grad-CAM explanations..."):
+        ranking_df = gradcam_ranking_df.head(5).copy()
+        ranking_df.insert(0, "rank", np.arange(1, len(ranking_df) + 1))
+
     ranking_styler = (
-        ranking_df.style.format({"tumor_probability": "{:.3f}"})
+        ranking_df.style.format(
+            {
+                "tumor_probability": "{:.3f}",
+                "brain_visibility": "{:.3f}",
+                "gradcam_visibility": "{:.3f}",
+                "center_proximity": "{:.3f}",
+                "combined_score": "{:.3f}",
+            }
+        )
         .set_table_styles(
             [
                 {
@@ -1510,11 +1767,21 @@ with ranking_tab:
                         ("background-color", "#8ec8ff"),
                         ("color", "#0f172a"),
                         ("font-weight", "600"),
+                        ("text-align", "center"),
+                    ],
+                },
+                {
+                    "selector": "td",
+                    "props": [
+                        ("text-align", "center"),
                     ],
                 }
             ]
         )
-        .set_properties(**{"background-color": "#eaf4ff", "color": "#0f172a"})
+        .set_properties(**{"background-color": "#eaf4ff", "color": "#0f172a", "text-align": "center"})
     )
     st.dataframe(ranking_styler, use_container_width=True, hide_index=True)
-    st.caption("Use these slices as a fast review shortlist for expert verification.")
+    st.markdown(
+        "<div style='text-align:center;'>Top 5 slices are chosen from the middle of the scan using Grad-CAM visibility, brain visibility, and proximity to the center, so the explanations are easier to read.</div>",
+        unsafe_allow_html=True,
+    )

@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+from collections import defaultdict
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.metrics import (
     confusion_matrix,
@@ -56,6 +57,47 @@ def evaluate(model, loader, criterion, device):
     return avg_loss, accuracy, all_labels, all_preds, all_probs, all_patient_ids
 
 
+def evaluate_patient_level(
+    slice_labels,
+    slice_probs,
+    slice_patient_ids,
+    threshold=0.5,
+    top_k=10,
+):
+    """Aggregate slice outputs per patient using top-k mean (same rule as inference)."""
+    patient_prob_map = defaultdict(list)
+    patient_label_map = {}
+
+    for label, prob, patient_id in zip(slice_labels, slice_probs, slice_patient_ids):
+        patient_prob_map[patient_id].append(float(prob))
+        if patient_id not in patient_label_map:
+            patient_label_map[patient_id] = int(label)
+
+    patient_true = []
+    patient_pred = []
+    patient_scores = []
+
+    for patient_id, probs in patient_prob_map.items():
+        probs_arr = np.asarray(probs, dtype=np.float32)
+        k = min(top_k, probs_arr.size)
+        patient_score = float(np.mean(np.sort(probs_arr)[-k:]))
+
+        true_label = patient_label_map[patient_id]
+        pred_label = 1 if patient_score >= threshold else 0
+
+        patient_true.append(true_label)
+        patient_pred.append(pred_label)
+        patient_scores.append(patient_score)
+
+    patient_true = np.asarray(patient_true, dtype=np.int32)
+    patient_pred = np.asarray(patient_pred, dtype=np.int32)
+    patient_scores = np.asarray(patient_scores, dtype=np.float32)
+
+    patient_acc = 100.0 * float(np.mean(patient_true == patient_pred)) if patient_true.size > 0 else 0.0
+
+    return patient_acc, patient_true, patient_pred, patient_scores
+
+
 def train():
     set_seed(42)
 
@@ -63,7 +105,9 @@ def train():
 
 
     config = {
-        "use_2_5d": True
+        "use_2_5d": True,
+        "patient_threshold": 0.5,
+        "patient_top_k": 10,
     }
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -122,7 +166,7 @@ def train():
     )
 
     num_epochs = 60
-    best_val_acc = 0.0
+    best_val_patient_acc = 0.0
 
     os.makedirs("checkpoints", exist_ok=True)
 
@@ -156,8 +200,16 @@ def train():
         train_loss = running_loss / len(train_loader)
         train_acc = 100 * correct / total
 
-        val_loss, val_acc, _, _, _, _ = evaluate(
+        val_loss, val_acc, val_true, _, val_probs, val_patient_ids = evaluate(
             model, val_loader, criterion, device
+        )
+
+        val_patient_acc, _, _, _ = evaluate_patient_level(
+            val_true,
+            val_probs,
+            val_patient_ids,
+            threshold=config["patient_threshold"],
+            top_k=config["patient_top_k"],
         )
 
         scheduler.step(val_loss)
@@ -165,10 +217,11 @@ def train():
         print(f"Epoch [{epoch+1}/{num_epochs}]")
         print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.2f}%")
         print(f"Val   Loss: {val_loss:.4f} | Val   Acc: {val_acc:.2f}%")
+        print(f"Val   Patient Acc: {val_patient_acc:.2f}%")
         print("-" * 50)
 
-        if val_acc > best_val_acc:
-            best_val_acc = val_acc
+        if val_patient_acc > best_val_patient_acc:
+            best_val_patient_acc = val_patient_acc
             torch.save(model.state_dict(), "checkpoints/best_model.pth")
             print("✔ Best model saved.")
 
@@ -199,6 +252,31 @@ def train():
     fpr, tpr, _ = roc_curve(test_true, test_probs)
     roc_auc = auc(fpr, tpr)
     print(f"ROC-AUC: {roc_auc:.4f}")
+
+    patient_acc, patient_true, patient_pred, patient_scores = evaluate_patient_level(
+        test_true,
+        test_probs,
+        test_patient_ids,
+        threshold=config["patient_threshold"],
+        top_k=config["patient_top_k"],
+    )
+
+    print("\n===== PATIENT-LEVEL EVALUATION (Top-k Aggregation) =====")
+    print(f"Patient-level Accuracy: {patient_acc:.2f}%")
+
+    print("\nPatient-level Confusion Matrix:")
+    print(confusion_matrix(patient_true, patient_pred))
+
+    print("\nPatient-level Classification Report:")
+    print(classification_report(patient_true, patient_pred, zero_division=0))
+
+    unique_patient_classes = np.unique(patient_true)
+    if unique_patient_classes.size > 1:
+        pfpr, ptpr, _ = roc_curve(patient_true, patient_scores)
+        patient_auc = auc(pfpr, ptpr)
+        print(f"\nPatient-level ROC-AUC: {patient_auc:.4f}")
+    else:
+        print("\nPatient-level ROC-AUC: N/A (only one class present in patient-level ground truth)")
 
 
 if __name__ == "__main__":

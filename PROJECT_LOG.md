@@ -1627,3 +1627,152 @@ Changes:
 #### Outcome
 
 Patient-level score now appears as a styled, information-rich bar that is easier to interpret and visually consistent with the overall UI.
+
+---
+
+## Step 17 - Explainability UI & Evaluation Alignment Updates
+
+### Objective
+
+Refine explainability-focused UI behavior in Streamlit and align training-time model selection with deployment-time patient-level inference logic.
+
+---
+
+### Step 17.1 - Slice-Level Analysis and Top-Slice Interpretation Refinement
+
+Files Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Added a dedicated **Slice-Level Analysis** panel to surface high-priority per-case summary fields.
+- Updated the "best slice" semantics to use explainability quality (Grad-CAM visibility + brain visibility + center proximity), not just highest tumor probability.
+- Renamed UI label from "Highest Tumor Slice" to **"Best Explanation Slice"**.
+- Ensured this card uses the same ranking logic as the Top Slices table to avoid mismatch.
+
+Outcome:
+- The highlighted slice is now explainability-driven and consistent across panel + table.
+
+---
+
+### Step 17.2 - Top Slices Ranking Logic Rework (Explainability-Centric)
+
+Files Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Introduced Grad-CAM visibility scoring utility.
+- Introduced brain visibility scoring utility.
+- Restricted candidate selection primarily to middle scan region (with fallback to full range if insufficient candidates).
+- Built combined ranking score from:
+  - Grad-CAM visibility
+  - brain visibility
+  - center proximity
+- Kept final table output to top 5 ranked slices for concise review.
+
+Outcome:
+- Top Slices now prioritizes interpretability quality over raw probability alone.
+
+---
+
+### Step 17.3 - Probability Trend Chart Iterations (Final Explainability Trend)
+
+Files Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Iterated chart modes from slice probability and binary decision views to an explainability-focused trend.
+- Final chart behavior:
+  - x-axis: slice index
+  - y-axis: explainability score (combined Grad-CAM-based score)
+  - filled area under trend
+  - explicit marker for best explanation slice
+
+Outcome:
+- Trend tab now visualizes explainability strength across slices instead of only classification probability.
+
+---
+
+### Step 17.4 - Top Slices Table Visual Consistency Updates
+
+Files Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Updated dataframe styling to enforce centered alignment for headers and cells.
+- Centered Top Slices section title and explanatory caption for consistent panel composition.
+
+Outcome:
+- Table and surrounding text now render with consistent alignment and cleaner visual hierarchy.
+
+---
+
+### Step 17.5 - Font Unification Across UI
+
+Files Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Consolidated app typography to a single font family.
+- Removed mixed-font behavior and added a global font rule for consistent text rendering across cards, labels, captions, and table content.
+
+Outcome:
+- Dashboard now uses one consistent text style end-to-end.
+
+---
+
+### Step 17.6 - Reliability Card Metric Logic Corrections
+
+Files Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Reworked reliability card behavior after multiple metric experiments.
+- Final state:
+  - first card: **Prediction confidence**
+  - final benchmark card: **Max model accuracy** (best available from logged benchmark metrics)
+- Removed duplicate file-estimated-accuracy card behavior introduced during experimentation.
+
+Outcome:
+- Reliability section now reflects model benchmark intent clearly without duplicated/conflicting accuracy cards.
+
+---
+
+### Step 17.7 - Training/Test Evaluation Alignment (Patient-Level)
+
+Files Modified:
+- `train.py`
+
+Changes:
+- Added patient-level aggregation/evaluation utility in training script using top-k mean (same strategy as inference).
+- Added patient-level test reporting:
+  - patient-level accuracy
+  - confusion matrix
+  - classification report
+  - ROC-AUC (when both classes present)
+- Updated checkpoint selection criterion:
+  - from slice-level validation accuracy
+  - to patient-level validation accuracy
+- Added config controls for patient aggregation:
+  - `patient_threshold`
+  - `patient_top_k`
+
+Outcome:
+- Training-time model selection is now aligned with deployment-time patient-level decision logic.
+
+---
+
+### Step 17 Summary
+
+This update batch delivered:
+
+1. Explainability-first slice ranking and best-slice selection
+2. Explainability trend visualization in the chart tab
+3. Cleaner and more consistent Top Slices panel formatting
+4. Unified typography across the app
+5. Reliability-card logic cleanup with explicit max-model-accuracy benchmark display
+6. Patient-level training/evaluation alignment in `train.py`
+
+Overall Outcome:
+UI explainability outputs and training/evaluation logic are now more coherent, interpretable, and consistent with final deployment behavior.
+
+---
