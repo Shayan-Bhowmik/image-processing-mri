@@ -23,7 +23,7 @@ def train_one_epoch(model, dataloader, criterion, optimizer, device):
 
         optimizer.step()
 
-        total_loss += loss.item()
+        total_loss += loss.item() * labels.size(0)
 
         _, predicted = torch.max(outputs, 1)
 
@@ -31,5 +31,6 @@ def train_one_epoch(model, dataloader, criterion, optimizer, device):
         correct += (predicted == labels).sum().item()
 
     accuracy = correct / total
+    avg_loss = total_loss / total
 
-    return total_loss, accuracy
+    return avg_loss, accuracy
