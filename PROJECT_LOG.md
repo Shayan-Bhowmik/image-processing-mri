@@ -1903,6 +1903,50 @@ Status:
 
 ---
 
+### Step 18.7 - Final Metrics Snapshot and Version Control Record
+
+Calibration Artifact Snapshot:
+- Source: `outputs/calibration/threshold_report.json`
+- Timestamp: `2026-04-06T20:16:52`
+- Split scope: `val_split`
+- Split file: `data/splits/patient_split_domain_holdout.json`
+- Cases processed: 122
+  - BraTS: 52
+  - OASIS: 70
+  - Failures: 0
+
+Baseline @ threshold 0.50:
+- TP: 52
+- FN: 0
+- TN: 70
+- FP: 0
+- Sensitivity: 1.0000
+- Specificity: 1.0000
+- Balanced Accuracy: 1.0000
+- Accuracy: 1.0000
+
+Recommended threshold:
+- Threshold: 0.50
+- TP: 52
+- FN: 0
+- TN: 70
+- FP: 0
+- Sensitivity: 1.0000
+- Specificity: 1.0000
+- Balanced Accuracy: 1.0000
+- Accuracy: 1.0000
+
+Version Control Record:
+- Commit: `5cce17a0e5e8e98d770e1818491b5379fb6f98fc`
+- Short hash: `5cce17a`
+- Message: `Validating Cross Domain Workflow`
+- Date: `Mon Apr 6 20:21:10 2026 +0530`
+
+Outcome:
+- End-to-end cross-domain validation workflow completed and recorded with reproducible metrics + commit traceability.
+
+---
+
 ### Step 18 Summary
 
 This step delivered:
