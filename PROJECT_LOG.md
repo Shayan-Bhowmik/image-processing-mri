@@ -2060,6 +2060,14 @@ Interpretation:
 Recommended reporting language:
 - "100% accuracy on the held-out in-domain tumor-vs-healthy test split (n=122), with documented domain-shift failure on cross-modality IXI T2 healthy controls."
 
+### Step 19 Summary - Result Comparison Table
+
+| Evaluation Setup | Scope | Cases (Tumor / Healthy) | Threshold | Sensitivity | Specificity | Balanced Accuracy | Accuracy | Confusion (TP/FN/TN/FP) | Key Takeaway |
+|------------------|-------|--------------------------|-----------|-------------|-------------|-------------------|----------|-------------------------|--------------|
+| BraTS2021 + OASIS | all_cases | 1251 / 436 | 0.50 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1251 / 0 / 436 / 0 | Strong near-domain external performance |
+| BraTS2021 + IXI T2 | all_cases | 1251 / 578 | 0.50 | 1.0000 | 0.0000 | 0.5000 | 0.68398 | 1251 / 0 / 0 / 578 | Severe cross-modality domain shift (healthy specificity collapse) |
+| Current held-out split (BraTS + OASIS) | test_split | 54 / 68 | 0.50 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 54 / 0 / 68 / 0 | 100% accuracy on current in-domain held-out test |
+
 Outcome:
 - Project has reached a defensible research-ready milestone with explicit strengths and limitations.
 
