@@ -1962,3 +1962,105 @@ Overall Outcome:
 The project moved from suspiciously perfect metrics toward a more defensible, bias-aware, and evaluation-rigorous workflow.
 
 ---
+
+## Step 19 - External Validation Expansion and Current Research Readiness
+
+### Objective
+
+Validate tumor-vs-healthy performance beyond the original development split, quantify domain-shift behavior on external sources, and determine whether the current model is complete for research use.
+
+---
+
+### Step 19.1 - External Tumor Cohort Acquisition (BraTS2021)
+
+Action:
+- Added external tumor dataset for out-of-split stress testing.
+
+Data:
+- BraTS2021 Training cohort extracted under:
+  - `data/raw/brats2021_extracted`
+
+Purpose:
+- Test positive-class robustness (tumor detection) on a newer external BraTS source.
+
+---
+
+### Step 19.2 - External Healthy Cohort Trials (IXI T2 and OASIS)
+
+Action:
+- Evaluated model with multiple non-tumor cohorts to test specificity under domain variation.
+
+Trial A - BRaTS2021 + IXI T2:
+- Result indicated severe modality/domain mismatch.
+- Observed behavior: very high false-positive rate on IXI T2 healthy scans (specificity collapse).
+- Interpretation: model does not generalize to this cross-modality setup without adaptation.
+
+Trial B - BRaTS2021 + OASIS:
+- Result: perfect separation on evaluated cohort.
+- Confusion summary: zero false negatives and zero false positives in this run.
+- Interpretation: strong in-domain/near-domain separability was retained.
+
+Outcome:
+- Domain-shift limitation is confirmed and now explicitly documented.
+
+---
+
+### Step 19.3 - Additional Dataset Exploration and Curation Decisions
+
+Actions:
+- Explored additional Kaggle candidates for external healthy validation.
+- Downloaded and inspected neurohacking MRI dataset.
+
+Findings:
+- Neurohacking dataset was too small for meaningful external validation.
+- OASIS-2 identified as Alzheimer-focused (non-tumor), useful only for additional specificity testing, not for tumor-positive evaluation.
+
+Curation decisions:
+- Removed low-value experimental datasets/folders used during exploration.
+- Retained validated evaluation paths focused on reproducible results.
+
+---
+
+### Step 19.4 - Current Tumor-vs-Healthy Test-Split Evaluation (Latest)
+
+Command executed:
+- `python scripts/calibrate_threshold.py --checkpoint checkpoints/best_model.pth --split-json data/splits/patient_split.json --split-name test --out-dir outputs/calibration_current_test`
+
+Scope:
+- `test_split`
+- BraTS cases: 54
+- OASIS cases: 68
+- Total cases: 122
+- Processed: 122 (failed: 0)
+
+Baseline @ threshold 0.50:
+- Sensitivity: 1.0000
+- Specificity: 1.0000
+- Balanced Accuracy: 1.0000
+- Accuracy: 1.0000
+- Confusion: TP=54, FN=0, TN=68, FP=0
+
+Recommended threshold:
+- Threshold: 0.5000
+- Metrics unchanged from baseline (perfect on this split)
+
+Artifacts saved:
+- `outputs/calibration_current_test/threshold_report.json`
+- `outputs/calibration_current_test/recommended_threshold.json`
+
+---
+
+### Step 19.5 - Research Interpretation and Completion Status
+
+Interpretation:
+- The model is currently complete for research demonstration in the present data domain.
+- 100% accuracy is valid for the evaluated held-out split, not a universal guarantee for all future datasets.
+- Cross-modality testing (IXI T2) demonstrated a real external generalization boundary.
+
+Recommended reporting language:
+- "100% accuracy on the held-out in-domain tumor-vs-healthy test split (n=122), with documented domain-shift failure on cross-modality IXI T2 healthy controls."
+
+Outcome:
+- Project has reached a defensible research-ready milestone with explicit strengths and limitations.
+
+---

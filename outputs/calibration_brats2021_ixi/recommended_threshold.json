@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-04-07T02:37:11",
+  "checkpoint": ".\\checkpoints\\best_model.pth",
+  "recommended_threshold": 1.0,
+  "top_k": 10,
+  "metrics": {
+    "threshold": 1.0,
+    "tp": 1251,
+    "fn": 0,
+    "tn": 4,
+    "fp": 574,
+    "sensitivity": 1.0,
+    "specificity": 0.00692,
+    "balanced_accuracy": 0.50346,
+    "accuracy": 0.686167
+  }
+}
