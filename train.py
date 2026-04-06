@@ -1,3 +1,4 @@
+import argparse
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -98,7 +99,11 @@ def evaluate_patient_level(
     return patient_acc, patient_true, patient_pred, patient_scores
 
 
-def train():
+def train(
+    split_path="data/splits/patient_split.json",
+    canonical_shape=(192, 192, 160),
+    fixed_slice_count=96,
+):
     set_seed(42)
 
 
@@ -112,15 +117,12 @@ def train():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    split_path = "data/splits/patient_split.json"
-
-
-
-
     train_loader, val_loader, test_loader = create_dataloaders(
         split_path,
         batch_size=8,
-        use_2_5d=config["use_2_5d"]
+        use_2_5d=config["use_2_5d"],
+        canonical_shape=canonical_shape,
+        fixed_slice_count=fixed_slice_count,
     )
 
 
@@ -280,4 +282,30 @@ def train():
 
 
 if __name__ == "__main__":
-    train()
+    parser = argparse.ArgumentParser(description="Train MRI classifier")
+    parser.add_argument(
+        "--split-path",
+        default="data/splits/patient_split.json",
+        help="Path to split JSON file",
+    )
+    parser.add_argument(
+        "--canonical-shape",
+        type=int,
+        nargs=3,
+        default=(192, 192, 160),
+        metavar=("H", "W", "D"),
+        help="Canonical 3D shape used before slice extraction",
+    )
+    parser.add_argument(
+        "--fixed-slice-count",
+        type=int,
+        default=96,
+        help="Maximum valid slices sampled per volume",
+    )
+
+    args = parser.parse_args()
+    train(
+        split_path=args.split_path,
+        canonical_shape=tuple(args.canonical_shape),
+        fixed_slice_count=int(args.fixed_slice_count),
+    )

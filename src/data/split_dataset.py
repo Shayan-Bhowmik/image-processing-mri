@@ -45,19 +45,7 @@ def save_split(train, val, test, save_path):
 
 
 if __name__ == "__main__":
-    root_dir = "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
-
-    patient_paths = get_patient_folders(root_dir)
-    train, val, test = split_patients(patient_paths)
-
-    save_split(
-        train,
-        val,
-        test,
-        save_path="data/splits/patient_split.json"
+    raise RuntimeError(
+        "Deprecated split generator: this script creates BRATS-only splits. "
+        "Use rebuild_split.py for leakage-safe BraTS+OASIS subject-level splitting."
     )
-
-    print(f"Total patients: {len(patient_paths)}")
-    print(f"Train: {len(train)}")
-    print(f"Val: {len(val)}")
-    print(f"Test: {len(test)}")

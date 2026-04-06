@@ -5,6 +5,7 @@ import os
 
 from src.preprocessing.load_nifti import load_nifti
 from src.preprocessing.normalize import zscore_normalize
+from src.preprocessing.resample_3d import resample_volume_3d
 from src.preprocessing.slice_extraction import extract_valid_slices
 from src.preprocessing.resize import resize_sample
 
@@ -16,9 +17,18 @@ def load_split(split_path, split_name):
 
 
 class MRIDataset(Dataset):
-    def __init__(self, split_entries, image_size=(224, 224), use_2_5d=True):
+    def __init__(
+        self,
+        split_entries,
+        image_size=(224, 224),
+        use_2_5d=True,
+        canonical_shape=(192, 192, 160),
+        fixed_slice_count=96,
+    ):
         self.image_size = image_size
         self.use_2_5d = use_2_5d
+        self.canonical_shape = canonical_shape
+        self.fixed_slice_count = fixed_slice_count
         self.index_map = []
         self.volume_store = {}
         self.valid_slices_store = {}
@@ -40,7 +50,8 @@ class MRIDataset(Dataset):
 
                 flair_path = None
                 for file in os.listdir(patient_path):
-                    if "flair" in file.lower() and file.endswith(".nii"):
+                    file_lower = file.lower()
+                    if "flair" in file_lower and file_lower.endswith((".nii", ".nii.gz")):
                         flair_path = os.path.join(patient_path, file)
                         break
 
@@ -57,8 +68,9 @@ class MRIDataset(Dataset):
             if len(volume.shape) == 4:
                 volume = volume[..., 0]
 
+            volume = resample_volume_3d(volume, target_shape=self.canonical_shape)
             volume = zscore_normalize(volume)
-            valid_slices = extract_valid_slices(volume)
+            valid_slices = extract_valid_slices(volume, fixed_count=self.fixed_slice_count)
             if not valid_slices:
                 continue
 

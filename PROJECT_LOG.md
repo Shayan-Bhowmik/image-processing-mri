@@ -1776,3 +1776,145 @@ Overall Outcome:
 UI explainability outputs and training/evaluation logic are now more coherent, interpretable, and consistent with final deployment behavior.
 
 ---
+
+## Step 18 - Shortcut Bias Audit, Domain Harmonization, and Cross-Domain Workflow
+
+### Objective
+
+Address suspicious 100% validation performance by auditing for leakage/shortcut learning, then harden preprocessing and evaluation to reduce domain-driven bias.
+
+---
+
+### Step 18.1 - Leakage and Shortcut Audit (Findings)
+
+Audit Outcomes:
+- Verified no split leakage in current split:
+  - no train/val/test file ID overlap
+  - no BraTS patient overlap
+  - no OASIS subject overlap (MR1/MR2)
+- Confirmed strong domain shortcut signal:
+  - OASIS native volume shape: `(176, 208, 176)`
+  - BraTS native volume shape: `(240, 240, 155)`
+- A trivial metadata rule (depth-only) achieved 100% classification, indicating shortcut risk independent of tumor morphology.
+
+Interpretation:
+- Perfect metrics were not caused by split leakage after fixes.
+- Remaining concern was acquisition/domain separability between source datasets.
+
+---
+
+### Step 18.2 - Pipeline Hardening: Canonical 3D Harmonization
+
+Files Added/Modified:
+- `src/preprocessing/resample_3d.py` (added)
+- `src/preprocessing/slice_extraction.py` (modified)
+- `src/data/mri_dataset.py` (modified)
+- `src/data/dataloaders.py` (modified)
+- `src/inference.py` (modified)
+- `train.py` (modified)
+
+Changes:
+- Added canonical 3D trilinear resampling before slice extraction:
+  - default canonical shape: `(192, 192, 160)`
+- Added fixed-count valid-slice sampling to reduce depth/coverage shortcut cues:
+  - default: `fixed_slice_count=96`
+- Ensured train and inference use the same harmonized preprocessing path.
+- Added training CLI controls:
+  - `--split-path`
+  - `--canonical-shape H W D`
+  - `--fixed-slice-count`
+
+Outcome:
+- Reduced dependence on raw scanner/domain geometry.
+- Improved train/deploy preprocessing consistency.
+
+---
+
+### Step 18.3 - Metadata Bias Stress Test Baseline
+
+File Added:
+- `scripts/metadata_bias_audit.py`
+
+Implemented:
+- Metadata-only logistic regression baseline using NIfTI header features:
+  - `(shape_x, shape_y, shape_z, zoom_x, zoom_y, zoom_z)`
+- Single-feature depth-threshold baseline.
+- Reports train/val/test accuracy and confusion matrices.
+
+Observed Result:
+- Metadata-only baselines remained 100% on the evaluated split, confirming strong shortcut potential in this dataset composition.
+
+Outcome:
+- Established a reproducible bias-check gate for all future experiments.
+
+---
+
+### Step 18.4 - Cross-Domain Holdout Split Builder
+
+File Added:
+- `scripts/build_domain_holdout_split.py`
+
+Implemented:
+- Protocol-based holdout split generation for OASIS (example: `MR2` holdout).
+- Subject-level grouping to prevent MR1/MR2 cross-split contamination.
+- Automatic split summary + overlap checks.
+
+Generated Artifact:
+- `data/splits/patient_split_domain_holdout.json`
+
+Validation Output:
+- OASIS subject overlap (train-val/train-test/val-test): `0 / 0 / 0`
+
+Outcome:
+- Stronger domain-shift evaluation pathway established.
+
+---
+
+### Step 18.5 - Reliability Display Source Alignment
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Replaced benchmark extraction from free-text `PROJECT_LOG.md` with artifact-backed metrics from:
+  - `outputs/calibration/threshold_report.json`
+- Reliability cards now use held-out calibration metrics directly.
+
+Outcome:
+- UI reliability indicators now reflect machine-generated calibration artifacts rather than manual log text.
+
+---
+
+### Step 18.6 - Executed Workflow Commands (Runbook)
+
+Commands executed in sequence:
+
+1. Train with domain-holdout split:
+   - `c:/Shayan/coding/pbl/image-processing-mri/venv/Scripts/python.exe train.py --split-path data/splits/patient_split_domain_holdout.json`
+
+2. Recalibrate threshold on held-out validation split:
+   - `c:/Shayan/coding/pbl/image-processing-mri/venv/Scripts/python.exe scripts/calibrate_threshold.py --split-json data/splits/patient_split_domain_holdout.json --split-name val`
+
+3. Run metadata bias audit:
+   - `c:/Shayan/coding/pbl/image-processing-mri/venv/Scripts/python.exe scripts/metadata_bias_audit.py --split-json data/splits/patient_split_domain_holdout.json`
+
+Status:
+- Commands completed successfully in current environment.
+
+---
+
+### Step 18 Summary
+
+This step delivered:
+
+1. Verified leakage-safe splitting while exposing residual shortcut bias risk
+2. Canonical 3D harmonization integrated across train and inference
+3. Automated metadata-only shortcut audit tooling
+4. Protocol-based cross-domain holdout split generation
+5. Artifact-backed reliability metrics in Streamlit
+6. Reproducible 3-command runbook for retrain, recalibration, and bias audit
+
+Overall Outcome:
+The project moved from suspiciously perfect metrics toward a more defensible, bias-aware, and evaluation-rigorous workflow.
+
+---

@@ -1073,11 +1073,12 @@ def build_gradcam_slice_ranking(
     for idx in candidate_indices:
         slice_image = input_batch[idx][1].detach().cpu().numpy()
         brain_visibility = compute_brain_visibility_score(slice_image)
+        target_class = int(slice_preds[idx])
         heatmap = build_gradcam_for_slice(
             model,
             device,
             input_batch[idx],
-            target_class=1,
+            target_class=target_class,
             smooth_kernel=gradcam_smooth_kernel,
             clip_percentiles=(gradcam_clip_low, gradcam_clip_high),
             apply_brain_mask=True,
@@ -1253,25 +1254,35 @@ def create_gradcam_composite_image(slice_img: np.ndarray, heatmap_on_brain: np.n
 
 
 @st.cache_data
-def load_reference_metrics(log_path: str = "PROJECT_LOG.md") -> dict[str, float]:
+def load_reference_metrics(
+    calibration_report_path: str = "outputs/calibration/threshold_report.json",
+) -> dict[str, float]:
     metrics: dict[str, float] = {}
-    try:
-        with open(log_path, "r", encoding="utf-8") as f:
-            text = f.read()
-    except OSError:
+    path = Path(calibration_report_path)
+    if not path.exists():
         return metrics
 
-    # Pull latest benchmark values from the project log if available.
-    test_acc_matches = re.findall(r"Test Accuracy:\s*~?([0-9]+(?:\.[0-9]+)?)%", text, flags=re.IGNORECASE)
-    auc_matches = re.findall(r"ROC-AUC:\s*~?([0-9]+(?:\.[0-9]+)?)", text, flags=re.IGNORECASE)
-    patient_acc_matches = re.findall(r"Patient-level accuracy:\s*~?([0-9]+(?:\.[0-9]+)?)%", text, flags=re.IGNORECASE)
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        return metrics
 
-    if test_acc_matches:
-        metrics["test_accuracy"] = float(test_acc_matches[-1])
-    if auc_matches:
-        metrics["roc_auc"] = float(auc_matches[-1])
-    if patient_acc_matches:
-        metrics["patient_accuracy"] = float(patient_acc_matches[-1])
+    recommended = payload.get("recommended", {})
+    if isinstance(recommended, dict):
+        accuracy = recommended.get("accuracy")
+        sensitivity = recommended.get("sensitivity")
+        specificity = recommended.get("specificity")
+        if accuracy is not None:
+            metrics["heldout_accuracy"] = float(accuracy) * 100.0
+        if sensitivity is not None:
+            metrics["heldout_sensitivity"] = float(sensitivity)
+        if specificity is not None:
+            metrics["heldout_specificity"] = float(specificity)
+
+    scope = payload.get("calibration_scope")
+    if isinstance(scope, str):
+        metrics["calibration_scope"] = scope
+
     return metrics
 
 
@@ -1441,12 +1452,12 @@ st.caption(f"{decision_title}: {decision_detail}")
 st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 st.subheader("Result Reliability")
 
-reference_accuracy = reference_metrics.get("test_accuracy")
-reference_patient_accuracy = reference_metrics.get("patient_accuracy")
-reference_auc = reference_metrics.get("roc_auc")
+heldout_accuracy = reference_metrics.get("heldout_accuracy")
+heldout_sensitivity = reference_metrics.get("heldout_sensitivity")
+heldout_specificity = reference_metrics.get("heldout_specificity")
+calibration_scope = reference_metrics.get("calibration_scope", "held-out split")
 
-max_model_accuracy_candidates = [m for m in [reference_accuracy, reference_patient_accuracy] if m is not None]
-max_model_accuracy_text = f"{max(max_model_accuracy_candidates):.2f}%" if max_model_accuracy_candidates else "N/A"
+heldout_accuracy_text = f"{heldout_accuracy:.2f}%" if heldout_accuracy is not None else "N/A"
 
 st.markdown(
     f"""
@@ -1467,9 +1478,9 @@ st.markdown(
         <div class="detail-helper">Slices agreeing with patient decision</div>
     </div>
     <div class="detail-card">
-        <div class="detail-label">Max model accuracy</div>
-        <div class="detail-value">{max_model_accuracy_text}</div>
-        <div class="detail-helper">Best benchmark from recorded model metrics</div>
+        <div class="detail-label">Held-out calibration accuracy</div>
+        <div class="detail-value">{heldout_accuracy_text}</div>
+        <div class="detail-helper">From threshold_report.json ({calibration_scope})</div>
     </div>
 </div>
 """,
@@ -1483,14 +1494,14 @@ with advanced_box:
             f"""
 - Composite confidence score: **{confidence_score * 100:.1f}%** (combines class probability + decision margin).
 - Prediction uncertainty (entropy-based): **{uncertainty * 100:.1f}%**.
-- Reference patient-level accuracy: **{reference_patient_accuracy:.2f}%**.
-- Reference ROC-AUC: **{reference_auc:.4f}**.
+    - Held-out sensitivity: **{heldout_sensitivity:.4f}**.
+    - Held-out specificity: **{heldout_specificity:.4f}**.
 """
-            if reference_patient_accuracy is not None and reference_auc is not None
+            if heldout_sensitivity is not None and heldout_specificity is not None
             else f"""
 - Composite confidence score: **{confidence_score * 100:.1f}%** (combines class probability + decision margin).
 - Prediction uncertainty (entropy-based): **{uncertainty * 100:.1f}%**.
-- Reference accuracy values are unavailable in `PROJECT_LOG.md`.
+    - Held-out calibration metrics are unavailable in outputs/calibration/threshold_report.json.
 """
         )
 
@@ -1540,7 +1551,6 @@ best_explanation_slice_label = f"#{best_explanation_slice_index + 1}"
 current_slice_display = f"{slice_index + 1} / {len(valid_slices)}"
 prediction_display = "Tumor" if pred_label == 1 else "Normal"
 confidence_display = f"{confidence_score * 100:.2f}%"
-tumor_probability_display = f"{patient_score * 100:.2f}%"
 best_explanation_slice = best_explanation_slice_label
 
 st.markdown(
@@ -1562,11 +1572,6 @@ st.markdown(
             <div class="slice-analysis-label">Confidence</div>
             <div class="slice-analysis-value">{confidence_display}</div>
             <div class="slice-analysis-helper">MRI-level confidence for this model decision</div>
-        </div>
-        <div class="slice-analysis-card">
-            <div class="slice-analysis-label">Tumor Probability</div>
-            <div class="slice-analysis-value">{tumor_probability_display}</div>
-            <div class="slice-analysis-helper">Aggregated tumor probability for this MRI file</div>
         </div>
         <div class="slice-analysis-card">
             <div class="slice-analysis-label">Best Explanation Slice</div>

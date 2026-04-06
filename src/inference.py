@@ -8,6 +8,7 @@ import torch
 from models.model import BrainMRICNN
 from src.preprocessing.load_nifti import load_nifti
 from src.preprocessing.normalize import zscore_normalize
+from src.preprocessing.resample_3d import resample_volume_3d
 from src.preprocessing.slice_extraction import extract_valid_slices
 from src.preprocessing.resize import resize_sample
 from src.utils.gradcam import GradCAM
@@ -48,15 +49,21 @@ def _stack_25d_from_valid_slices(valid_slices: List[np.ndarray]) -> List[np.ndar
     return samples
 
 
-def preprocess_volume(volume: np.ndarray, image_size: Tuple[int, int] = (224, 224)) -> Dict[str, object]:
+def preprocess_volume(
+    volume: np.ndarray,
+    image_size: Tuple[int, int] = (224, 224),
+    canonical_shape: Tuple[int, int, int] = (192, 192, 160),
+    fixed_slice_count: int = 96,
+) -> Dict[str, object]:
     """Preprocess 3D MRI volume and build per-slice 2.5D tensors."""
     if len(volume.shape) == 4:
         volume = volume[..., 0]
 
     volume = volume.astype(np.float32, copy=False)
+    volume = resample_volume_3d(volume, target_shape=canonical_shape)
     volume = zscore_normalize(volume)
 
-    valid_slices = extract_valid_slices(volume)
+    valid_slices = extract_valid_slices(volume, fixed_count=fixed_slice_count)
     if not valid_slices:
         raise ValueError("No valid slices found after filtering. Try a different scan.")
 
@@ -78,6 +85,8 @@ def preprocess_uploaded_nifti(
     uploaded_bytes: bytes,
     uploaded_filename: str | None = None,
     image_size: Tuple[int, int] = (224, 224),
+    canonical_shape: Tuple[int, int, int] = (192, 192, 160),
+    fixed_slice_count: int = 96,
 ) -> Dict[str, object]:
     """Load uploaded NIfTI bytes and return preprocessed tensors and source slices."""
     suffix = ".nii.gz"
@@ -96,7 +105,12 @@ def preprocess_uploaded_nifti(
         except OSError:
             pass
 
-    return preprocess_volume(volume, image_size=image_size)
+    return preprocess_volume(
+        volume,
+        image_size=image_size,
+        canonical_shape=canonical_shape,
+        fixed_slice_count=fixed_slice_count,
+    )
 
 
 def predict_slices(

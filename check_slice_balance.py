@@ -13,7 +13,7 @@ train_loader = DataLoader(
 
 all_labels = []
 
-for _, labels in train_loader:
+for _, labels, _ in train_loader:
     all_labels.extend(labels.tolist())
 
 print("Total slices:", len(all_labels))
