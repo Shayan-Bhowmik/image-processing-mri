@@ -1,91 +1,80 @@
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torchvision import models
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
 
 
 class GradCAM:
-    def __init__(self, model, target_layer):
+
+    def __init__(self, model):
+
         self.model = model
-        self.target_layer = target_layer
-        self.feature_maps = None
-        self.gradients = None
-        self._register_hooks()
+        self.model.eval()
 
-    def _register_hooks(self):
-
-        def forward_hook(module, input, output):
-            self.feature_maps = output
-
-        def backward_hook(module, grad_input, grad_output):
-            self.gradients = grad_output[0]
-
-        self.target_layer.register_forward_hook(forward_hook)
-        self.target_layer.register_backward_hook(backward_hook)
-
-    def generate_cam(self, input_tensor):
+    def generate(self, input_tensor):
+        """
+        Generate GradCAM heatmap
+        """
 
         output = self.model(input_tensor)
+
         class_idx = torch.argmax(output)
 
         self.model.zero_grad()
+
         output[0, class_idx].backward()
 
-        gradients = self.gradients
-        feature_maps = self.feature_maps
+        gradients = self.model.gradients
+        activations = self.model.activations
 
-        weights = torch.mean(gradients, dim=(2, 3), keepdim=True)
-        cam = torch.sum(weights * feature_maps, dim=1)
+        pooled_gradients = torch.mean(gradients, dim=[0, 2, 3])
 
-        cam = F.relu(cam)
-        cam = cam.squeeze().detach().cpu().numpy()
+        for i in range(activations.shape[1]):
 
-        cam = (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
+            activations[:, i, :, :] *= pooled_gradients[i]
 
-        return cam
+        heatmap = torch.mean(activations, dim=1).squeeze()
 
+        heatmap = heatmap.detach().cpu().numpy()
 
-def generate_dummy_mri():
-    """Create a fake MRI-like image"""
-    img = np.zeros((224,224,3), dtype=np.uint8)
+        heatmap = np.maximum(heatmap, 0)
 
-    cv2.circle(img,(112,112),80,(120,120,120),-1)
-    cv2.circle(img,(140,100),25,(200,200,200),-1)  # fake tumor
+        heatmap = heatmap / np.max(heatmap)
 
-    return img
+        return heatmap
 
 
-def overlay_heatmap(original_image, heatmap):
+def brain_mask(slice_img):
+    """
+    Remove skull edges from GradCAM
+    """
 
-    heatmap = cv2.resize(heatmap,(224,224))
-    heatmap = np.uint8(255 * heatmap)
-    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+    mask = slice_img > 0
 
-    overlay = cv2.addWeighted(original_image,0.6,heatmap,0.4,0)
-
-    return overlay
+    return mask.astype(float)
 
 
-if __name__ == "__main__":
+def overlay(slice_img, heatmap):
 
-    model = models.resnet50(weights=None)
-    model.fc = nn.Linear(2048,2)
-    model.eval()
+    import cv2
+    import numpy as np
 
-    gradcam = GradCAM(model, model.layer4)
+    # Resize heatmap to match slice
+    heatmap = cv2.resize(heatmap, (slice_img.shape[1], slice_img.shape[0]))
 
-    dummy_image = generate_dummy_mri()
+    # Normalize heatmap
+    heatmap = heatmap - heatmap.min()
+    heatmap = heatmap / (heatmap.max() + 1e-8)
 
-    input_tensor = torch.tensor(dummy_image/255.).permute(2,0,1).unsqueeze(0).float()
+    # Convert heatmap to color
+    heatmap = cv2.applyColorMap(np.uint8(255 * heatmap), cv2.COLORMAP_JET)
 
-    cam = gradcam.generate_cam(input_tensor)
+    # Convert slice to RGB
+    if len(slice_img.shape) == 2:
+        slice_img = cv2.cvtColor(np.uint8(slice_img), cv2.COLOR_GRAY2RGB)
 
-    overlay = overlay_heatmap(dummy_image, cam)
+    slice_img = cv2.resize(slice_img, (heatmap.shape[1], heatmap.shape[0]))
 
-    plt.imshow(overlay)
-    plt.title("Grad-CAM Example")
-    plt.axis("off")
-    plt.show()
+    # Blend images
+    overlay_img = cv2.addWeighted(slice_img, 0.6, heatmap, 0.4, 0)
+
+    return overlay_img

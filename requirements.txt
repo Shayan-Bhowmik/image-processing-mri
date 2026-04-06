@@ -19,9 +19,11 @@ pandas==3.0.1
 pillow==12.1.1
 pyparsing==3.3.2
 python-dateutil==2.9.0.post0
+reportlab==4.4.4
 scikit-learn==1.8.0
 scipy==1.17.0
 six==1.17.0
+streamlit==1.49.1
 sympy==1.14.0
 threadpoolctl==3.6.0
 torch==2.10.0

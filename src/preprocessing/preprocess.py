@@ -1,21 +1,31 @@
-import cv2
 import numpy as np
-
-def preprocess_slice(slice_25d):
-
-    # Resize
-    resized = cv2.resize(slice_25d, (224, 224))
-
-    # Normalize
-    normalized = resized / np.max(resized)
-
-    return normalized
+import cv2
 
 
-if __name__ == "__main__":
+def normalize(slice_img):
+    """
+    Z-score normalization on non-zero voxels
+    """
 
-    dummy = np.random.rand(240,240,3)
+    mask = slice_img != 0
 
-    processed = preprocess_slice(dummy)
+    if mask.sum() == 0:
+        return slice_img
 
-    print("Processed shape:", processed.shape)
+    mean = slice_img[mask].mean()
+    std = slice_img[mask].std()
+
+    if std == 0:
+        std = 1
+
+    slice_img = (slice_img - mean) / std
+
+    return slice_img
+
+
+def resize_slice(slice_img, size=224):
+    """
+    Resize slice to CNN input size
+    """
+
+    return cv2.resize(slice_img, (size, size))

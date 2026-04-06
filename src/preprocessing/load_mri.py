@@ -1,27 +1,19 @@
 import nibabel as nib
 import numpy as np
-import matplotlib.pyplot as plt
 
-# absolute MRI path
-file_path = r"C:\brats\BraTS2020_TrainingData\MICCAI_BraTS2020_TrainingData\BraTS20_Training_001\BraTS20_Training_001_flair.nii"
 
-# load MRI volume
-mri = nib.load(file_path)
+def load_nifti(file_path):
+    """
+    Load a NIfTI MRI file and return the volume as numpy array
+    """
 
-# convert to numpy array
-mri_data = mri.get_fdata()
+    mri = nib.load(file_path)
 
-print("MRI shape:", mri_data.shape)
+    volume = mri.get_fdata()
 
-# total slices
-num_slices = mri_data.shape[2]
-print("Total slices:", num_slices)
+    volume = np.asarray(volume, dtype=np.float32)
 
-# show middle slice (verification)
-mid = num_slices // 2
-slice_img = mri_data[:, :, mid]
+    if volume.ndim == 4:
+        volume = volume[:, :, :, 0]
 
-plt.imshow(slice_img, cmap="gray")
-plt.title(f"Slice {mid}")
-plt.axis("off")
-plt.show()
+    return volume
