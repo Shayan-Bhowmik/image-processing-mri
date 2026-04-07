@@ -341,47 +341,48 @@ body, p, div, span, label {
 
 .slice-analysis-grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
     align-items: stretch;
 }
 
 .slice-analysis-card {
-    background: transparent;
-    border: none;
-    border-radius: 18px;
-    padding: 6px 8px 6px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    box-shadow: 0 5px 12px var(--shadow);
     min-height: 118px;
 }
 
 .slice-analysis-label {
-    color: var(--text-main);
-    font-size: 1rem;
-    line-height: 1.1;
-    margin-bottom: 10px;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.15;
+    margin-bottom: 4px;
 }
 
 .slice-analysis-value {
     color: var(--text-main);
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 2.45rem;
-    line-height: 1;
-    font-weight: 400;
+    font-size: 2.1rem;
+    line-height: 1.05;
+    font-weight: 700;
     letter-spacing: 0.01em;
 }
 
 .slice-analysis-value-sm {
     color: var(--text-main);
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 2.1rem;
-    line-height: 1;
-    font-weight: 400;
+    font-size: 1.85rem;
+    line-height: 1.05;
+    font-weight: 700;
 }
 
 .slice-analysis-helper {
     color: var(--text-muted);
-    font-size: 0.82rem;
-    margin-top: 8px;
+    font-size: 0.78rem;
+    margin-top: 4px;
 }
 
 .slice-analysis-arrow {
@@ -660,6 +661,54 @@ body, p, div, span, label {
 
 .stMarkdown, .stCaption, .stSlider, .stTextInput, .stToggle {
     color: var(--text-main);
+}
+
+.stFileUploader label {
+    color: var(--text-main) !important;
+    background-color: transparent !important;
+}
+
+.stFileUploader label span {
+    color: var(--text-main) !important;
+    background-color: transparent !important;
+}
+
+.stFileUploader [data-testid="stFileUploadDropzone"] label {
+    color: var(--text-main) !important;
+    background-color: transparent !important;
+}
+
+/* Override any accent colors in file uploader */
+.stFileUploader {
+    color: var(--text-main) !important;
+}
+
+/* Remove blue highlight from file uploader label */
+.stFileUploader [class*="label"] {
+    background-color: transparent !important;
+    color: var(--text-main) !important;
+}
+
+/* Override accent soft color in file uploader */
+.stFileUploader [style*="background"] {
+    background-color: transparent !important;
+}
+
+.stFileUploader label > div {
+    background-color: transparent !important;
+    color: var(--text-main) !important;
+}
+
+/* Make dropzone text white - highest specificity */
+.stFileUploader [data-testid="stFileUploadDropzone"],
+.stFileUploader [data-testid="stFileUploadDropzone"] * {
+    color: #ffffff !important;
+}
+
+.stFileUploader [data-testid="stFileUploadDropzone"] div,
+.stFileUploader [data-testid="stFileUploadDropzone"] p,
+.stFileUploader [data-testid="stFileUploadDropzone"] span {
+    color: #ffffff !important;
 }
 
 .stButton button,
@@ -1397,19 +1446,21 @@ reference_metrics = load_reference_metrics()
 top_k_slices = min(5, len(slice_probs))
 top_indices = np.argsort(slice_probs)[-top_k_slices:][::-1]
 
-st.markdown('<div class="section-wrap">', unsafe_allow_html=True)
-st.subheader("Study Snapshot")
-
-uploaded_name = uploaded_file.name
-download_base_name = download_stem(uploaded_name)
 st.markdown(
     f"""
-<div class="subtle">Loaded volume</div>
-<div class="mono">{uploaded_name}</div>
+<div class="section-wrap">
+    <div style="margin-bottom: 8px;">
+        <h2 style="font-size: 1.65rem; font-weight: 700; margin: 0 0 4px 0; color: var(--text-main); letter-spacing: 0.2px;">Study Snapshot</h2>
+    </div>
+    <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px; letter-spacing: 0.15px;">Loaded volume</div>
+    <div style="font-family: var(--app-font); font-size: 0.95rem; color: var(--text-main); font-weight: 500; word-break: break-word; letter-spacing: 0.2px;">{uploaded_file.name}</div>
+</div>
 """,
     unsafe_allow_html=True,
 )
-st.markdown("</div>", unsafe_allow_html=True)
+
+uploaded_name = uploaded_file.name
+download_base_name = download_stem(uploaded_name)
 
 st.subheader("Prediction Summary")
 st.markdown(
@@ -1507,6 +1558,7 @@ with advanced_box:
 
 interpretation_box = st.container(border=True)
 with interpretation_box:
+    st.markdown('<div style="margin-top: -72px;"></div>', unsafe_allow_html=True)
     with st.expander("How to interpret this output", expanded=False):
         st.markdown(
             """
@@ -1518,7 +1570,22 @@ with interpretation_box:
         )
 
 max_index = len(valid_slices) - 1
-default_index = int(np.argmax(slice_probs))
+
+# Calculate best explanation slice index first, before slider
+with st.spinner("Selecting the best explanation slice..."):
+    gradcam_ranking_df = build_gradcam_slice_ranking(
+        model=model,
+        device=device,
+        input_batch=input_batch,
+        slice_probs=slice_probs,
+        slice_preds=slice_preds,
+        gradcam_smooth_kernel=gradcam_smooth_kernel,
+        gradcam_clip_low=gradcam_clip_low,
+        gradcam_clip_high=gradcam_clip_high,
+    )
+
+best_explanation_slice_index = int(gradcam_ranking_df.iloc[0]["slice_index"])
+default_index = best_explanation_slice_index
 slice_index = st.slider("Slice index", min_value=0, max_value=max_index, value=default_index, step=1)
 
 
@@ -1534,21 +1601,9 @@ else:
 slice_img = np.clip((slice_img - p_low) / (p_high - p_low + 1e-8), 0.0, 1.0)
 selected_prob = float(slice_probs[slice_index])
 
-gradcam_ranking_df = build_gradcam_slice_ranking(
-    model=model,
-    device=device,
-    input_batch=input_batch,
-    slice_probs=slice_probs,
-    slice_preds=slice_preds,
-    gradcam_smooth_kernel=gradcam_smooth_kernel,
-    gradcam_clip_low=gradcam_clip_low,
-    gradcam_clip_high=gradcam_clip_high,
-)
+best_explanation_slice_label = f"#{best_explanation_slice_index}"
 
-best_explanation_slice_index = int(gradcam_ranking_df.iloc[0]["slice_index"])
-best_explanation_slice_label = f"#{best_explanation_slice_index + 1}"
-
-current_slice_display = f"{slice_index + 1} / {len(valid_slices)}"
+current_slice_display = f"{slice_index} / {len(valid_slices) - 1}"
 prediction_display = "Tumor" if pred_label == 1 else "Normal"
 confidence_display = f"{confidence_score * 100:.2f}%"
 best_explanation_slice = best_explanation_slice_label
@@ -1769,7 +1824,7 @@ with ranking_tab:
                 {
                     "selector": "th",
                     "props": [
-                        ("background-color", "#8ec8ff"),
+                        ("background-color", "#b3d9ff"),
                         ("color", "#0f172a"),
                         ("font-weight", "600"),
                         ("text-align", "center"),
@@ -1783,7 +1838,7 @@ with ranking_tab:
                 }
             ]
         )
-        .set_properties(**{"background-color": "#eaf4ff", "color": "#0f172a", "text-align": "center"})
+        .set_properties(**{"background-color": "#b3d9ff", "color": "#0f172a", "text-align": "center"})
     )
     st.dataframe(ranking_styler, use_container_width=True, hide_index=True)
     st.markdown(

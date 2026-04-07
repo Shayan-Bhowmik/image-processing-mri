@@ -2071,4 +2071,182 @@ Recommended reporting language:
 Outcome:
 - Project has reached a defensible research-ready milestone with explicit strengths and limitations.
 
+--- 
+## Step 20 - Streamlit UI Refinement & Explainability-Driven Slice Selection
+
+### Objective
+
+Refine the Streamlit dashboard to improve visual hierarchy, professional presentation, and usability. Implement slice-selection logic that defaults to the best Grad-CAM explanation rather than highest tumor probability to prioritize interpretability.
+
+---
+
+### Step 20.1 - Slice-Level Analysis Panel: Card Layout Conversion
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Converted Slice-Level Analysis section from 5-column grid to 4-column card layout
+- Applied bordered, shadowed card styling consistent with Result Reliability panel
+- Updated CSS classes:
+  - Grid: `grid-template-columns: repeat(4, minmax(0, 1fr))`
+  - Card: Added background, border, box-shadow styling
+  - Label: Updated color to `text-muted`, better typography hierarchy
+  - Value: Adjusted font sizing and weight for visual balance
+  - Helper text: Refined color and spacing
+
+Outcome:
+- Slice-Level Analysis now displays as four distinct, equally-spaced card blocks
+- Visual consistency with Result Reliability section
+- Improved readability and professional appearance
+
+---
+
+### Step 20.2 - Study Snapshot: Styled Containment & Typography
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Moved Study Snapshot heading and content into unified `section-wrap` container
+- Implemented inline HTML/CSS styling:
+  - Removed center alignment (left-aligned for scannability)
+  - Decreased vertical spacing between heading and label text
+  - Applied professional typography with letter-spacing and line-height
+  - Updated heading font size: 1.65rem (retained from original scale)
+
+Outcome:
+- Study Snapshot now displays as a cohesive, professionally-styled block
+- Heading and content fully contained within bordered box
+- Left-aligned text improves readability
+
+---
+
+### Step 20.3 - Top Slices Table: Unified Light Blue Styling
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Applied uniform light blue (#b3d9ff) to entire Top Slices table:
+  - Header background: #b3d9ff
+  - Cell background: #b3d9ff (previously #eaf4ff)
+- Maintained dark text color for contrast
+- Applied pandas Styler for consistent table rendering
+
+Outcome:
+- Top Slices table now displays with a unified, cohesive light blue color
+- All cells (headers and data rows) use the same background color
+- Improved visual consistency with the app's light theme
+
+---
+
+### Step 20.4 - File Uploader: Label Visibility Restoration
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Added CSS rules to fix file uploader label text color:
+  - .stFileUploader label: Applied color: var(--text-main), background-color: transparent
+  - .stFileUploader label span: Removed blue highlight background
+  - Targeted multiple class-based selectors to override Streamlit defaults
+
+Outcome:
+- File uploader label text now matches the color of text above it
+- Eliminated blue highlight that was obscuring readability
+- Consistent label appearance across upload interface
+
+---
+
+### Step 20.5 - File Uploader: Dropzone Text Whitening
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Added CSS rules to make dropzone text white:
+  - .stFileUploader [data-testid="stFileUploadDropzone"]: Set color: #ffffff !important
+  - Applied to all child elements within dropzone for full coverage
+  - Added multiple targeting strategies for robustness
+
+Outcome:
+- Dropzone text ("Drag and drop file here", "Limit 200MB...") now displays in white
+- Better contrast against dark dropzone background
+- Improved readability for users uploading files
+
+---
+
+### Step 20.6 - Slider: Default to Best Explanation Slice
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Moved Grad-CAM ranking calculation before slider creation
+- Used `with st.spinner()` to show processing status while computing ranking
+- Extracted `best_explanation_slice_index` from ranking before slider instantiation
+- Set slider default value to `best_explanation_slice_index` instead of `argmax(slice_probs)`
+- Removed duplicate ranking calculation that occurred after slider
+
+Outcome:
+- Slider now defaults to the best Grad-CAM explanation slice for every MRI scan
+- Users immediately see the most interpretable slice upon upload
+- Prioritizes explainability over raw tumor probability
+
+---
+
+### Step 20.7 - Slice Indexing: Consistent 0-Based Display
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Changed `best_explanation_slice_label` from `f"#{best_explanation_slice_index + 1}"` to `f"#{best_explanation_slice_index}"`
+- Updated `current_slice_display` from `f"{slice_index + 1} / {len(valid_slices)}"` to `f"{slice_index} / {len(valid_slices) - 1}"`
+
+Rationale:
+- Internal slicing uses 0-based indexing
+- Displaying 0-based indices maintains consistency with internal representation
+- Users see indices that directly correspond to program logic
+
+Outcome:
+- All slice indices are now consistently 0-indexed throughout the app
+- Slice numbering matches internal data representation
+- Reduced potential for off-by-one confusion during development
+
+---
+
+### Step 20.8 - Expander Blocks: Reduced Spacing
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Added negative top margin to "How to interpret this output" container:
+  - Changed from `-48px` to `-72px` for the `margin-top` styling
+- This pulls the "How to interpret" expander block closer to "Advanced reliability details"
+
+Outcome:
+- Spacing between the two expander blocks reduced to near-zero
+- Blocks now appear directly stacked, improving visual cohesion
+- More compact dashboard layout
+
+---
+
+### Step 20 Summary
+
+This session delivered comprehensive UI refinements focused on:
+
+1. **Visual Hierarchy**: Slice-Level Analysis converted to card layout for consistency
+2. **Professional Styling**: Study Snapshot styled as contained, left-aligned block
+3. **Color Coherence**: Top Slices table unified to single light blue color
+4. **Text Visibility**: File uploader label and dropzone text made readable
+5. **Explainability Priority**: Slice slider defaults to best Grad-CAM explanation
+6. **Indexing Consistency**: All indices standardized to 0-based display
+7. **Compact Layout**: Reduced spacing between expander blocks
+
+**Overall Outcome**: 
+Streamlit dashboard now presents a more professional, cohesive, and user-friendly interface with improved visual consistency and explainability-driven defaults.
+
 ---
