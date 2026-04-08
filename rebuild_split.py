@@ -6,7 +6,10 @@ from collections import defaultdict
 
 random.seed(42)
 
-brats_root = "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
+brats_roots = [
+    "data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData",
+    "data/raw/brats2021_extracted",
+]
 oasis_root = "data/raw/oasis/OASIS_Clean_Data/OASIS_Clean_Data"
 
 
@@ -17,11 +20,23 @@ def split_list(items, train_ratio=0.7, val_ratio=0.15):
     return items[:train_end], items[train_end:val_end], items[val_end:]
 
 
-brats_patients = [
-    {"id": p, "label": 1}
-    for p in os.listdir(brats_root)
-    if os.path.isdir(os.path.join(brats_root, p))
-]
+def collect_brats_patients(roots):
+    patients = []
+    for root in roots:
+        if not os.path.exists(root):
+            continue
+        for p in os.listdir(root):
+            if os.path.isdir(os.path.join(root, p)):
+                patients.append({"id": p, "label": 1})
+
+    # Keep unique ids only (safe if same id appears in multiple roots)
+    unique = {}
+    for entry in patients:
+        unique[entry["id"]] = entry
+    return sorted(unique.values(), key=lambda x: x["id"])
+
+
+brats_patients = collect_brats_patients(brats_roots)
 
 
 oasis_files = [

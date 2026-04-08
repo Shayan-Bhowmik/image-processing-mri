@@ -1,4 +1,5 @@
 import argparse
+import time
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -14,7 +15,7 @@ from sklearn.metrics import (
 import os
 from src.utils.seed import set_seed
 
-from models.model import BrainMRICNN
+from models.model import BrainMRICNN, MultiModalBrainMRI, FlexibleMultiModalBrainMRI
 from src.data.dataloaders import create_dataloaders
 
 
@@ -103,6 +104,7 @@ def train(
     split_path="data/splits/patient_split.json",
     canonical_shape=(192, 192, 160),
     fixed_slice_count=96,
+    exclude_brats2021=False,
 ):
     set_seed(42)
 
@@ -110,7 +112,7 @@ def train(
 
 
     config = {
-        "use_2_5d": True,
+        "use_multimodal": True,
         "patient_threshold": 0.5,
         "patient_top_k": 10,
     }
@@ -119,10 +121,11 @@ def train(
 
     train_loader, val_loader, test_loader = create_dataloaders(
         split_path,
-        batch_size=8,
-        use_2_5d=config["use_2_5d"],
+        batch_size=4,
+        use_2_5d=config.get("use_multimodal", True),
         canonical_shape=canonical_shape,
         fixed_slice_count=fixed_slice_count,
+        exclude_brats2021=exclude_brats2021,
     )
 
 
@@ -131,12 +134,14 @@ def train(
     x, _, *_ = next(iter(train_loader))
     print("Baseline check - Input shape:", x.shape)
 
+    num_modalities = x.shape[1]
+    print(f"Detected {num_modalities} modalities in dataset\n")
 
 
 
-    all_labels = []
-    for _, labels, _ in train_loader:
-        all_labels.extend(labels.tolist())
+
+    # Build class labels directly from indexed metadata to avoid a full lazy-loading pass.
+    all_labels = [label for _, _, label in train_loader.dataset.index_map]
 
     print("Total samples:", len(all_labels))
     print("Class 0 count:", all_labels.count(0))
@@ -154,8 +159,21 @@ def train(
 
 
 
-    in_channels = 3 if config["use_2_5d"] else 1
-    model = BrainMRICNN(num_classes=2, in_channels=in_channels).to(device)
+    modality_dropout_rate = 0.1
+    model = FlexibleMultiModalBrainMRI(
+        num_classes=2,
+        num_modalities=num_modalities,
+        modality_dropout_rate=modality_dropout_rate,
+    ).to(device)
+
+    print(f"\n{'='*70}")
+    print("FLEXIBLE MULTI-MODAL MRI MODEL WITH WEIGHTED FUSION")
+    print(f"{'='*70}")
+    print(f"Number of modalities (auto-detected): {num_modalities}")
+    print(f"Modality dropout rate (for robustness): {modality_dropout_rate}")
+    print("Architecture: Adaptive Conv + Weighted Fusion + 3-layer CNN")
+    print("Model adapts to ANY number of modalities automatically!")
+    print(f"{'='*70}\n")
 
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
@@ -167,27 +185,34 @@ def train(
         patience=1
     )
 
-    num_epochs = 60
+    num_epochs = 20
     best_val_patient_acc = 0.0
 
     os.makedirs("checkpoints", exist_ok=True)
 
-
-
+    print("\n" + "="*70)
+    print("STARTING TRAINING LOOP")
+    print("="*70 + "\n")
 
     for epoch in range(num_epochs):
+        epoch_start_time = time.time()
         model.train()
 
         running_loss = 0.0
         correct = 0
         total = 0
+        
+        print(f"Epoch {epoch + 1}/{num_epochs} - Starting batch processing...")
 
-        for images, labels, _ in train_loader:
+        for batch_idx, (images, labels, _) in enumerate(train_loader):
+            if batch_idx % 100 == 0:
+                print(f"  Batch {batch_idx}/{len(train_loader)}", end='\r')
+            
             images = images.to(device)
             labels = labels.to(device)
 
             optimizer.zero_grad()
-            outputs = model(images)
+            outputs = model(images, apply_modality_dropout=True)
             loss = criterion(outputs, labels)
 
             loss.backward()
@@ -215,12 +240,25 @@ def train(
         )
 
         scheduler.step(val_loss)
+        current_lr = optimizer.param_groups[0]["lr"]
+        epoch_seconds = time.time() - epoch_start_time
+
+        if (epoch + 1) % 5 == 0 or epoch == 0:
+            modality_weights = model.get_modality_weights(
+                modality_names=[f"M{i}" for i in range(num_modalities)]
+            )
+            print(f"\nLearned Modality Weights (epoch {epoch+1}):")
+            for mod, weight in modality_weights.items():
+                bar_length = int(weight * 30)
+                bar = "█" * bar_length + "░" * (30 - bar_length)
+                print(f"  {mod:8s}: {weight:.4f} |{bar}|")
 
         print(f"Epoch [{epoch+1}/{num_epochs}]")
         print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.2f}%")
         print(f"Val   Loss: {val_loss:.4f} | Val   Acc: {val_acc:.2f}%")
         print(f"Val   Patient Acc: {val_patient_acc:.2f}%")
-        print("-" * 50)
+        print(f"Epoch Time: {epoch_seconds:.1f}s | LR: {current_lr:.6f}")
+        print("-" * 70)
 
         if val_patient_acc > best_val_patient_acc:
             best_val_patient_acc = val_patient_acc
@@ -229,6 +267,18 @@ def train(
 
 
 
+
+    print("\n" + "="*70)
+    print("FINAL LEARNED MODALITY WEIGHTS")
+    print("="*70)
+    modality_weights = model.get_modality_weights(
+        modality_names=[f"Modality_{i}" for i in range(num_modalities)]
+    )
+    for mod, weight in modality_weights.items():
+        bar_length = int(weight * 40)
+        bar = "█" * bar_length + "░" * (40 - bar_length)
+        print(f"{mod:15s}: {weight:.4f} |{bar}|")
+    print("="*70 + "\n")
 
     print("\n===== TEST SET EVALUATION =====")
 
@@ -302,10 +352,16 @@ if __name__ == "__main__":
         default=96,
         help="Maximum valid slices sampled per volume",
     )
+    parser.add_argument(
+        "--exclude-brats2021",
+        action="store_true",
+        help="Exclude BRATS 2021 dataset (use only BRATS 2020 + OASIS for faster training)",
+    )
 
     args = parser.parse_args()
     train(
         split_path=args.split_path,
         canonical_shape=tuple(args.canonical_shape),
         fixed_slice_count=int(args.fixed_slice_count),
+        exclude_brats2021=args.exclude_brats2021,
     )

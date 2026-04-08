@@ -20,6 +20,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from src.inference import (
     aggregate_patient_score,
     build_gradcam_for_slice,
+    get_model_input_channels,
     load_trained_model,
     predict_slices,
     preprocess_uploaded_nifti,
@@ -1414,8 +1415,14 @@ except Exception as exc:
     st.error(f"Could not load model: {exc}")
     st.stop()
 
+model_in_channels = get_model_input_channels(model)
+
 try:
-    prep = preprocess_uploaded_nifti(uploaded_file.getvalue(), uploaded_file.name)
+    prep = preprocess_uploaded_nifti(
+        uploaded_file.getvalue(),
+        uploaded_file.name,
+        model_in_channels=model_in_channels,
+    )
 except Exception as exc:
     st.error(f"Could not preprocess MRI file: {exc}")
     st.stop()

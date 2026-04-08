@@ -2250,3 +2250,123 @@ This session delivered comprehensive UI refinements focused on:
 Streamlit dashboard now presents a more professional, cohesive, and user-friendly interface with improved visual consistency and explainability-driven defaults.
 
 ---
+
+## Step 21 - Data Pipeline Simplification, Runtime Stabilization, and UI Integration
+
+### Objective
+
+Stabilize training workflow under real hardware constraints, simplify operations for `.nii`-first training, and align Streamlit inference with the latest trained model architecture.
+
+---
+
+### Step 21.1 - Split and Dataset Coverage Corrections
+
+Issues Identified:
+- `patient_split.json` did not include BraTS2021 entries during one rebuild cycle.
+- Preprocessing initially reflected split composition rather than intended experiment scope.
+
+Fixes:
+- Updated split builder logic to support both BraTS2020 and BraTS2021 roots.
+- Rebuilt split and verified composition:
+  - BraTS2020: 350
+  - BraTS2021: 1251
+  - OASIS: 436
+
+Outcome:
+- Split generation path is now explicit and verifiable for domain-specific experiments.
+
+---
+
+### Step 21.2 - OASIS Modality Semantics Correction
+
+Issue Identified:
+- OASIS scans in this workspace are T1/MPR-like single volumes, but were temporarily mapped as `flair` in file-mode handling.
+
+Fixes:
+- Updated dataset and preprocessing logic to map OASIS file-mode volumes to `t1`.
+- Regenerated OASIS preprocessing outputs to enforce consistent modality keys.
+
+Outcome:
+- Modality naming now matches actual data characteristics, improving interpretability of learned modality weights.
+
+---
+
+### Step 21.3 - Preprocessing Scope Control (BraTS2021 Excluded by Design)
+
+Requirement:
+- Keep BraTS2021 for testing strategy only; do not preprocess it.
+
+Fixes:
+- Removed BraTS2021 from `preprocess_dataset.py` logic.
+- Kept preprocessing scope to:
+  - BraTS2020
+  - OASIS
+
+Operational Cleanup:
+- Deleted BraTS2021 preprocessed cache files when needed.
+- Later removed all NPZ cache files for a clean `.nii`-only workflow.
+
+Outcome:
+- Preprocessing and experimentation scope are now aligned with evaluation intent.
+
+---
+
+### Step 21.4 - NPZ Runtime Path Integration and Simplification Decision
+
+Work Completed:
+- Added optional NPZ-first loading in `MRIDataset` with safe fallback to raw NIfTI on cache failure.
+- Added startup visibility for cache mode.
+
+Observed Runtime Event:
+- Example cache corruption warning (`invalid code lengths set`) on one NPZ file.
+
+Final Decision:
+- User requested simpler operations.
+- Set dataloader default to raw `.nii` mode (`use_preprocessed=False`) to avoid NPZ operational overhead.
+
+Outcome:
+- Training now follows a straightforward and robust `.nii` path by default.
+
+---
+
+### Step 21.5 - Training Loop Observability Improvements
+
+Enhancements:
+- Added per-epoch runtime reporting (`Epoch Time` in seconds).
+- Added current learning rate printout per epoch.
+- Kept explicit train/val loss and accuracy outputs.
+
+Outcome:
+- Long-running training progress is now easier to monitor and estimate.
+
+---
+
+### Step 21.6 - Streamlit Inference Integration with Current Training Architecture
+
+Issue Identified:
+- Streamlit inference path still assumed `BrainMRICNN` while training used `FlexibleMultiModalBrainMRI`.
+
+Fixes:
+- Updated `src/inference.py` to auto-detect checkpoint architecture and instantiate the correct model class.
+- Added model input channel detection and preprocessing adaptation.
+- Updated `app/streamlit_app.py` to pass model-expected channel count during upload preprocessing.
+
+Validation:
+- Inference smoke test confirmed:
+  - Loaded model: `FlexibleMultiModalBrainMRI`
+  - Detected channels: `4`
+
+Outcome:
+- Streamlit UI is now aligned with the latest trained checkpoint format.
+
+---
+
+### Step 21.7 - Current Operational State
+
+- Default training path: raw `.nii` loading
+- BraTS2021 excluded from training via `--exclude-brats2021` when desired
+- Preprocessed NPZ cache is optional, not required
+- Streamlit inference is compatible with current checkpoint architecture
+- Project now supports both simplification-first operation and optional acceleration paths
+
+---

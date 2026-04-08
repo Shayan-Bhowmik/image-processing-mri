@@ -30,6 +30,16 @@ def get_brats_entries(brats_root: Path):
     return entries
 
 
+def get_brats_entries_multi(roots):
+    merged = {}
+    for root in roots:
+        if not root.exists():
+            continue
+        for entry in get_brats_entries(root):
+            merged[entry["id"]] = entry
+    return sorted(merged.values(), key=lambda x: x["id"])
+
+
 def group_oasis_by_subject_and_protocol(oasis_root: Path):
     subject_pattern = re.compile(r"^(OAS\d?_\d{4})_")
     protocol_pattern = re.compile(r"_MR(\d+)_", flags=re.IGNORECASE)
@@ -71,6 +81,10 @@ def main() -> None:
         default="data/raw/brats/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData",
     )
     parser.add_argument(
+        "--brats2021-root",
+        default="data/raw/brats2021_extracted",
+    )
+    parser.add_argument(
         "--oasis-root",
         default="data/raw/oasis/OASIS_Clean_Data/OASIS_Clean_Data",
     )
@@ -84,9 +98,10 @@ def main() -> None:
     random.seed(args.seed)
 
     brats_root = Path(args.brats_root)
+    brats2021_root = Path(args.brats2021_root)
     oasis_root = Path(args.oasis_root)
 
-    brats_entries = get_brats_entries(brats_root)
+    brats_entries = get_brats_entries_multi([brats_root, brats2021_root])
     random.shuffle(brats_entries)
     brats_train, brats_val, brats_test = split_list(
         brats_entries,

@@ -9,6 +9,8 @@ def create_dataloaders(
     use_2_5d=True,
     canonical_shape=(192, 192, 160),
     fixed_slice_count=96,
+    exclude_brats2021=False,
+    use_preprocessed=False,
 ):
     train_paths = load_split(split_path, "train")
     val_paths = load_split(split_path, "val")
@@ -19,18 +21,24 @@ def create_dataloaders(
         use_2_5d=use_2_5d,
         canonical_shape=canonical_shape,
         fixed_slice_count=fixed_slice_count,
+        exclude_brats2021=exclude_brats2021,
+        use_preprocessed=use_preprocessed,
     )
     val_dataset = MRIDataset(
         val_paths,
         use_2_5d=use_2_5d,
         canonical_shape=canonical_shape,
         fixed_slice_count=fixed_slice_count,
+        exclude_brats2021=exclude_brats2021,
+        use_preprocessed=use_preprocessed,
     )
     test_dataset = MRIDataset(
         test_paths,
         use_2_5d=use_2_5d,
         canonical_shape=canonical_shape,
         fixed_slice_count=fixed_slice_count,
+        exclude_brats2021=exclude_brats2021,
+        use_preprocessed=use_preprocessed,
     )
 
     train_loader = DataLoader(
