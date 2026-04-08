@@ -825,6 +825,26 @@ body, p, div, span, label {
 }
 
 /* Replace default red accents in native Streamlit controls */
+.stSelectbox [data-baseweb="select"] > div {
+    background: #CFE5FA !important;
+    border-color: #CFE5FA !important;
+    color: #0f172a !important;
+}
+
+.stSelectbox [data-baseweb="select"] div,
+.stSelectbox [data-baseweb="select"] span,
+.stSelectbox [data-baseweb="select"] input,
+.stSelectbox [data-baseweb="select"] [role="combobox"] {
+    color: #0f172a !important;
+    -webkit-text-fill-color: #0f172a !important;
+}
+
+.stSelectbox [data-baseweb="select"] svg,
+.stSelectbox [data-baseweb="select"] svg * {
+    fill: #0f172a !important;
+    stroke: #0f172a !important;
+}
+
 .stSlider [data-baseweb="slider"] div[role="slider"] {
     background: var(--text-main) !important;
     border-color: var(--text-main) !important;
@@ -1175,6 +1195,19 @@ def download_stem(filename: str) -> str:
     return Path(name).stem
 
 
+def infer_modality_from_filename(filename: str) -> str:
+    name = Path(filename).name.lower()
+    if "t1ce" in name or "t1c" in name:
+        return "t1c"
+    if "flair" in name:
+        return "flair"
+    if "_t2" in name or "-t2" in name or " t2" in name:
+        return "t2"
+    if "_t1" in name or "-t1" in name or " t1" in name or "mpr" in name:
+        return "t1"
+    return "t1"
+
+
 def build_study_report(
     uploaded_name: str,
     patient_score: float,
@@ -1358,6 +1391,12 @@ def load_calibrated_threshold(
 st.sidebar.header("Controls")
 checkpoint_path = "checkpoints/best_model.pth"
 default_threshold = load_calibrated_threshold()
+uploaded_modality = st.sidebar.selectbox(
+    "Uploaded scan modality",
+    options=["auto", "t1", "flair", "t1c", "t2"],
+    index=0,
+    help="For single-volume uploads, this selects which model channel receives the input.",
+)
 threshold = st.sidebar.slider(
     "Decision threshold",
     min_value=0.0,
@@ -1400,9 +1439,9 @@ with st.sidebar.expander("Grad-CAM Quality", expanded=False):
         step=1,
     )
 
-uploaded_file = st.file_uploader("Upload MRI volume (.nii or .nii.gz)", type=["nii", "nii.gz"])
-status_slot = st.empty()
+uploaded_file = st.file_uploader("Upload MRI volume (.nii or .nii.gz)", type=["nii", "nii.gz"], key="single_upload")
 
+status_slot = st.empty()
 render_status_bar(status_slot, model_ready=False, file_name=uploaded_file.name if uploaded_file else None)
 
 if uploaded_file is None:
@@ -1416,21 +1455,34 @@ except Exception as exc:
     st.stop()
 
 model_in_channels = get_model_input_channels(model)
+effective_modality = infer_modality_from_filename(uploaded_file.name) if uploaded_modality == "auto" else uploaded_modality
 
 try:
     prep = preprocess_uploaded_nifti(
         uploaded_file.getvalue(),
         uploaded_file.name,
         model_in_channels=model_in_channels,
+        single_modality_name=effective_modality,
     )
 except Exception as exc:
     st.error(f"Could not preprocess MRI file: {exc}")
     st.stop()
 
-render_status_bar(status_slot, model_ready=True, file_name=uploaded_file.name)
+st.sidebar.caption(f"Using modality channel: {effective_modality}")
+ready_name = uploaded_file.name
+
+render_status_bar(status_slot, model_ready=True, file_name=ready_name)
 
 input_batch = prep["input_batch"]
 valid_slices = prep["valid_slices"]
+
+
+def pick_display_channel(sample_tensor: np.ndarray) -> int:
+    """Pick the channel with strongest non-zero foreground for visualization."""
+    if sample_tensor.ndim != 3 or sample_tensor.shape[0] <= 1:
+        return 0
+    channel_signal = [float(np.count_nonzero(np.abs(sample_tensor[c]) > 1e-8)) for c in range(sample_tensor.shape[0])]
+    return int(np.argmax(channel_signal))
 
 slice_preds, slice_probs = predict_slices(model, input_batch, device)
 patient_score = aggregate_patient_score(slice_probs, top_k=10)
@@ -1460,13 +1512,13 @@ st.markdown(
         <h2 style="font-size: 1.65rem; font-weight: 700; margin: 0 0 4px 0; color: var(--text-main); letter-spacing: 0.2px;">Study Snapshot</h2>
     </div>
     <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px; letter-spacing: 0.15px;">Loaded volume</div>
-    <div style="font-family: var(--app-font); font-size: 0.95rem; color: var(--text-main); font-weight: 500; word-break: break-word; letter-spacing: 0.2px;">{uploaded_file.name}</div>
+    <div style="font-family: var(--app-font); font-size: 0.95rem; color: var(--text-main); font-weight: 500; word-break: break-word; letter-spacing: 0.2px;">{ready_name}</div>
 </div>
 """,
     unsafe_allow_html=True,
 )
 
-uploaded_name = uploaded_file.name
+uploaded_name = ready_name
 download_base_name = download_stem(uploaded_name)
 
 st.subheader("Prediction Summary")
@@ -1595,8 +1647,9 @@ best_explanation_slice_index = int(gradcam_ranking_df.iloc[0]["slice_index"])
 default_index = best_explanation_slice_index
 slice_index = st.slider("Slice index", min_value=0, max_value=max_index, value=default_index, step=1)
 
-
-slice_img = input_batch[slice_index][1].detach().cpu().numpy()
+slice_tensor_np = input_batch[slice_index].detach().cpu().numpy()
+display_channel_idx = pick_display_channel(slice_tensor_np)
+slice_img = slice_tensor_np[display_channel_idx]
 
 
 brain_pixels = slice_img[np.abs(slice_img) > 1e-6]
@@ -1607,6 +1660,8 @@ else:
 
 slice_img = np.clip((slice_img - p_low) / (p_high - p_low + 1e-8), 0.0, 1.0)
 selected_prob = float(slice_probs[slice_index])
+channel_label_map = {0: "FLAIR", 1: "T1", 2: "T1c", 3: "T2"}
+display_channel_name = channel_label_map.get(display_channel_idx, f"Channel {display_channel_idx}")
 
 best_explanation_slice_label = f"#{best_explanation_slice_index}"
 
@@ -1639,6 +1694,11 @@ st.markdown(
             <div class="slice-analysis-label">Best Explanation Slice</div>
             <div class="slice-analysis-value">{best_explanation_slice}</div>
             <div class="slice-analysis-helper">Best Grad-CAM explanation with clear brain visibility</div>
+        </div>
+        <div class="slice-analysis-card">
+            <div class="slice-analysis-label">Display Channel</div>
+            <div class="slice-analysis-value-sm">{display_channel_name}</div>
+            <div class="slice-analysis-helper">Auto-selected channel with strongest visible signal</div>
         </div>
     </div>
 </div>

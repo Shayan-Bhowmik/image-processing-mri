@@ -83,7 +83,11 @@ def _stack_25d_from_valid_slices(valid_slices: List[np.ndarray]) -> List[np.ndar
     return samples
 
 
-def _build_model_input_samples(valid_slices: List[np.ndarray], model_in_channels: int) -> List[np.ndarray]:
+def _build_model_input_samples(
+    valid_slices: List[np.ndarray],
+    model_in_channels: int,
+    single_modality_name: str = "t1",
+) -> List[np.ndarray]:
     """
     Build per-slice model inputs for the expected channel count.
 
@@ -92,6 +96,20 @@ def _build_model_input_samples(valid_slices: List[np.ndarray], model_in_channels
     """
     if model_in_channels == 3:
         return _stack_25d_from_valid_slices(valid_slices)
+
+    if model_in_channels == 4:
+        # Keep channel semantics aligned with training order in dataset loader.
+        # Default order: [flair, t1, t1c, t2]
+        modality_order = ["flair", "t1", "t1c", "t2"]
+        selected_modality = str(single_modality_name).lower().strip()
+        selected_index = modality_order.index(selected_modality) if selected_modality in modality_order else 1
+
+        samples = []
+        for curr_slice in valid_slices:
+            sample = np.zeros((model_in_channels, curr_slice.shape[0], curr_slice.shape[1]), dtype=curr_slice.dtype)
+            sample[selected_index] = curr_slice
+            samples.append(sample)
+        return samples
 
     samples = []
     for curr_slice in valid_slices:
@@ -105,6 +123,7 @@ def preprocess_volume(
     canonical_shape: Tuple[int, int, int] = (192, 192, 160),
     fixed_slice_count: int = 96,
     model_in_channels: int = 3,
+    single_modality_name: str = "t1",
 ) -> Dict[str, object]:
     """Preprocess 3D MRI volume and build per-slice 2.5D tensors."""
     if len(volume.shape) == 4:
@@ -118,7 +137,11 @@ def preprocess_volume(
     if not valid_slices:
         raise ValueError("No valid slices found after filtering. Try a different scan.")
 
-    stacked_samples = _build_model_input_samples(valid_slices, model_in_channels=model_in_channels)
+    stacked_samples = _build_model_input_samples(
+        valid_slices,
+        model_in_channels=model_in_channels,
+        single_modality_name=single_modality_name,
+    )
 
     tensors = []
     for sample in stacked_samples:
@@ -139,6 +162,7 @@ def preprocess_uploaded_nifti(
     canonical_shape: Tuple[int, int, int] = (192, 192, 160),
     fixed_slice_count: int = 96,
     model_in_channels: int = 3,
+    single_modality_name: str = "t1",
 ) -> Dict[str, object]:
     """Load uploaded NIfTI bytes and return preprocessed tensors and source slices."""
     suffix = ".nii.gz"
@@ -163,7 +187,89 @@ def preprocess_uploaded_nifti(
         canonical_shape=canonical_shape,
         fixed_slice_count=fixed_slice_count,
         model_in_channels=model_in_channels,
+        single_modality_name=single_modality_name,
     )
+
+
+def preprocess_uploaded_multimodal_nifti(
+    uploaded_by_modality: Dict[str, Tuple[bytes, str]],
+    image_size: Tuple[int, int] = (224, 224),
+    canonical_shape: Tuple[int, int, int] = (192, 192, 160),
+    fixed_slice_count: int = 96,
+    modality_order: Tuple[str, ...] = ("flair", "t1", "t1c", "t2"),
+) -> Dict[str, object]:
+    """
+    Build a true multi-modal input batch from uploaded NIfTI files.
+
+    Args:
+        uploaded_by_modality: mapping modality -> (bytes, original_filename)
+            Expected keys: flair, t1, t1c, t2 (missing keys are zero-filled).
+    """
+    modality_volumes: Dict[str, np.ndarray] = {}
+
+    for modality in modality_order:
+        if modality not in uploaded_by_modality:
+            continue
+
+        uploaded_bytes, uploaded_filename = uploaded_by_modality[modality]
+        suffix = ".nii.gz"
+        if uploaded_filename and uploaded_filename.lower().endswith(".nii"):
+            suffix = ".nii"
+
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+            tmp.write(uploaded_bytes)
+            tmp_path = tmp.name
+
+        try:
+            volume = load_nifti(tmp_path)
+        finally:
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
+
+        if len(volume.shape) == 4:
+            volume = volume[..., 0]
+
+        volume = volume.astype(np.float32, copy=False)
+        volume = resample_volume_3d(volume, target_shape=canonical_shape)
+        volume = zscore_normalize(volume)
+        modality_volumes[modality] = volume
+
+    if not modality_volumes:
+        raise ValueError("No valid modality files were provided.")
+
+    reference_modality = "flair" if "flair" in modality_volumes else next(iter(modality_volumes.keys()))
+    reference_volume = modality_volumes[reference_modality]
+    valid_slices_ref = extract_valid_slices(reference_volume, fixed_count=fixed_slice_count)
+    if not valid_slices_ref:
+        raise ValueError("No valid slices found after filtering. Try different scan files.")
+
+    modality_slices_map: Dict[str, List[np.ndarray]] = {}
+    for modality, volume in modality_volumes.items():
+        slices = extract_valid_slices(volume, fixed_count=fixed_slice_count)
+        if len(slices) != len(valid_slices_ref):
+            slices = valid_slices_ref
+        modality_slices_map[modality] = slices
+
+    tensors = []
+    for idx in range(len(valid_slices_ref)):
+        channel_slices = []
+        for modality in modality_order:
+            if modality in modality_slices_map:
+                channel_slices.append(modality_slices_map[modality][idx])
+            else:
+                channel_slices.append(np.zeros_like(valid_slices_ref[idx]))
+
+        sample = np.stack(channel_slices, axis=0)
+        tensors.append(resize_sample(sample, size=image_size))
+
+    input_batch = torch.stack(tensors, dim=0).float()
+
+    return {
+        "valid_slices": valid_slices_ref,
+        "input_batch": input_batch,
+    }
 
 
 def predict_slices(
@@ -218,7 +324,20 @@ def build_gradcam_for_slice(
         gradcam.remove_hooks()
 
     if apply_brain_mask:
-        base_slice = sample_tensor[1].detach().cpu().numpy()
+        sample_np = sample_tensor.detach().cpu().numpy()
+
+        # Use the channel with strongest foreground signal for masking.
+        # This prevents blank masks when single-modality uploads are placed in
+        # channels other than index 1 (e.g., FLAIR/T1c/T2 in 4-channel mode).
+        if sample_np.ndim == 3 and sample_np.shape[0] > 1:
+            channel_signal = [float(np.count_nonzero(np.abs(sample_np[c]) > 1e-8)) for c in range(sample_np.shape[0])]
+            best_channel_idx = int(np.argmax(channel_signal))
+            base_slice = sample_np[best_channel_idx]
+        elif sample_np.ndim == 3:
+            base_slice = sample_np[0]
+        else:
+            base_slice = sample_np
+
         base_slice = (base_slice - base_slice.min()) / (base_slice.max() - base_slice.min() + 1e-8)
         brain_mask = (base_slice > brain_mask_threshold).astype(np.float32)
 

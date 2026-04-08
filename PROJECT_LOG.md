@@ -2370,3 +2370,93 @@ Outcome:
 - Project now supports both simplification-first operation and optional acceleration paths
 
 ---
+
+## Step 22 - Single-File UI Finalization, Grad-CAM Visibility Fixes, and Control Styling Updates
+
+### Objective
+
+Finalize the Streamlit experience around single-file uploads, fix visualization issues for single-modality cases, and polish control styling for a cleaner dashboard.
+
+---
+
+### Step 22.1 - Remove Multimodal Upload Mode
+
+Issue Identified:
+- The Streamlit app had both single-file and multimodal upload paths, which added complexity and confused the primary workflow.
+
+Fixes:
+- Removed the multimodal upload option from the UI.
+- Kept only the single `.nii` / `.nii.gz` upload path.
+- Preserved the modality selector for single-file mapping.
+
+Outcome:
+- App workflow is now simpler and focused on the single-file use case.
+
+---
+
+### Step 22.2 - Selectbox Styling Updates
+
+UI Refinements:
+- Adjusted the black select-box controls to use user-requested light-blue tones.
+- Updated text and icon colors for readability depending on the chosen background.
+- Iterated through multiple palette values to match the requested look and contrast.
+
+Outcome:
+- Sidebar control appearance is now visually consistent with the rest of the dashboard.
+
+---
+
+### Step 22.3 - Grad-CAM Visibility Fixes for Single-Modality Inputs
+
+Issue Identified:
+- Grad-CAM overlays were not reliably visible for some single-modality uploads because the masking/display logic assumed a fixed channel index.
+
+Fixes:
+- Updated Grad-CAM masking to select the most informative channel automatically.
+- Added automatic display-channel selection in the Streamlit slice viewer.
+- Added a display-channel indicator in the UI for transparency.
+
+Outcome:
+- Grad-CAM and slice visualization now remain visible for single-modality cases regardless of which channel carries the signal.
+
+---
+
+### Step 22.4 - Modality Mapping and False-Positive/False-Negative Diagnosis
+
+Investigations Performed:
+- Tested healthy OASIS scans and BraTS tumor scans through the same inference pipeline.
+- Verified that predictions flipped depending on which modality channel was used.
+
+Findings:
+- T1-like uploads tended to be predicted as healthy.
+- FLAIR / T1c / T2 inputs tended to be predicted as tumor-like.
+
+Interpretation:
+- The checkpoint is modality-sensitive and depends on correct channel placement.
+- Single-file inference without correct modality context can produce misleading predictions.
+
+Outcome:
+- The app now exposes modality selection and display logic to reduce accidental misclassification from channel mismatch.
+
+---
+
+### Step 22.5 - Final Streamlit Cleanup and UX Adjustments
+
+Changes:
+- Removed the temporary T1 upload warning.
+- Removed multimodal upload mode after user request.
+- Continued iterating select-box colors to match the requested palette.
+
+Outcome:
+- Streamlit UI is now cleaner, less confusing, and aligned with the single-file workflow.
+
+---
+
+### Step 22 Summary
+
+- Single-file upload flow retained as the main interface.
+- Grad-CAM visibility issues for single-modality cases were fixed.
+- Sidebar controls were restyled to the requested palette.
+- Modality-dependent behavior was diagnosed and documented.
+
+---
