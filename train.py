@@ -105,6 +105,8 @@ def train(
     canonical_shape=(192, 192, 160),
     fixed_slice_count=96,
     exclude_brats2021=False,
+    eval_only=False,
+    epochs=20,
 ):
     set_seed(42)
 
@@ -132,10 +134,28 @@ def train(
 
 
     x, _, *_ = next(iter(train_loader))
-    print("Baseline check - Input shape:", x.shape)
+    if not eval_only:
+        print("Baseline check - Input shape:", x.shape)
 
     num_modalities = x.shape[1]
-    print(f"Detected {num_modalities} modalities in dataset\n")
+    if not eval_only:
+        print(f"Detected {num_modalities} modalities in dataset\n")
+
+    if eval_only:
+        model = FlexibleMultiModalBrainMRI(
+            num_classes=2,
+            num_modalities=num_modalities,
+            modality_dropout_rate=0.0,
+        ).to(device)
+        model.load_state_dict(
+            torch.load("checkpoints/best_model.pth", weights_only=True)
+        )
+        model.eval()
+
+        criterion = nn.CrossEntropyLoss()
+        _, _, test_true, test_pred, _, _ = evaluate(model, test_loader, criterion, device)
+        print(confusion_matrix(test_true, test_pred))
+        return
 
 
 
@@ -185,7 +205,7 @@ def train(
         patience=1
     )
 
-    num_epochs = 20
+    num_epochs = int(epochs)
     best_val_patient_acc = 0.0
 
     os.makedirs("checkpoints", exist_ok=True)
@@ -357,6 +377,17 @@ if __name__ == "__main__":
         action="store_true",
         help="Exclude BRATS 2021 dataset (use only BRATS 2020 + OASIS for faster training)",
     )
+    parser.add_argument(
+        "--eval-only",
+        action="store_true",
+        help="Skip training and print only the confusion matrix from the saved checkpoint",
+    )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=20,
+        help="Number of training epochs",
+    )
 
     args = parser.parse_args()
     train(
@@ -364,4 +395,6 @@ if __name__ == "__main__":
         canonical_shape=tuple(args.canonical_shape),
         fixed_slice_count=int(args.fixed_slice_count),
         exclude_brats2021=args.exclude_brats2021,
+        eval_only=args.eval_only,
+        epochs=int(args.epochs),
     )

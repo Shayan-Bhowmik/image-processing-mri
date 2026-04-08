@@ -2460,3 +2460,135 @@ Outcome:
 - Modality-dependent behavior was diagnosed and documented.
 
 ---
+
+## Step 23 - IXI Rebuild, Healthy-Domain Calibration Naming, and BraTS2021+IXI Evaluation
+
+### Objective
+
+Run a clean external healthy-domain evaluation using BraTS2021 (tumor) vs IXI (healthy), while stabilizing IXI data ingestion and making calibration outputs domain-agnostic in naming.
+
+---
+
+### Step 23.1 - Calibration Runtime and Environment Fixes
+
+Issues Identified:
+- Running calibration with system Python failed due to missing packages (`ModuleNotFoundError: numpy`).
+- Initial attempts without script subfolder path failed (`can't open file calibrate_threshold.py`).
+
+Fixes:
+- Standardized runtime to project venv Python.
+- Standardized command path to `scripts/calibrate_threshold.py`.
+
+Outcome:
+- Calibration commands became reproducible from project root.
+
+---
+
+### Step 23.2 - Calibrator Compatibility Fix for Flexible Multi-Modal Checkpoint
+
+Issue Identified:
+- Calibration discovered cases but processed none due to preprocessing/model channel mismatch.
+- Checkpoint expected 4-channel input while calibration preprocessing defaulted to 3-channel behavior.
+
+Fixes Implemented:
+- Updated `scripts/calibrate_threshold.py` to detect model input channels from loaded checkpoint.
+- Passed detected channel count into preprocessing path.
+- Added single-modality mapping by label during calibration:
+  - tumor label (BraTS): `flair`
+  - healthy label (OASIS/IXI): `t1`
+- Added early failure preview logging when no valid cases are processed.
+
+Outcome:
+- Calibration pipeline became compatible with current `FlexibleMultiModalBrainMRI` checkpoints.
+
+---
+
+### Step 23.3 - IXI Dataset Reset, Re-download, and Extraction Verification
+
+Operations Performed:
+- Repeatedly cleaned and re-downloaded IXI T1/T2 archives due to partial/truncated tar states during interrupted downloads.
+- Managed lock/contention issues by stopping background download terminals and re-running clean download/extract sequence.
+
+Final Verified Archive Integrity and Extraction:
+- `IXI-T1.tar` entries: 581, extracted: 581
+- `IXI-T2.tar` entries: 578, extracted: 578
+
+Outcome:
+- IXI T1 and T2 data are fully extracted and consistent with archive contents.
+
+---
+
+### Step 23.4 - Healthy-Domain Naming Upgrade in Calibration Script
+
+Issue Identified:
+- Calibration output still printed `OASIS` labels even when IXI path was used.
+
+Fixes Implemented in `scripts/calibrate_threshold.py`:
+- Added preferred flag: `--healthy-root`
+- Kept `--oasis-root` for backward compatibility
+- Updated console output label from `OASIS cases` to `Healthy cases`
+- Updated heading to `Combined BraTS + Healthy-Domain Threshold Tuning`
+- Added neutral dataset count key `healthy` in report payload (while preserving compatibility)
+
+Outcome:
+- Evaluation outputs now correctly reflect dataset intent when using IXI as healthy cohort.
+
+---
+
+### Step 23.5 - BraTS2021 + IXI (T1+T2) Evaluation (All Available Cases)
+
+Command Used:
+- `python .\\scripts\\calibrate_threshold.py --checkpoint .\\checkpoints\\best_model.pth --brats-root .\\data\\raw\\brats2021_extracted --healthy-root .\\data\\raw\\ixi --use-all-cases --out-dir .\\outputs\\calibration_brats2021_ixi_eval`
+
+Reported Metrics:
+- Calibration scope: `all_cases`
+- BraTS cases: 1251
+- Healthy cases: 1159
+- Total cases: 2410
+- Model loaded on: `cuda`
+- Model input channels: 4
+- Processed cases: 2410 (failed: 0)
+
+Baseline @ threshold 0.50:
+- Sensitivity = 1.0000
+- Specificity = 1.0000
+- Balanced Accuracy = 1.0000
+- Confusion: TP=1251, FN=0, TN=1159, FP=0
+
+Recommended threshold:
+- Threshold = 0.5000
+- Sensitivity = 1.0000
+- Specificity = 1.0000
+- Balanced Accuracy = 1.0000
+- Confusion: TP=1251, FN=0, TN=1159, FP=0
+
+Artifacts Saved:
+- `outputs/calibration_brats2021_ixi_eval/threshold_report.json`
+- `outputs/calibration_brats2021_ixi_eval/recommended_threshold.json`
+
+---
+
+### Step 23 Summary
+
+1. Calibration runtime path is now stable under project venv.
+2. Calibration preprocessing now matches checkpoint channel expectations.
+3. IXI T1/T2 datasets were cleanly rebuilt and fully verified.
+4. Calibration terminology now supports generic healthy-domain evaluation.
+5. Final BraTS2021 vs IXI evaluation achieved perfect confusion metrics on all available processed cases.
+
+### Step 23.6 - Latest Status Snapshot
+
+| Check | Result |
+|------|--------|
+| IXI T1 archive entries vs extracted files | 581 / 581 |
+| IXI T2 archive entries vs extracted files | 578 / 578 |
+| Evaluation scope | all_cases |
+| Dataset counts | BraTS: 1251, Healthy (IXI): 1159, Total: 2410 |
+| Processed / Failed | 2410 / 0 |
+| Baseline threshold | 0.50 |
+| Baseline confusion | TP=1251, FN=0, TN=1159, FP=0 |
+| Recommended threshold | 0.50 |
+| Recommended confusion | TP=1251, FN=0, TN=1159, FP=0 |
+| Report artifacts | outputs/calibration_brats2021_ixi_eval/threshold_report.json and outputs/calibration_brats2021_ixi_eval/recommended_threshold.json |
+
+---

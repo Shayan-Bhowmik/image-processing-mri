@@ -13,6 +13,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from src.inference import (
     aggregate_patient_score,
+    get_model_input_channels,
     load_trained_model,
     predict_slices,
     preprocess_uploaded_nifti,
@@ -52,9 +53,9 @@ def find_brats_flair_files(brats_root: Path) -> list[tuple[str, int, Path]]:
     return entries
 
 
-def find_oasis_files(oasis_root: Path) -> list[tuple[str, int, Path]]:
+def find_healthy_files(healthy_root: Path) -> list[tuple[str, int, Path]]:
     entries: list[tuple[str, int, Path]] = []
-    for file_path in sorted(oasis_root.iterdir()):
+    for file_path in sorted(healthy_root.iterdir()):
         if _is_nifti_file(file_path):
             entries.append((file_path.name, 0, file_path))
     return entries
@@ -79,7 +80,7 @@ def load_split_entries(split_json_path: Path, split_name: str) -> list[dict[str,
 def resolve_cases_from_split_entries(
     split_entries: list[dict[str, object]],
     brats_root: Path,
-    oasis_root: Path,
+    healthy_root: Path,
 ) -> tuple[list[tuple[str, int, Path]], list[str]]:
     resolved: list[tuple[str, int, Path]] = []
     missing: list[str] = []
@@ -105,12 +106,12 @@ def resolve_cases_from_split_entries(
 
             resolved.append((case_id, label, flair_file))
         else:
-            oasis_file = oasis_root / case_id
-            if not _is_nifti_file(oasis_file):
-                missing.append(f"missing oasis file: {oasis_file}")
+            healthy_file = healthy_root / case_id
+            if not _is_nifti_file(healthy_file):
+                missing.append(f"missing healthy file: {healthy_file}")
                 continue
 
-            resolved.append((case_id, label, oasis_file))
+            resolved.append((case_id, label, healthy_file))
 
     return resolved, missing
 
@@ -120,6 +121,7 @@ def evaluate_case_scores(
     device,
     all_cases: list[tuple[str, int, Path]],
     top_k: int,
+    model_in_channels: int,
 ) -> tuple[list[CaseResult], list[tuple[str, str]]]:
     results: list[CaseResult] = []
     failures: list[tuple[str, str]] = []
@@ -127,7 +129,13 @@ def evaluate_case_scores(
     for case_id, label, file_path in all_cases:
         try:
             payload = file_path.read_bytes()
-            prep = preprocess_uploaded_nifti(payload, file_path.name)
+            single_modality_name = "flair" if label == 1 else "t1"
+            prep = preprocess_uploaded_nifti(
+                payload,
+                file_path.name,
+                model_in_channels=model_in_channels,
+                single_modality_name=single_modality_name,
+            )
             _, probs = predict_slices(model, prep["input_batch"], device)
             score = float(aggregate_patient_score(probs, top_k=top_k))
             results.append(CaseResult(case_id=case_id, label=label, score=score, num_slices=int(len(probs))))
@@ -203,7 +211,7 @@ def to_float(value: float) -> float:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Calibrate patient-level threshold on a held-out split (default) or full BraTS + OASIS."
+        description="Calibrate patient-level threshold on a held-out split (default) or full BraTS + healthy-domain data."
     )
     parser.add_argument("--checkpoint", default="checkpoints/best_model.pth", help="Path to model checkpoint")
     parser.add_argument(
@@ -214,7 +222,12 @@ def main() -> None:
     parser.add_argument(
         "--oasis-root",
         default="data/raw/oasis/OASIS_Clean_Data/OASIS_Clean_Data",
-        help="OASIS root directory",
+        help="Healthy-domain root directory (legacy flag name; IXI/OASIS both supported)",
+    )
+    parser.add_argument(
+        "--healthy-root",
+        default=None,
+        help="Healthy-domain root directory (preferred flag name)",
     )
     parser.add_argument("--top-k", type=int, default=10, help="Top-k slices used for patient score aggregation")
     parser.add_argument(
@@ -236,13 +249,13 @@ def main() -> None:
     parser.add_argument(
         "--use-all-cases",
         action="store_true",
-        help="Use every discovered BraTS+OASIS case instead of a held-out split",
+        help="Use every discovered BraTS+healthy-domain case instead of a held-out split",
     )
 
     args = parser.parse_args()
 
     brats_root = Path(args.brats_root)
-    oasis_root = Path(args.oasis_root)
+    healthy_root = Path(args.healthy_root) if args.healthy_root else Path(args.oasis_root)
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -250,34 +263,46 @@ def main() -> None:
 
     if args.use_all_cases:
         brats_cases = find_brats_flair_files(brats_root)
-        oasis_cases = find_oasis_files(oasis_root)
-        all_cases = brats_cases + oasis_cases
+        healthy_cases = find_healthy_files(healthy_root)
+        all_cases = brats_cases + healthy_cases
         missing_cases: list[str] = []
         calibration_scope = "all_cases"
     else:
         split_entries = load_split_entries(split_json_path, args.split_name)
-        all_cases, missing_cases = resolve_cases_from_split_entries(split_entries, brats_root, oasis_root)
+        all_cases, missing_cases = resolve_cases_from_split_entries(split_entries, brats_root, healthy_root)
         calibration_scope = f"{args.split_name}_split"
 
     brats_count = sum(1 for _, label, _ in all_cases if label == 1)
-    oasis_count = sum(1 for _, label, _ in all_cases if label == 0)
+    healthy_count = sum(1 for _, label, _ in all_cases if label == 0)
 
     if not all_cases:
-        raise RuntimeError("No cases were found in BraTS/OASIS roots.")
+        raise RuntimeError("No cases were found in BraTS/healthy-domain roots.")
 
     print(f"Calibration scope: {calibration_scope}")
     print(f"BraTS cases: {brats_count}")
-    print(f"OASIS cases: {oasis_count}")
+    print(f"Healthy cases: {healthy_count}")
     print(f"Total cases: {len(all_cases)}")
     if missing_cases:
         print(f"Missing/invalid split entries skipped: {len(missing_cases)}")
 
     model, device = load_trained_model(checkpoint_path=args.checkpoint)
     print(f"Model loaded on: {device}")
+    model_in_channels = get_model_input_channels(model)
+    print(f"Model input channels: {model_in_channels}")
 
-    results, failures = evaluate_case_scores(model, device, all_cases, top_k=max(1, int(args.top_k)))
+    results, failures = evaluate_case_scores(
+        model,
+        device,
+        all_cases,
+        top_k=max(1, int(args.top_k)),
+        model_in_channels=model_in_channels,
+    )
 
     if not results:
+        if failures:
+            print("First few preprocessing failures:")
+            for case, error in failures[:5]:
+                print(f"  {case}: {error}")
         raise RuntimeError("No valid cases processed. Check data paths and preprocessing.")
 
     labels = np.array([r.label for r in results], dtype=np.int32)
@@ -300,7 +325,8 @@ def main() -> None:
         "use_all_cases": bool(args.use_all_cases),
         "dataset_counts": {
             "brats": brats_count,
-            "oasis": oasis_count,
+            "healthy": healthy_count,
+            "oasis": healthy_count,
             "processed": len(results),
             "failed": len(failures),
             "missing_split_entries": len(missing_cases),
@@ -358,7 +384,7 @@ def main() -> None:
     report_path.write_text(json.dumps(calibration_payload, indent=2), encoding="utf-8")
     recommendation_path.write_text(json.dumps(recommended_payload, indent=2), encoding="utf-8")
 
-    print("\n=== Combined BraTS + OASIS Threshold Tuning ===")
+    print("\n=== Combined BraTS + Healthy-Domain Threshold Tuning ===")
     print(f"Processed cases: {len(results)} (failed: {len(failures)})")
     print("\nBaseline @ threshold 0.50")
     print(

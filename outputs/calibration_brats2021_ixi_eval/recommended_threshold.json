@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-04-08T14:10:33",
+  "created_at": "2026-04-08T20:22:03",
   "checkpoint": ".\\checkpoints\\best_model.pth",
   "recommended_threshold": 0.5,
   "top_k": 10,
@@ -7,7 +7,7 @@
     "threshold": 0.5,
     "tp": 1251,
     "fn": 0,
-    "tn": 757,
+    "tn": 1159,
     "fp": 0,
     "sensitivity": 1.0,
     "specificity": 1.0,
