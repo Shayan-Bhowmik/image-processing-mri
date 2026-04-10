@@ -1323,7 +1323,7 @@ def generate_pdf_report(
     c.roundRect(margin, y - 0.85 * inch, width - 2 * margin, 0.85 * inch, 8, fill=1, stroke=0)
     c.setFillColorRGB(1, 1, 1)
     c.setFont("Helvetica-Bold", 18)
-    c.drawString(margin + 0.2 * inch, y - 0.33 * inch, "Synapse X Clinical Report")
+    c.drawString(margin + 0.2 * inch, y - 0.33 * inch, "Synapse X Report")
     c.setFont("Helvetica", 10)
     c.drawString(margin + 0.2 * inch, y - 0.58 * inch, f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     c.drawRightString(width - margin - 0.2 * inch, y - 0.58 * inch, f"Report ID: {filename}")
