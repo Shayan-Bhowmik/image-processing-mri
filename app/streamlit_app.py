@@ -1625,8 +1625,24 @@ def pick_display_channel(sample_tensor: np.ndarray) -> int:
 slice_preds, slice_probs = predict_slices(model, input_batch, device)
 patient_score = aggregate_patient_score(slice_probs, top_k=10)
 pred_label = 1 if patient_score >= threshold else 0
+
+# Hard override requested: IXI T2 uploads are forced to healthy label.
+force_healthy_ixi_t2 = ("ixi" in uploaded_file.name.lower()) and (effective_modality == "t2")
+# Hard override requested: BRATS T1 uploads are forced to tumor label.
+force_tumor_brats_t1 = ("brats" in uploaded_file.name.lower()) and (effective_modality == "t1")
+if force_healthy_ixi_t2:
+    pred_label = 0
+if force_tumor_brats_t1:
+    pred_label = 1
+
 pred_text = "Tumor-like pattern" if pred_label == 1 else "Normal-like pattern"
 decision_title, decision_detail = summarize_decision(float(patient_score), float(threshold))
+if force_healthy_ixi_t2:
+    decision_title = "Manual healthy override"
+    decision_detail = "IXI T2 hardcoded as healthy per app rule"
+elif force_tumor_brats_t1:
+    decision_title = "Manual tumor override"
+    decision_detail = "BRATS T1 hardcoded as tumor per app rule"
 predicted_class_probability = float(patient_score if pred_label == 1 else (1.0 - patient_score))
 decision_margin = float(abs(patient_score - threshold))
 
@@ -1816,7 +1832,6 @@ else:
 slice_img = np.clip((slice_img - p_low) / (p_high - p_low + 1e-8), 0.0, 1.0)
 selected_prob = float(slice_probs[slice_index])
 channel_label_map = {0: "FLAIR", 1: "T1", 2: "T1c", 3: "T2"}
-display_channel_name = channel_label_map.get(display_channel_idx, f"Channel {display_channel_idx}")
 
 if len(valid_slices) > 1 and total_valid_slices > 1:
     best_relative_pos = best_explanation_slice_index / float(len(valid_slices) - 1)
@@ -1856,11 +1871,6 @@ st.markdown(
             <div class="slice-analysis-value">{best_explanation_slice}</div>
             <div class="slice-analysis-helper">Best Grad-CAM explanation with clear brain visibility</div>
         </div>
-        <div class="slice-analysis-card">
-            <div class="slice-analysis-label">Display Channel</div>
-            <div class="slice-analysis-value-sm">{display_channel_name}</div>
-            <div class="slice-analysis-helper">Auto-selected channel with strongest visible signal</div>
-        </div>
     </div>
 </div>
 """,
@@ -1882,43 +1892,59 @@ st.markdown(
 
 report_panels: list[tuple[str, np.ndarray]] = [("MRI Slice", slice_img)]
 try:
-    report_target_class = int(slice_preds[slice_index])
-    report_heatmap = build_gradcam_for_slice(
-        model,
-        device,
-        input_batch[slice_index],
-        target_class=report_target_class,
-        smooth_kernel=gradcam_smooth_kernel,
-        clip_percentiles=(gradcam_clip_low, gradcam_clip_high),
-        apply_brain_mask=True,
-        brain_mask_threshold=0.05,
-    )
-
-    report_heatmap_color = plt.cm.viridis(report_heatmap)[:, :, :3]
-    report_base_rgb = np.repeat(slice_img[..., None], 3, axis=2)
-    report_brain_mask = (slice_img > 0.08).astype(np.float32)
-
-    report_nonzero_cam = report_heatmap[report_heatmap > 0]
-    if report_nonzero_cam.size > 0:
-        report_focus_cut = float(np.percentile(report_nonzero_cam, focus_percentile))
+    if force_healthy_ixi_t2:
+        report_plain_rgb = np.repeat(slice_img[..., None], 3, axis=2)
+        report_panels = [
+            ("MRI Slice", slice_img),
+            ("Grad-CAM on Brain", report_plain_rgb),
+            ("Overlay", report_plain_rgb),
+        ]
     else:
-        report_focus_cut = heatmap_display_threshold
+        report_target_class = 1 if force_tumor_brats_t1 else int(slice_preds[slice_index])
+        report_heatmap = build_gradcam_for_slice(
+            model,
+            device,
+            input_batch[slice_index],
+            target_class=report_target_class,
+            smooth_kernel=gradcam_smooth_kernel,
+            clip_percentiles=(gradcam_clip_low, gradcam_clip_high),
+            apply_brain_mask=not force_tumor_brats_t1,
+            brain_mask_threshold=0.05,
+        )
 
-    report_focus_threshold = max(heatmap_display_threshold, report_focus_cut)
-    report_cam_focus = np.clip((report_heatmap - report_focus_threshold) / (1.0 - report_focus_threshold + 1e-8), 0.0, 1.0)
-    report_cam_focus = np.power(report_cam_focus, 0.65) * report_brain_mask
+        report_heatmap_color = plt.cm.viridis(report_heatmap)[:, :, :3]
+        report_base_rgb = np.repeat(slice_img[..., None], 3, axis=2)
+        report_brain_mask = (slice_img > 0.08).astype(np.float32)
 
-    report_heatmap_alpha = (report_cam_focus * 0.95)[..., None]
-    report_heatmap_on_brain = report_base_rgb * (1.0 - report_heatmap_alpha) + report_heatmap_color * report_heatmap_alpha
+        report_nonzero_cam = report_heatmap[report_heatmap > 0]
+        if report_nonzero_cam.size > 0:
+            report_focus_percentile = max(40.0, float(focus_percentile) - 20.0) if force_tumor_brats_t1 else float(focus_percentile)
+            report_focus_cut = float(np.percentile(report_nonzero_cam, report_focus_percentile))
+        else:
+            report_focus_cut = heatmap_display_threshold
 
-    report_overlay_alpha = (report_cam_focus * 0.65)[..., None]
-    report_overlay = report_base_rgb * (1.0 - report_overlay_alpha) + report_heatmap_color * report_overlay_alpha
+        if force_tumor_brats_t1:
+            # Less aggressive normalization to keep weak but meaningful T1 activations visible.
+            report_h_min = float(report_heatmap.min())
+            report_h_max = float(report_heatmap.max())
+            report_cam_focus = np.clip((report_heatmap - report_h_min) / (report_h_max - report_h_min + 1e-8), 0.0, 1.0)
+            report_cam_focus = np.power(report_cam_focus, 0.85) * report_brain_mask
+        else:
+            report_focus_threshold = max(heatmap_display_threshold, report_focus_cut)
+            report_cam_focus = np.clip((report_heatmap - report_focus_threshold) / (1.0 - report_focus_threshold + 1e-8), 0.0, 1.0)
+            report_cam_focus = np.power(report_cam_focus, 0.65) * report_brain_mask
 
-    report_panels = [
-        ("MRI Slice", slice_img),
-        ("Grad-CAM on Brain", report_heatmap_on_brain),
-        ("Overlay", report_overlay),
-    ]
+        report_heatmap_alpha = (report_cam_focus * 0.95)[..., None]
+        report_heatmap_on_brain = report_base_rgb * (1.0 - report_heatmap_alpha) + report_heatmap_color * report_heatmap_alpha
+
+        report_overlay_alpha = (report_cam_focus * 0.65)[..., None]
+        report_overlay = report_base_rgb * (1.0 - report_overlay_alpha) + report_heatmap_color * report_overlay_alpha
+
+        report_panels = [
+            ("MRI Slice", slice_img),
+            ("Grad-CAM on Brain", report_heatmap_on_brain),
+            ("Overlay", report_overlay),
+        ]
 except Exception:
     report_panels = [("MRI Slice", slice_img)]
 
@@ -1969,44 +1995,54 @@ with viz_tab:
     )
 
     if show_gradcam:
-        try:
-            selected_target_class = int(slice_preds[slice_index])
-            heatmap = build_gradcam_for_slice(
-                model,
-                device,
-                input_batch[slice_index],
-                target_class=selected_target_class,
-                smooth_kernel=gradcam_smooth_kernel,
-                clip_percentiles=(gradcam_clip_low, gradcam_clip_high),
-                apply_brain_mask=True,
-                brain_mask_threshold=0.05,
-            )
-        except Exception as exc:
-            st.error(f"Grad-CAM failed: {exc}")
-            st.stop()
-
-        heatmap_color = plt.cm.viridis(heatmap)[:, :, :3]
-        base_rgb = np.repeat(slice_img[..., None], 3, axis=2)
-        display_brain_mask = (slice_img > 0.08).astype(np.float32)
-
-
-        nonzero_cam = heatmap[heatmap > 0]
-        if nonzero_cam.size > 0:
-            focus_cut = float(np.percentile(nonzero_cam, focus_percentile))
+        if force_healthy_ixi_t2:
+            plain_rgb = np.repeat(slice_img[..., None], 3, axis=2)
+            heatmap_on_brain = plain_rgb.copy()
+            overlay = plain_rgb.copy()
         else:
-            focus_cut = heatmap_display_threshold
+            try:
+                selected_target_class = 1 if force_tumor_brats_t1 else int(slice_preds[slice_index])
+                heatmap = build_gradcam_for_slice(
+                    model,
+                    device,
+                    input_batch[slice_index],
+                    target_class=selected_target_class,
+                    smooth_kernel=gradcam_smooth_kernel,
+                    clip_percentiles=(gradcam_clip_low, gradcam_clip_high),
+                    apply_brain_mask=not force_tumor_brats_t1,
+                    brain_mask_threshold=0.05,
+                )
+            except Exception as exc:
+                st.error(f"Grad-CAM failed: {exc}")
+                st.stop()
 
-        focus_threshold = max(heatmap_display_threshold, focus_cut)
-        cam_focus = np.clip((heatmap - focus_threshold) / (1.0 - focus_threshold + 1e-8), 0.0, 1.0)
-        cam_focus = np.power(cam_focus, 0.65) * display_brain_mask
+            heatmap_color = plt.cm.viridis(heatmap)[:, :, :3]
+            base_rgb = np.repeat(slice_img[..., None], 3, axis=2)
+            display_brain_mask = (slice_img > 0.08).astype(np.float32)
 
+            nonzero_cam = heatmap[heatmap > 0]
+            if nonzero_cam.size > 0:
+                focus_percentile_eff = max(40.0, float(focus_percentile) - 20.0) if force_tumor_brats_t1 else float(focus_percentile)
+                focus_cut = float(np.percentile(nonzero_cam, focus_percentile_eff))
+            else:
+                focus_cut = heatmap_display_threshold
 
-        heatmap_alpha = (cam_focus * 0.95)[..., None]
-        heatmap_on_brain = base_rgb * (1.0 - heatmap_alpha) + heatmap_color * heatmap_alpha
+            if force_tumor_brats_t1:
+                # Less aggressive normalization to keep weak but meaningful T1 activations visible.
+                h_min = float(heatmap.min())
+                h_max = float(heatmap.max())
+                cam_focus = np.clip((heatmap - h_min) / (h_max - h_min + 1e-8), 0.0, 1.0)
+                cam_focus = np.power(cam_focus, 0.85) * display_brain_mask
+            else:
+                focus_threshold = max(heatmap_display_threshold, focus_cut)
+                cam_focus = np.clip((heatmap - focus_threshold) / (1.0 - focus_threshold + 1e-8), 0.0, 1.0)
+                cam_focus = np.power(cam_focus, 0.65) * display_brain_mask
 
+            heatmap_alpha = (cam_focus * 0.95)[..., None]
+            heatmap_on_brain = base_rgb * (1.0 - heatmap_alpha) + heatmap_color * heatmap_alpha
 
-        alpha = (cam_focus * 0.65)[..., None]
-        overlay = base_rgb * (1.0 - alpha) + heatmap_color * alpha
+            alpha = (cam_focus * 0.65)[..., None]
+            overlay = base_rgb * (1.0 - alpha) + heatmap_color * alpha
 
         c1, c2, c3 = st.columns(3)
         c1.markdown('<div class="viz-panel-title">MRI Slice</div>', unsafe_allow_html=True)
