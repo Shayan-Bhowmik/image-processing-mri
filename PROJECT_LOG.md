@@ -2592,3 +2592,138 @@ Artifacts Saved:
 | Report artifacts | outputs/calibration_brats2021_ixi_eval/threshold_report.json and outputs/calibration_brats2021_ixi_eval/recommended_threshold.json |
 
 ---
+
+## Step 24 - Slice Index Semantics, Probability Trend Expansion, and PDF Report Professionalization
+
+### Objective
+
+Unify slice indexing across UI/report outputs, ensure probability/explainability trends span the full available slice range, and upgrade downloaded PDF reports for cleaner presentation and clinical-style readability.
+
+---
+
+### Step 24.1 - Valid Slice Reporting Logic Clarification
+
+Files Modified:
+- `src/inference.py`
+- `app/streamlit_app.py`
+
+Changes:
+- Added explicit preprocessing outputs for:
+  - `total_valid_slices` (all detected non-empty slices)
+  - `used_valid_slices` (slices actually passed to inference after fixed-count sampling)
+- Updated UI summary to show **total valid slices** clearly.
+
+Outcome:
+- Removed ambiguity caused by fixed-count inference sampling.
+
+---
+
+### Step 24.2 - Total-Slice Indexing Alignment in UI
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Updated slice slider semantics to operate in total-slice coordinates.
+- Added mapping from selected total index to nearest sampled inference index internally.
+- Updated Slice-Level Analysis text to display current position as:
+  - `selected_total_index / total_valid_slices`
+
+Outcome:
+- User-facing slice controls and displayed indices now follow total-slice indexing consistently.
+
+---
+
+### Step 24.3 - Probability Trend and Top Slices Coordinate Unification
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Updated Probability Trend x-axis to use total-slice index coordinates.
+- Updated Top Slices table slice indices to total-slice coordinates.
+- Set chart x-axis limits to full total range (`1..total_valid_slices`) with evenly spaced ticks.
+- Expanded Grad-CAM ranking candidate set from middle-only subset to **all slices** so trend coverage spans full volume.
+
+Outcome:
+- Trend and ranking outputs now align with total-slice slider semantics and cover the full slice range.
+
+---
+
+### Step 24.4 - PDF Report Layout Overhaul
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Reworked PDF generator into structured sections:
+  - Study Overview
+  - Reliability Metrics
+  - Slice Details
+- Added fixed-column key-value layout with width-aware text truncation for alignment stability.
+- Improved typography, spacing, separators, and report header metadata.
+
+Outcome:
+- Downloaded PDF is now significantly more organized and presentation-ready.
+
+---
+
+### Step 24.5 - PDF Slice-Index Logic Corrections
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Corrected selected slice index reporting in PDF to use total-slice coordinates.
+- Corrected top-slice index reporting logic to avoid sampled-index inconsistencies.
+
+Outcome:
+- PDF slice references now match UI total-slice indexing semantics.
+
+---
+
+### Step 24.6 - PDF Content Scope Change (Top Slices Removed)
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Removed Top Slices section from downloaded PDF content and renderer.
+
+Outcome:
+- PDF now focuses on core case-level decision summary without ranking-table clutter.
+
+---
+
+### Step 24.7 - PDF Visual Evidence Embedding (Chosen Slice)
+
+File Modified:
+- `app/streamlit_app.py`
+
+Changes:
+- Added embedded chosen-slice visualization section in PDF with three panels:
+  - MRI Slice
+  - Grad-CAM on Brain
+  - Overlay
+- Added report panel passing into PDF generation and image embedding via ReportLab image utilities.
+- Fixed panel-generation placement so chosen-slice assets are created after slice selection.
+
+Outcome:
+- Downloaded report now includes visual explainability artifacts directly in the PDF.
+
+---
+
+### Step 24 Summary
+
+This step delivered:
+
+1. Total-slice indexing consistency across slider, cards, trend chart, and report outputs.
+2. Full-range probability/explainability trend coverage over all slices.
+3. A professional, aligned, and cleaner downloadable PDF format.
+4. Embedded chosen-slice Grad-CAM evidence in the PDF.
+5. Removal of non-essential Top Slices content from the downloaded report per user workflow preference.
+
+Overall Outcome:
+The Streamlit inference experience and report artifacts are now more coherent, interpretable, and presentation-ready for research/demo use.
+
+---

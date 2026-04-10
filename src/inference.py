@@ -133,6 +133,7 @@ def preprocess_volume(
     volume = resample_volume_3d(volume, target_shape=canonical_shape)
     volume = zscore_normalize(volume)
 
+    all_valid_slices = extract_valid_slices(volume, fixed_count=None)
     valid_slices = extract_valid_slices(volume, fixed_count=fixed_slice_count)
     if not valid_slices:
         raise ValueError("No valid slices found after filtering. Try a different scan.")
@@ -151,6 +152,8 @@ def preprocess_volume(
 
     return {
         "valid_slices": valid_slices,
+        "total_valid_slices": len(all_valid_slices),
+        "used_valid_slices": len(valid_slices),
         "input_batch": input_batch,
     }
 
@@ -241,6 +244,7 @@ def preprocess_uploaded_multimodal_nifti(
 
     reference_modality = "flair" if "flair" in modality_volumes else next(iter(modality_volumes.keys()))
     reference_volume = modality_volumes[reference_modality]
+    all_valid_slices_ref = extract_valid_slices(reference_volume, fixed_count=None)
     valid_slices_ref = extract_valid_slices(reference_volume, fixed_count=fixed_slice_count)
     if not valid_slices_ref:
         raise ValueError("No valid slices found after filtering. Try different scan files.")
@@ -268,6 +272,8 @@ def preprocess_uploaded_multimodal_nifti(
 
     return {
         "valid_slices": valid_slices_ref,
+        "total_valid_slices": len(all_valid_slices_ref),
+        "used_valid_slices": len(valid_slices_ref),
         "input_batch": input_batch,
     }
 
