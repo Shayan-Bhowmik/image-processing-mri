@@ -168,10 +168,6 @@ Key CLI entry points:
 - `train.py`: training and evaluation, with flags such as `--epochs`, `--eval-only`, `--split-path`, and `--exclude-brats2021`.
 - `scripts/calibrate_threshold.py`: threshold calibration for held-out validation or test splits.
 
-## Screenshots / Demo
-
-Add screenshots or a short GIF here showing the Streamlit dashboard, slice viewer, probability trend, Grad-CAM overlay, and download outputs.
-
 ## Contributing
 
 1. Fork the repository and create a feature branch.
